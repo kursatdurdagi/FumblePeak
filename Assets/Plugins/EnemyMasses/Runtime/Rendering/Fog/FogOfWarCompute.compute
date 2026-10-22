@@ -1,0 +1,107 @@
+// FogOfWarCompute.compute
+// GPU compute shader for Enemy Masses fog of war system.
+// Replaces the CPU-bound ClearMask/Stamp/WriteMask loops with three GPU kernels.
+// Fog values: 0.0 = fully revealed, 1.0 = fully hidden.
+
+#pragma kernel ClearMask
+#pragma kernel StampRevealers
+#pragma kernel BlendMask
+
+// ─── Textures ───────────────────────────────────────────────────────────────────
+// _MaskTex  — per-tick scratch mask (cleared each tick, stamped by revealers)
+// _AlphaTex — persistent accumulated fog (blended each tick, read back to CPU)
+RWTexture2D<float> _MaskTex;
+RWTexture2D<float> _AlphaTex;
+
+// ─── Grid dimensions ────────────────────────────────────────────────────────────
+uint _GridX;
+uint _GridY;
+
+// ─── Blend parameters ───────────────────────────────────────────────────────────
+float _RevealedAlpha;
+float _RefogSpeed;
+float _RefogOpacity;
+float _DeltaTime;
+uint  _KeepRevealed;
+uint  _EnableRefog;
+uint  _LerpBuffer;
+
+// ─── Revealer data ──────────────────────────────────────────────────────────────
+// Each float4: (cellX, cellY, radius, unused)
+StructuredBuffer<float4> _Revealers;
+uint _RevealerCount;
+
+// ═════════════════════════════════════════════════════════════════════════════════
+// Kernel 0: ClearMask
+// Fills _MaskTex with 1.0 (fully hidden) before stamping.
+// ═════════════════════════════════════════════════════════════════════════════════
+[numthreads(8, 8, 1)]
+void ClearMask(uint3 id : SV_DispatchThreadID)
+{
+    if (id.x >= _GridX || id.y >= _GridY) return;
+    _MaskTex[id.xy] = 1.0;
+}
+
+// ═════════════════════════════════════════════════════════════════════════════════
+// Kernel 1: StampRevealers
+// One thread per revealer. Rasterises a filled circle of 0.0 (revealed) into
+// _MaskTex. Race-free because all threads write the same value (0).
+// ═════════════════════════════════════════════════════════════════════════════════
+[numthreads(64, 1, 1)]
+void StampRevealers(uint3 id : SV_DispatchThreadID)
+{
+    uint idx = id.x;
+    if (idx >= _RevealerCount) return;
+
+    float4 rev = _Revealers[idx];
+    int cx = (int)rev.x;
+    int cy = (int)rev.y;
+    int r  = (int)rev.z;
+    int r2 = r * r;
+
+    for (int y = -r; y <= r; y++)
+    {
+        int py = cy + y;
+        if (py < 0 || (uint)py >= _GridY) continue;
+
+        int yy = y * y;
+        int dx = (int)sqrt((float)(r2 - yy));
+        int xMin = max(-dx, -cx);
+        int xMax = min(dx, (int)_GridX - 1 - cx);
+
+        for (int x = xMin; x <= xMax; x++)
+        {
+            _MaskTex[uint2((uint)(cx + x), (uint)py)] = 0.0;
+        }
+    }
+}
+
+// ═════════════════════════════════════════════════════════════════════════════════
+// Kernel 2: BlendMask
+// Per-pixel blend of current-tick _MaskTex into persistent _AlphaTex.
+// Supports keepRevealed, lerpBuffer, enableRefog (same logic as old CPU path).
+// ═════════════════════════════════════════════════════════════════════════════════
+[numthreads(8, 8, 1)]
+void BlendMask(uint3 id : SV_DispatchThreadID)
+{
+    if (id.x >= _GridX || id.y >= _GridY) return;
+
+    float mask = _MaskTex[id.xy] * _RevealedAlpha;
+    float prev = _AlphaTex[id.xy];
+    float target = _KeepRevealed ? min(prev, mask) : mask;
+
+    if (_EnableRefog && mask >= 0.996) // ≈ 254/255 — not currently revealed
+    {
+        target = max(target, _RefogOpacity);
+        float t = saturate(_RefogSpeed * _DeltaTime);
+        _AlphaTex[id.xy] = lerp(prev, target, t);
+    }
+    else if (_LerpBuffer)
+    {
+        _AlphaTex[id.xy] = lerp(prev, target, 0.5);
+    }
+    else
+    {
+        _AlphaTex[id.xy] = target;
+    }
+}

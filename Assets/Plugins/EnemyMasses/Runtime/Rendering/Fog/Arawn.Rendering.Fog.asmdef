@@ -1,0 +1,16 @@
+{
+    "name": "Arawn.Rendering.Fog",
+    "rootNamespace": "Arawn.Rendering.Fog",
+    "references": [
+        "Arawn.EnemyMasses.Runtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e857c46db40aab1dfb10841fd683f531, type: 3}
+  m_Name: ClassicRTSPreset
+  m_EditorClassIdentifier: Arawn.EnemyMasses.Runtime::Arawn.EnemyMasses.Runtime.RTSCameraPreset
+  presetName: Classic RTS
+  description: Edge pan + Middle mouse drag + Scroll zoom (StarCraft, Age of Empires)
+  moveSpeed: 20
+  fastMoveSpeed: 40
+  moveAcceleration: 8
+  moveDeceleration: 12
+  smoothMovement: 1
+  enableEdgePan: 1
+  edgePanBorder: 10
+  edgePanSpeedMultiplier: 1
+  disableEdgePanOutsideWindow: 1
+  enableDragPan: 1
+  dragPanButton: 2
+  invertDragPan: 0
+  dragPanSensitivity: 1
+  enableKeyboardPan: 1
+  enableZoom: 1
+  zoomSpeed: 10
+  minZoomDistance: 5
+  maxZoomDistance: 100
+  smoothZoom: 1
+  zoomSmoothSpeed: 8
+  zoomToCursor: 0
+  enableRotation: 0
+  rotationButton: 1
+  rotationSpeed: 1
+  rotateWithoutButton: 0
+  enableTilt: 0
+  minTiltAngle: 30
+  maxTiltAngle: 80
+  smoothRotation: 1
+  rotationSmoothSpeed: 10
+  initialZoom: 50
+  initialPitch: 45
+  initialYaw: 0
+  enableBounds: 1
+  enableFocus: 1
+  smoothFocusTransition: 1
+  focusTransitionSpeed: 8
+  enableFollowMode: 0
+  followSmoothness: 5
+  followTargetOffset: {x: 0, y: 0, z: 0}
+  followOffsetInTargetSpace: 0
+  followUseTargetHeight: 0
+  followTargetHeightOffset: 1.5
+  enableLookahead: 0
+  lookaheadTime: 0.2
+  lookaheadSmoothTime: 0.15
+  maxLookaheadDistance: 3
+  enableCameraCollision: 0
+  cameraCollisionRadius: 0.25
+  cameraCollisionBuffer: 0.1
+  cameraCollisionIgnoreTriggers: 1
+  enableLineOfSightGroundReposition: 0
+  lineOfSightGroundBuffer: 0.1
+  terrainFollowing: 0
+  heightAboveGround: 0

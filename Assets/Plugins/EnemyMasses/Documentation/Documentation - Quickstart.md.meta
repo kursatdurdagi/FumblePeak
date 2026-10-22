@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: bb2fd6a3e1a43ce428b80d9a5a07fcfd
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 351712
+  packageName: Enemy Masses | Massive Crowds, 1-Click Enemy AI, RTS Formations &
+    Controller
+  packageVersion: 2.0.6
+  assetPath: Assets/Plugins/EnemyMasses/Documentation/Documentation - Quickstart.md
+  uploadId: 873462

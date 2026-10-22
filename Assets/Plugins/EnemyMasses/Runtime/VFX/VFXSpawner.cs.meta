@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 5a6d16d02329e282f8e8be4bb448a2ff
+AssetOrigin:
+  serializedVersion: 1
+  productId: 351712
+  packageName: Enemy Masses | Massive Crowds, 1-Click Enemy AI, RTS Formations &
+    Controller
+  packageVersion: 2.0.6
+  assetPath: Assets/Plugins/EnemyMasses/Runtime/VFX/VFXSpawner.cs
+  uploadId: 873462

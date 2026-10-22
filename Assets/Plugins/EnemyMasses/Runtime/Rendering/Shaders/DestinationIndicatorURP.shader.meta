@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 178ff29c35297e7a8a7e0def9a0c985b
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  nonModifiableTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 351712
+  packageName: Enemy Masses | Massive Crowds, 1-Click Enemy AI, RTS Formations &
+    Controller
+  packageVersion: 2.0.6
+  assetPath: Assets/Plugins/EnemyMasses/Runtime/Rendering/Shaders/DestinationIndicatorURP.shader
+  uploadId: 873462

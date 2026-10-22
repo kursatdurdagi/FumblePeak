@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 5be39a6be0b02e1c894c35645c53a77a
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 351712
+  packageName: Enemy Masses | Massive Crowds, 1-Click Enemy AI, RTS Formations &
+    Controller
+  packageVersion: 2.0.6
+  assetPath: Assets/Plugins/EnemyMasses/Runtime/Navigation/Climbing/NavMeshLinkClimbing/README.md
+  uploadId: 873462

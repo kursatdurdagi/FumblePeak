@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 230b0ceff589f1667924f06d3a49059a
+AssetOrigin:
+  serializedVersion: 1
+  productId: 351712
+  packageName: Enemy Masses | Massive Crowds, 1-Click Enemy AI, RTS Formations &
+    Controller
+  packageVersion: 2.0.6
+  assetPath: Assets/Plugins/EnemyMasses/Runtime/Skills/SkillProjectileArc.cs
+  uploadId: 873462

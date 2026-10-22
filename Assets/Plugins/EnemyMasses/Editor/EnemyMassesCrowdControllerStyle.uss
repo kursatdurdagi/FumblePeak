@@ -1,0 +1,322 @@
+/* Enemy Masses - Modern Tab-Based Inspector */
+/* Theme-aware styling for both Light and Dark modes */
+
+/* === Header === */
+.header {
+    background-color: var(--unity-colors-toolbar-background);
+    padding: 16px;
+    margin-bottom: 0;
+    border-bottom-width: 2px;
+    border-bottom-color: var(--unity-colors-toolbar-border);
+}
+
+.header-title {
+    font-size: 20px;
+    -unity-font-style: bold;
+    color: var(--unity-colors-default-text);
+    -unity-text-align: middle-center;
+    margin-bottom: 2px;
+}
+
+.header-subtitle {
+    font-size: 12px;
+    color: var(--unity-colors-label-text-focus);
+    -unity-text-align: middle-center;
+    margin-bottom: 8px;
+}
+
+.status-bar {
+    background-color: var(--unity-colors-inspector_titlebar-background);
+    border-radius: 4px;
+    padding: 6px;
+    margin-top: 8px;
+}
+
+.status-label {
+    font-size: 11px;
+    color: rgb(80, 180, 80);
+    -unity-text-align: middle-center;
+}
+
+/* === Tab Bar === */
+.tab-bar {
+    flex-direction: row;
+    background-color: var(--unity-colors-toolbar-background);
+    border-bottom-width: 1px;
+    border-bottom-color: var(--unity-colors-toolbar-border);
+}
+
+.tab-button {
+    flex-grow: 1;
+    padding: 12px;
+    background-color: transparent;
+    border-width: 0;
+    border-bottom-width: 3px;
+    border-bottom-color: transparent;
+    color: var(--unity-colors-label-text);
+    font-size: 13px;
+    -unity-text-align: middle-center;
+    transition-duration: 0.2s;
+}
+
+.tab-button:hover {
+    background-color: var(--unity-colors-button-background-hover);
+    color: var(--unity-colors-button-text-hover);
+}
+
+.tab-active {
+    background-color: var(--unity-colors-button-background-pressed);
+    border-bottom-color: var(--unity-colors-highlight-background);
+    color: var(--unity-colors-button-text-pressed);
+}
+
+/* === Content Container === */
+.content-container {
+    flex-grow: 1;
+}
+
+.tab-content {
+    padding: 12px;
+}
+
+/* === Sections === */
+.section {
+    margin-bottom: 12px;
+}
+
+Foldout {
+    margin-bottom: 8px;
+}
+
+Foldout > .unity-foldout__toggle {
+    background-color: var(--unity-colors-inspector_titlebar-background);
+    border-radius: 4px;
+    padding: 8px;
+    margin-bottom: 4px;
+}
+
+Foldout > .unity-foldout__toggle:hover {
+    background-color: var(--unity-colors-button-background-hover);
+}
+
+.subsection {
+    margin-left: 12px;
+    margin-top: 8px;
+}
+
+.config-section {
+    margin-bottom: 4px;
+}
+
+.config-description {
+    font-size: 11px;
+    color: var(--unity-colors-label-text-focus);
+    margin-bottom: 8px;
+    white-space: normal;
+}
+
+.config-field {
+    margin-bottom: 8px;
+}
+
+/* === Buttons === */
+.button-group {
+    flex-direction: row;
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+.button-group > Button {
+    flex-grow: 1;
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
+.button-grid {
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.button-grid > Button {
+    flex-basis: 48%;
+    margin: 2px;
+}
+
+.primary-button {
+    padding: 12px;
+    background-color: var(--unity-colors-button-background);
+    border-radius: 4px;
+    border-width: 0;
+    color: var(--unity-colors-button-text);
+    font-size: 13px;
+    -unity-font-style: bold;
+}
+
+.primary-button:hover {
+    background-color: var(--unity-colors-button-background-hover);
+}
+
+.primary-button:active {
+    background-color: var(--unity-colors-button-background-pressed);
+}
+
+.secondary-button {
+    padding: 10px;
+    background-color: var(--unity-colors-window-background);
+    border-radius: 4px;
+    border-width: 1px;
+    border-color: var(--unity-colors-toolbar-border);
+    color: var(--unity-colors-default-text);
+    font-size: 12px;
+}
+
+.secondary-button:hover {
+    background-color: var(--unity-colors-button-background-hover);
+    border-color: var(--unity-colors-toolbar-border);
+}
+
+.secondary-button:active {
+    background-color: var(--unity-colors-button-background-pressed);
+}
+
+.danger-button {
+    padding: 12px;
+    background-color: rgba(160, 50, 50, 0.9);
+    border-radius: 4px;
+    border-width: 0;
+    color: rgb(255, 255, 255);
+    font-size: 13px;
+    -unity-font-style: bold;
+    margin-top: 8px;
+}
+
+.danger-button:hover {
+    background-color: rgba(180, 60, 60, 1);
+}
+
+.danger-button:active {
+    background-color: rgba(140, 40, 40, 0.9);
+}
+
+.stress-button {
+    padding: 10px;
+    background-color: rgba(140, 80, 20, 0.9);
+    border-radius: 4px;
+    border-width: 0;
+    color: rgb(255, 255, 255);
+    font-size: 12px;
+}
+
+.stress-button:hover {
+    background-color: rgba(160, 95, 30, 1);
+}
+
+.edit-button {
+    padding: 8px;
+    background-color: var(--unity-colors-toolbar-background);
+    border-radius: 4px;
+    border-width: 1px;
+    border-color: var(--unity-colors-toolbar-border);
+    color: var(--unity-colors-label-text);
+    font-size: 11px;
+    margin-top: 4px;
+}
+
+.edit-button:hover {
+    background-color: var(--unity-colors-button-background-hover);
+    border-color: var(--unity-colors-highlight-background);
+}
+
+/* === Stats Panel === */
+.stats-panel {
+    background-color: var(--unity-colors-inspector_titlebar-background);
+    border-radius: 6px;
+    padding: 16px;
+    margin-bottom: 16px;
+    border-width: 2px;
+    border-color: var(--unity-colors-toolbar-border);
+}
+
+.stats-large {
+    font-size: 24px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+}
+
+.stats-normal {
+    color: rgb(100, 220, 120);
+}
+
+.stats-warning {
+    color: rgb(255, 180, 60);
+}
+
+.stats-critical {
+    color: rgb(255, 100, 100);
+}
+
+/* === Text & Labels === */
+.guide-text {
+    font-size: 12px;
+    color: var(--unity-colors-label-text);
+    white-space: normal;
+    padding: 8px;
+    background-color: var(--unity-colors-toolbar-background);
+    border-radius: 4px;
+}
+
+.info-label {
+    font-size: 11px;
+    color: rgba(100, 180, 100, 0.9);
+    margin-top: 4px;
+    margin-bottom: 8px;
+}
+
+.slider-value {
+    font-size: 12px;
+    color: var(--unity-colors-label-text-focus);
+    margin-bottom: 8px;
+    -unity-text-align: middle-right;
+}
+
+.debug-text {
+    font-size: 11px;
+    color: var(--unity-colors-default-text);
+    background-color: var(--unity-colors-inspector_titlebar-background);
+    padding: 12px;
+    border-radius: 4px;
+    white-space: pre;
+}
+
+.placeholder-text {
+    font-size: 11px;
+    color: var(--unity-colors-label-text-focus);
+    -unity-font-style: italic;
+    padding: 8px;
+}
+
+.faction-item {
+    margin-bottom: 4px;
+}
+
+/* === Standard Elements === */
+PropertyField {
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+HelpBox {
+    margin-top: 6px;
+    margin-bottom: 6px;
+}
+
+SliderInt {
+    margin-top: 4px;
+    margin-bottom: 2px;
+}
+
+EnumField {
+    margin-top: 4px;
+    margin-bottom: 8px;
+}

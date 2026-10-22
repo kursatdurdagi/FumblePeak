@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 0bf52ddc2f8dde57e9921c8b9f0e3d03
+AssetOrigin:
+  serializedVersion: 1
+  productId: 351712
+  packageName: Enemy Masses | Massive Crowds, 1-Click Enemy AI, RTS Formations &
+    Controller
+  packageVersion: 2.0.6
+  assetPath: Assets/Plugins/EnemyMasses/Runtime/Components/Skills/BaseSkill.cs
+  uploadId: 873462
