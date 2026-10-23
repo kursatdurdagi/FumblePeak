@@ -1,4 +1,0 @@
-Location of Integration Demo Scenes
-
-Crystal Save: Assets/Plugins/CrystalSave/Modules/EnemyMasses/
-Game Creator 2: Install through Game Creator 2's own Install Menu (requires Shooter 2 & Melee 2)

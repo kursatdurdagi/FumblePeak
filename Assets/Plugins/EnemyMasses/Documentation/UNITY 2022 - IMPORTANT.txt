@@ -1,8 +1,0 @@
-Unity Version 2022 - Important Notice
-=====================================
-
-1. Open the Package Manager
-2. Import the following Unity Packages
-
-- AI Navigation
-- Input System
