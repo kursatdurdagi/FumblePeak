@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 107ec162e9a39314782d731393645d02, type: 3}
+  m_Name: (Language) German
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizationLanguage
+  LanguageName: German
+  Strings:
+  - SectionId: 46740512
+    EntryId: 82109474
+    Key: demo.language
+    Value: 'Sprache :'
+  - SectionId: 46740512
+    EntryId: 30845151
+    Key: demo.demo
+    Value: 'Demo :'
+  - SectionId: 46740512
+    EntryId: 50573230
+    Key: demo.dropdown.1
+    Value: Hallo
+  - SectionId: 46740512
+    EntryId: 62847070
+    Key: demo.dropdown.2
+    Value: Willkommen
