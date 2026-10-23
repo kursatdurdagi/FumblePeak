@@ -30,3 +30,593 @@ MonoBehaviour:
     EntryId: 62847070
     Key: demo.dropdown.2
     Value: Welcome
+  - SectionId: 40209645
+    EntryId: 28080632
+    Key: intro.top
+    Value: "1 BODY \xB7 4 LIMBS \xB7 0 COORDINATION"
+  - SectionId: 40209645
+    EntryId: 35911328
+    Key: intro.tagline
+    Value: If one lets go too early, we all fall.
+  - SectionId: 40209645
+    EntryId: 27176940
+    Key: intro.press
+    Value: PRESS ANY KEY
+  - SectionId: 76708446
+    EntryId: 57603178
+    Key: menu.single
+    Value: SINGLEPLAYER
+  - SectionId: 76708446
+    EntryId: 10478280
+    Key: menu.single_desc
+    Value: 'Octopus mode: all four limbs are yours.'
+  - SectionId: 76708446
+    EntryId: 76553287
+    Key: menu.multi
+    Value: MULTIPLAYER
+  - SectionId: 76708446
+    EntryId: 46816222
+    Key: menu.multi_desc
+    Value: 2-4 player co-op. Host a lobby or join a friend.
+  - SectionId: 76708446
+    EntryId: 52933792
+    Key: menu.settings
+    Value: SETTINGS
+  - SectionId: 76708446
+    EntryId: 79536307
+    Key: menu.quit
+    Value: QUIT
+  - SectionId: 76708446
+    EntryId: 73548192
+    Key: menu.back
+    Value: "\u2190 BACK"
+  - SectionId: 76708446
+    EntryId: 41465958
+    Key: menu.steam_ok
+    Value: "Steam connected \xB7 {0}"
+  - SectionId: 76708446
+    EntryId: 23623382
+    Key: menu.steam_off
+    Value: "Steam not found \xB7 Local network mode"
+  - SectionId: 89308091
+    EntryId: 37999102
+    Key: howto.title
+    Value: HOW TO PLAY
+  - SectionId: 89308091
+    EntryId: 32644992
+    Key: howto.l1
+    Value: Everyone controls one limb of the body.
+  - SectionId: 89308091
+    EntryId: 26149491
+    Key: howto.l2
+    Value: "MOUSE \u2014 move your limb"
+  - SectionId: 89308091
+    EntryId: 36193593
+    Key: howto.l3
+    Value: "LEFT CLICK \u2014 grab / release"
+  - SectionId: 89308091
+    EntryId: 95328796
+    Key: howto.l4
+    Value: "RIGHT CLICK \u2014 grab + switch limb"
+  - SectionId: 89308091
+    EntryId: 73969794
+    Key: howto.l5
+    Value: "Q / E / A / D \u2014 select limb"
+  - SectionId: 89308091
+    EntryId: 27629657
+    Key: howto.l6
+    Value: "While holding, pull the mouse DOWN \u2192 the body goes UP."
+  - SectionId: 89308091
+    EntryId: 79449286
+    Key: howto.l7
+    Value: 'Don''t hang in one spot too long: arms redden, shake and let go!'
+  - SectionId: 89308091
+    EntryId: 25288826
+    Key: howto.players
+    Value: PLAYER SPLIT
+  - SectionId: 89308091
+    EntryId: 70488937
+    Key: howto.p1
+    Value: "1 \u2014 Octopus mode (4 limbs)"
+  - SectionId: 89308091
+    EntryId: 38118160
+    Key: howto.p2
+    Value: "2 \u2014 Cross link (arm + opposite leg)"
+  - SectionId: 89308091
+    EntryId: 40755791
+    Key: howto.p3
+    Value: "3 \u2014 Asymmetric (one gets both legs)"
+  - SectionId: 89308091
+    EntryId: 75718668
+    Key: howto.p4
+    Value: "4 \u2014 Total chaos (one limb each)"
+  - SectionId: 98072823
+    EntryId: 67719605
+    Key: mp.title
+    Value: MULTIPLAYER
+  - SectionId: 98072823
+    EntryId: 48755742
+    Key: mp.host
+    Value: HOST LOBBY
+  - SectionId: 98072823
+    EntryId: 62855325
+    Key: mp.host_steam
+    Value: HOST STEAM LOBBY
+  - SectionId: 98072823
+    EntryId: 32339422
+    Key: mp.privacy
+    Value: Privacy
+  - SectionId: 98072823
+    EntryId: 36674409
+    Key: mp.privacy_friends
+    Value: Friends only
+  - SectionId: 98072823
+    EntryId: 71993921
+    Key: mp.privacy_public
+    Value: Public
+  - SectionId: 98072823
+    EntryId: 14635762
+    Key: mp.privacy_invite
+    Value: Invite only
+  - SectionId: 98072823
+    EntryId: 84457222
+    Key: mp.section_host
+    Value: HOST
+  - SectionId: 98072823
+    EntryId: 23243139
+    Key: mp.section_join
+    Value: JOIN
+  - SectionId: 98072823
+    EntryId: 73759853
+    Key: mp.code
+    Value: Lobby code
+  - SectionId: 98072823
+    EntryId: 88059731
+    Key: mp.code_join
+    Value: JOIN WITH CODE
+  - SectionId: 98072823
+    EntryId: 89592749
+    Key: mp.section_lan
+    Value: LOCAL NETWORK / IP
+  - SectionId: 98072823
+    EntryId: 28817126
+    Key: mp.address
+    Value: Address
+  - SectionId: 98072823
+    EntryId: 40906623
+    Key: mp.lan_host
+    Value: HOST VIA IP
+  - SectionId: 98072823
+    EntryId: 33879686
+    Key: mp.lan_join
+    Value: CONNECT VIA IP
+  - SectionId: 98072823
+    EntryId: 10562274
+    Key: mp.lan_hint
+    Value: On the same network, enter the host's local IP. Over the internet the
+      host must open UDP port {0}.
+  - SectionId: 98072823
+    EntryId: 50756612
+    Key: mp.my_ip
+    Value: 'Your local IP: {0}'
+  - SectionId: 98072823
+    EntryId: 14438547
+    Key: mp.tab_friends
+    Value: FRIENDS
+  - SectionId: 98072823
+    EntryId: 12324076
+    Key: mp.tab_public
+    Value: PUBLIC LOBBIES
+  - SectionId: 98072823
+    EntryId: 45157018
+    Key: mp.friends_empty
+    Value: None of your friends are playing Fumble Peak right now.
+  - SectionId: 98072823
+    EntryId: 37670596
+    Key: mp.public_empty
+    Value: No public lobbies found.
+  - SectionId: 98072823
+    EntryId: 13971723
+    Key: mp.nosteam
+    Value: Steam is not running. Start Steam for friends and invites.
+  - SectionId: 98072823
+    EntryId: 21489169
+    Key: mp.refresh
+    Value: REFRESH
+  - SectionId: 98072823
+    EntryId: 48642262
+    Key: mp.join
+    Value: JOIN
+  - SectionId: 98072823
+    EntryId: 42347968
+    Key: mp.friend_in_lobby
+    Value: In a lobby
+  - SectionId: 98072823
+    EntryId: 24568421
+    Key: mp.friend_playing
+    Value: Playing
+  - SectionId: 98072823
+    EntryId: 10181356
+    Key: mp.players
+    Value: '{0}/{1} players'
+  - SectionId: 98072823
+    EntryId: 28857021
+    Key: mp.loading
+    Value: Loading...
+  - SectionId: 63891677
+    EntryId: 29273638
+    Key: lobby.title
+    Value: LOBBY
+  - SectionId: 63891677
+    EntryId: 53744008
+    Key: lobby.code
+    Value: Lobby code
+  - SectionId: 63891677
+    EntryId: 72954902
+    Key: lobby.address
+    Value: Address
+  - SectionId: 63891677
+    EntryId: 16715737
+    Key: lobby.offline
+    Value: Local session
+  - SectionId: 63891677
+    EntryId: 35321227
+    Key: lobby.copy
+    Value: COPY
+  - SectionId: 63891677
+    EntryId: 79849408
+    Key: lobby.copied
+    Value: Copied!
+  - SectionId: 63891677
+    EntryId: 60068623
+    Key: lobby.invite
+    Value: INVITE FRIENDS
+  - SectionId: 63891677
+    EntryId: 28174076
+    Key: lobby.ready
+    Value: READY
+  - SectionId: 63891677
+    EntryId: 12510133
+    Key: lobby.unready
+    Value: NOT READY
+  - SectionId: 63891677
+    EntryId: 57402114
+    Key: lobby.start
+    Value: START GAME
+  - SectionId: 63891677
+    EntryId: 42764003
+    Key: lobby.leave
+    Value: LEAVE LOBBY
+  - SectionId: 63891677
+    EntryId: 82482396
+    Key: lobby.empty
+    Value: Empty slot
+  - SectionId: 63891677
+    EntryId: 71920182
+    Key: lobby.empty_hint
+    Value: Invite a friend
+  - SectionId: 63891677
+    EntryId: 42025398
+    Key: lobby.host
+    Value: HOST
+  - SectionId: 63891677
+    EntryId: 66014925
+    Key: lobby.you
+    Value: (you)
+  - SectionId: 63891677
+    EntryId: 16175735
+    Key: lobby.state_ready
+    Value: READY
+  - SectionId: 63891677
+    EntryId: 96222377
+    Key: lobby.state_waiting
+    Value: WAITING
+  - SectionId: 63891677
+    EntryId: 54822931
+    Key: lobby.kick
+    Value: KICK
+  - SectionId: 63891677
+    EntryId: 48916132
+    Key: lobby.wait_players
+    Value: Waiting for players to get ready...
+  - SectionId: 63891677
+    EntryId: 10645062
+    Key: lobby.all_ready
+    Value: Everyone is ready! You can start.
+  - SectionId: 63891677
+    EntryId: 76076821
+    Key: lobby.wait_host
+    Value: Waiting for the host to start...
+  - SectionId: 63891677
+    EntryId: 33211459
+    Key: lobby.mode
+    Value: 'Mode: {0}'
+  - SectionId: 63891677
+    EntryId: 44438714
+    Key: lobby.mode1
+    Value: Octopus mode
+  - SectionId: 63891677
+    EntryId: 36105285
+    Key: lobby.mode2
+    Value: Cross link
+  - SectionId: 63891677
+    EntryId: 13709402
+    Key: lobby.mode3
+    Value: Asymmetric
+  - SectionId: 63891677
+    EntryId: 80012287
+    Key: lobby.mode4
+    Value: Total chaos
+  - SectionId: 63891677
+    EntryId: 74133770
+    Key: lobby.joined
+    Value: '{0} joined'
+  - SectionId: 63891677
+    EntryId: 56325874
+    Key: lobby.left
+    Value: '{0} left'
+  - SectionId: 65552459
+    EntryId: 36498214
+    Key: settings.title
+    Value: SETTINGS
+  - SectionId: 65552459
+    EntryId: 62459419
+    Key: settings.sec_game
+    Value: GAME
+  - SectionId: 65552459
+    EntryId: 36652437
+    Key: settings.sec_video
+    Value: VIDEO
+  - SectionId: 65552459
+    EntryId: 38552044
+    Key: settings.sec_audio
+    Value: AUDIO
+  - SectionId: 65552459
+    EntryId: 81733268
+    Key: settings.language
+    Value: Language
+  - SectionId: 65552459
+    EntryId: 41464974
+    Key: settings.name
+    Value: Player name
+  - SectionId: 65552459
+    EntryId: 90246999
+    Key: settings.name_steam
+    Value: Your Steam name is used.
+  - SectionId: 65552459
+    EntryId: 55432202
+    Key: settings.sens
+    Value: Mouse sensitivity
+  - SectionId: 65552459
+    EntryId: 23004517
+    Key: settings.volume
+    Value: Master volume
+  - SectionId: 65552459
+    EntryId: 21164294
+    Key: settings.fullscreen
+    Value: Fullscreen
+  - SectionId: 65552459
+    EntryId: 30112250
+    Key: settings.vsync
+    Value: V-Sync
+  - SectionId: 65552459
+    EntryId: 23709495
+    Key: settings.quality
+    Value: Graphics quality
+  - SectionId: 65552459
+    EntryId: 77683924
+    Key: settings.resolution
+    Value: Resolution
+  - SectionId: 47142713
+    EntryId: 27898404
+    Key: msg.connecting
+    Value: CONNECTING
+  - SectionId: 47142713
+    EntryId: 72690724
+    Key: msg.connecting_to
+    Value: Connecting to {0}...
+  - SectionId: 47142713
+    EntryId: 82812113
+    Key: msg.creating
+    Value: CREATING LOBBY
+  - SectionId: 47142713
+    EntryId: 85096885
+    Key: msg.creating_steam
+    Value: Preparing Steam lobby...
+  - SectionId: 47142713
+    EntryId: 32453617
+    Key: msg.joining
+    Value: Joining lobby...
+  - SectionId: 47142713
+    EntryId: 22471417
+    Key: msg.cancel
+    Value: CANCEL
+  - SectionId: 47142713
+    EntryId: 69181033
+    Key: msg.ok
+    Value: OK
+  - SectionId: 47142713
+    EntryId: 90116612
+    Key: msg.yes
+    Value: YES
+  - SectionId: 47142713
+    EntryId: 89677840
+    Key: msg.no
+    Value: NO
+  - SectionId: 47142713
+    EntryId: 62214015
+    Key: msg.failed
+    Value: CONNECTION FAILED
+  - SectionId: 47142713
+    EntryId: 64270214
+    Key: msg.unreachable
+    Value: Could not reach the server.
+  - SectionId: 47142713
+    EntryId: 35472747
+    Key: msg.disconnected
+    Value: Disconnected, or the host closed the session.
+  - SectionId: 47142713
+    EntryId: 86149956
+    Key: msg.kicked
+    Value: You were kicked by the host.
+  - SectionId: 47142713
+    EntryId: 99958875
+    Key: msg.full
+    Value: Lobby is full (4/4).
+  - SectionId: 47142713
+    EntryId: 54780774
+    Key: msg.not_found
+    Value: Lobby not found or closed.
+  - SectionId: 47142713
+    EntryId: 96502977
+    Key: msg.create_failed
+    Value: Could not create Steam lobby ({0}).
+  - SectionId: 47142713
+    EntryId: 41183163
+    Key: msg.version
+    Value: 'Version mismatch (host: {0}, you: {1}).'
+  - SectionId: 47142713
+    EntryId: 93096879
+    Key: msg.invalid_code
+    Value: Invalid lobby code. It only contains digits.
+  - SectionId: 47142713
+    EntryId: 15950512
+    Key: msg.connection
+    Value: CONNECTION
+  - SectionId: 47142713
+    EntryId: 48571071
+    Key: msg.quit_title
+    Value: QUIT
+  - SectionId: 47142713
+    EntryId: 10286480
+    Key: msg.quit_confirm
+    Value: Do you want to quit the game?
+  - SectionId: 47142713
+    EntryId: 65924546
+    Key: msg.leave_title
+    Value: LEAVE LOBBY
+  - SectionId: 47142713
+    EntryId: 33267263
+    Key: msg.leave_host
+    Value: 'You are the host: leaving closes the lobby for everyone.'
+  - SectionId: 47142713
+    EntryId: 18541583
+    Key: msg.leave_client
+    Value: Do you want to leave the lobby?
+  - SectionId: 47142713
+    EntryId: 10061893
+    Key: msg.get_ready
+    Value: GET READY TO CLIMB
+  - SectionId: 47142713
+    EntryId: 81335112
+    Key: msg.octopus
+    Value: OCTOPUS MODE
+  - SectionId: 42099039
+    EntryId: 46242650
+    Key: hud.biome1
+    Value: STARTER VALLEY
+  - SectionId: 42099039
+    EntryId: 62715655
+    Key: hud.controls
+    Value: "MOUSE move limb  \xB7  LEFT CLICK grab/release  \xB7  RIGHT CLICK grab
+      + switch  \xB7  Q/E/A/D select limb  \xB7  ESC {0}"
+  - SectionId: 42099039
+    EntryId: 79326119
+    Key: hud.esc_pause
+    Value: pause
+  - SectionId: 42099039
+    EntryId: 29991008
+    Key: hud.esc_menu
+    Value: menu
+  - SectionId: 42099039
+    EntryId: 34166140
+    Key: hud.paused
+    Value: PAUSED
+  - SectionId: 42099039
+    EntryId: 91587256
+    Key: hud.paused_single
+    Value: The game is paused.
+  - SectionId: 42099039
+    EntryId: 96775107
+    Key: hud.paused_coop
+    Value: "(The game keeps running \u2014 your friends are still hanging!)"
+  - SectionId: 42099039
+    EntryId: 76623773
+    Key: hud.resume
+    Value: RESUME
+  - SectionId: 42099039
+    EntryId: 48362399
+    Key: hud.respawn
+    Value: BACK TO CAMP
+  - SectionId: 42099039
+    EntryId: 54458177
+    Key: hud.to_lobby
+    Value: BACK TO LOBBY (ALL)
+  - SectionId: 42099039
+    EntryId: 93277803
+    Key: hud.to_menu
+    Value: MAIN MENU
+  - SectionId: 42099039
+    EntryId: 66074653
+    Key: hud.camp
+    Value: CAMPFIRE! New checkpoint
+  - SectionId: 42099039
+    EntryId: 22992555
+    Key: hud.respawned
+    Value: Back to camp
+  - SectionId: 42099039
+    EntryId: 14455194
+    Key: hud.gave_up
+    Value: '{0} gave up!'
+  - SectionId: 42099039
+    EntryId: 43515210
+    Key: hud.summit
+    Value: SUMMIT!
+  - SectionId: 42099039
+    EntryId: 56544271
+    Key: hud.summit_text
+    Value: Nobody let anyone go. (Mostly.)
+  - SectionId: 42099039
+    EntryId: 94622246
+    Key: hud.state_grab
+    Value: HOLDING
+  - SectionId: 42099039
+    EntryId: 48333244
+    Key: hud.state_fist
+    Value: FIST
+  - SectionId: 42099039
+    EntryId: 26084975
+    Key: hud.state_free
+    Value: FREE
+  - SectionId: 42099039
+    EntryId: 60412424
+    Key: hud.address
+    Value: 'Address (port {0}):'
+  - SectionId: 42099039
+    EntryId: 26007057
+    Key: hud.connected
+    Value: 'Connected:'
+  - SectionId: 90629069
+    EntryId: 92969912
+    Key: limb.0
+    Value: Left Arm
+  - SectionId: 90629069
+    EntryId: 44774961
+    Key: limb.1
+    Value: Right Arm
+  - SectionId: 90629069
+    EntryId: 66626888
+    Key: limb.2
+    Value: Left Leg
+  - SectionId: 90629069
+    EntryId: 77332952
+    Key: limb.3
+    Value: Right Leg
+  - SectionId: 90629069
+    EntryId: 98882386
+    Key: limb.none
+    Value: Spectator
+  - SectionId: 13726791
+    EntryId: 80642767
+    Key: profile.default
+    Value: Climber

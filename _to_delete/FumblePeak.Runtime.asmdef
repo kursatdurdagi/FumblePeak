@@ -1,0 +1,33 @@
+{
+    "name": "FumblePeak.Runtime",
+    "rootNamespace": "FumblePeak",
+    "references": [
+        "Mirror",
+        "Mirror.Components",
+        "kcp2k",
+        "Mirror.Transports",
+        "Unity.InputSystem",
+        "com.rlabrecque.steamworks.net",
+        "FizzySteamworks"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.rlabrecque.steamworks.net",
+            "expression": "0.0.0",
+            "define": "FUMBLE_STEAM"
+        },
+        {
+            "name": "com.mirror.steamworks.net",
+            "expression": "0.0.0",
+            "define": "FUMBLE_FIZZY"
+        }
+    ],
+    "noEngineReferences": false
+}

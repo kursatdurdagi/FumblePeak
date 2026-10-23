@@ -1,0 +1,149 @@
+@import url("Common.uss");
+
+.hud { flex-grow: 1; }
+
+/* Oyuncu listesi */
+.roster { position: absolute; left: 28px; top: 24px; }
+.roster-item {
+    flex-direction: row;
+    align-items: center;
+    background-color: rgba(10, 12, 22, 0.55);
+    border-radius: 20px;
+    padding: 6px 16px 6px 8px;
+    margin-bottom: 8px;
+    border-width: 2px;
+    border-color: transparent;
+}
+.roster-item--local { border-color: rgba(255, 255, 255, 0.55); }
+.roster-item__dot { width: 18px; height: 18px; border-radius: 9px; margin-right: 10px; }
+.roster-item__name { color: var(--ink); font-size: 17px; -unity-font-style: bold; margin-right: 10px; }
+.roster-item__limbs { color: var(--ink-dim); font-size: 15px; }
+.limb-chip {
+    font-size: 14px;
+    color: var(--ink-dim);
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: 4px;
+    background-color: rgba(255, 255, 255, 0.06);
+}
+.limb-chip--active { color: #1A0E06; background-color: var(--accent); -unity-font-style: bold; }
+
+/* Bildirim */
+.toast {
+    position: absolute;
+    left: 0; right: 0; top: 110px;
+    align-items: center;
+    opacity: 0;
+    translate: 0 -20px;
+    transition-property: opacity, translate;
+    transition-duration: 0.25s, 0.35s;
+    transition-timing-function: ease-out, ease-out-back;
+}
+.toast--show { opacity: 1; translate: 0 0; }
+.toast__text {
+    background-color: rgba(10, 12, 22, 0.75);
+    color: var(--ink);
+    font-size: 26px;
+    -unity-font-style: bold;
+    letter-spacing: 3px;
+    padding: 10px 26px;
+    border-radius: 8px;
+}
+
+/* Zirve */
+.summit {
+    position: absolute;
+    left: 0; right: 0; top: 0; bottom: 0;
+    align-items: center; justify-content: center;
+    opacity: 1; scale: 1 1;
+    transition-property: opacity, scale;
+    transition-duration: 0.4s, 0.9s;
+    transition-timing-function: ease-out, ease-out-elastic;
+}
+.summit--hidden { opacity: 0; scale: 0.3 0.3; }
+.summit__title { font-size: 150px; color: var(--accent); -unity-font-style: bold; letter-spacing: 16px; }
+.summit__text { font-size: 26px; color: var(--ink); }
+
+/* Kontroller */
+.controls {
+    position: absolute;
+    bottom: 22px; left: 0; right: 0;
+    -unity-text-align: middle-center;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 16px;
+    opacity: 1;
+    transition-property: opacity;
+    transition-duration: 1.2s;
+}
+.controls--faded { opacity: 0; }
+
+/* Duraklat */
+.pause {
+    position: absolute;
+    left: 0; right: 0; top: 0; bottom: 0;
+    background-color: rgba(5, 6, 12, 0.6);
+    align-items: center; justify-content: center;
+    opacity: 1;
+    transition-property: opacity;
+    transition-duration: 0.18s;
+}
+.pause--hidden { opacity: 0; display: none; }
+.pause__card {
+    background-color: #151A2B;
+    border-radius: 12px;
+    border-width: 1px;
+    border-color: var(--panel-border);
+    padding: 32px 40px;
+    min-width: 460px;
+}
+.lobby-row { flex-direction: row; align-items: center; margin-bottom: 14px; }
+.lobby-row__label { color: var(--ink-dim); font-size: 16px; margin-right: 8px; }
+.lobby-row__code { color: var(--ink); font-size: 18px; -unity-font-style: bold; flex-grow: 1; }
+.small-btn {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-width: 0;
+    border-radius: 6px;
+    color: var(--ink);
+    font-size: 14px;
+    padding: 6px 12px;
+}
+.small-btn:hover { background-color: var(--accent); color: #1A0E06; }
+
+/* Uzuv paneli (birden çok uzuv yöneten oyuncu / tek oyuncu) */
+.limb-panel {
+    position: absolute;
+    left: 0; right: 0; bottom: 54px;
+    flex-direction: row;
+    justify-content: center;
+}
+.limb-card {
+    width: 150px;
+    margin: 0 6px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    background-color: rgba(10, 12, 22, 0.6);
+    border-width: 2px;
+    border-color: transparent;
+    flex-direction: row;
+    align-items: center;
+    translate: 0 0;
+    transition-property: translate, border-color, background-color;
+    transition-duration: 0.15s, 0.15s, 0.15s;
+    transition-timing-function: ease-out-back, ease-out, ease-out;
+}
+.limb-card--active { border-color: var(--accent); translate: 0 -8px; background-color: rgba(30, 20, 14, 0.8); }
+.limb-card__key {
+    width: 30px; height: 30px;
+    border-radius: 6px;
+    background-color: rgba(255, 255, 255, 0.12);
+    color: var(--ink);
+    font-size: 16px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    margin-right: 10px;
+}
+.limb-card--active .limb-card__key { background-color: var(--accent); color: #1A0E06; }
+.limb-card__name { color: var(--ink); font-size: 15px; -unity-font-style: bold; }
+.limb-card__state { color: var(--ink-dim); font-size: 12px; letter-spacing: 2px; }
+.limb-card__state--grab { color: #7CE08F; }
+.limb-card__state--fist { color: #FFD27A; }

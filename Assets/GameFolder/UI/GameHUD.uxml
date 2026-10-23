@@ -1,0 +1,37 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="GameHUD.uss" />
+    <!-- Metni "#anahtar" olan öğeler UILocalizer ile çevrilir. -->
+    <ui:VisualElement name="hud" class="hud">
+        <ui:VisualElement name="roster" class="roster" />
+
+        <ui:VisualElement name="toast" class="toast">
+            <ui:Label name="toast-text" text="" class="toast__text" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="summit" class="summit summit--hidden">
+            <ui:Label text="#hud.summit" class="summit__title" />
+            <ui:Label name="summit-text" text="#hud.summit_text" class="summit__text" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="limb-panel" class="limb-panel" />
+
+        <ui:Label name="controls" text="" class="controls" />
+
+        <ui:VisualElement name="pause" class="pause pause--hidden">
+            <ui:VisualElement class="pause__card">
+                <ui:Label text="#hud.paused" class="page-title" />
+                <ui:Label name="pause-hint" text="" class="hint" />
+                <ui:VisualElement name="lobby-row" class="lobby-row">
+                    <ui:Label name="lobby-label" text="" class="lobby-row__label" />
+                    <ui:Label name="lobby-code" text="-" class="lobby-row__code" />
+                    <ui:Button name="btn-copy" text="#lobby.copy" class="small-btn" />
+                </ui:VisualElement>
+                <ui:Button name="btn-resume" text="#hud.resume" class="menu-btn menu-btn--primary" />
+                <ui:Button name="btn-invite" text="#lobby.invite" class="menu-btn" />
+                <ui:Button name="btn-respawn" text="#hud.respawn" class="menu-btn" />
+                <ui:Button name="btn-lobby" text="#hud.to_lobby" class="menu-btn" />
+                <ui:Button name="btn-leave" text="#hud.to_menu" class="menu-btn menu-btn--ghost" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

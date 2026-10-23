@@ -24,6 +24,331 @@ MonoBehaviour:
       Key: dropdown.1
     - Id: 62847070
       Key: dropdown.2
+  - Id: 40209645
+    SectionName: intro
+    SectionSheet:
+    - Id: 28080632
+      Key: top
+    - Id: 35911328
+      Key: tagline
+    - Id: 27176940
+      Key: press
+  - Id: 76708446
+    SectionName: menu
+    SectionSheet:
+    - Id: 57603178
+      Key: single
+    - Id: 10478280
+      Key: single_desc
+    - Id: 76553287
+      Key: multi
+    - Id: 46816222
+      Key: multi_desc
+    - Id: 52933792
+      Key: settings
+    - Id: 79536307
+      Key: quit
+    - Id: 73548192
+      Key: back
+    - Id: 41465958
+      Key: steam_ok
+    - Id: 23623382
+      Key: steam_off
+  - Id: 89308091
+    SectionName: howto
+    SectionSheet:
+    - Id: 37999102
+      Key: title
+    - Id: 32644992
+      Key: l1
+    - Id: 26149491
+      Key: l2
+    - Id: 36193593
+      Key: l3
+    - Id: 95328796
+      Key: l4
+    - Id: 73969794
+      Key: l5
+    - Id: 27629657
+      Key: l6
+    - Id: 79449286
+      Key: l7
+    - Id: 25288826
+      Key: players
+    - Id: 70488937
+      Key: p1
+    - Id: 38118160
+      Key: p2
+    - Id: 40755791
+      Key: p3
+    - Id: 75718668
+      Key: p4
+  - Id: 98072823
+    SectionName: mp
+    SectionSheet:
+    - Id: 67719605
+      Key: title
+    - Id: 48755742
+      Key: host
+    - Id: 62855325
+      Key: host_steam
+    - Id: 32339422
+      Key: privacy
+    - Id: 36674409
+      Key: privacy_friends
+    - Id: 71993921
+      Key: privacy_public
+    - Id: 14635762
+      Key: privacy_invite
+    - Id: 84457222
+      Key: section_host
+    - Id: 23243139
+      Key: section_join
+    - Id: 73759853
+      Key: code
+    - Id: 88059731
+      Key: code_join
+    - Id: 89592749
+      Key: section_lan
+    - Id: 28817126
+      Key: address
+    - Id: 40906623
+      Key: lan_host
+    - Id: 33879686
+      Key: lan_join
+    - Id: 10562274
+      Key: lan_hint
+    - Id: 50756612
+      Key: my_ip
+    - Id: 14438547
+      Key: tab_friends
+    - Id: 12324076
+      Key: tab_public
+    - Id: 45157018
+      Key: friends_empty
+    - Id: 37670596
+      Key: public_empty
+    - Id: 13971723
+      Key: nosteam
+    - Id: 21489169
+      Key: refresh
+    - Id: 48642262
+      Key: join
+    - Id: 42347968
+      Key: friend_in_lobby
+    - Id: 24568421
+      Key: friend_playing
+    - Id: 10181356
+      Key: players
+    - Id: 28857021
+      Key: loading
+  - Id: 63891677
+    SectionName: lobby
+    SectionSheet:
+    - Id: 29273638
+      Key: title
+    - Id: 53744008
+      Key: code
+    - Id: 72954902
+      Key: address
+    - Id: 16715737
+      Key: offline
+    - Id: 35321227
+      Key: copy
+    - Id: 79849408
+      Key: copied
+    - Id: 60068623
+      Key: invite
+    - Id: 28174076
+      Key: ready
+    - Id: 12510133
+      Key: unready
+    - Id: 57402114
+      Key: start
+    - Id: 42764003
+      Key: leave
+    - Id: 82482396
+      Key: empty
+    - Id: 71920182
+      Key: empty_hint
+    - Id: 42025398
+      Key: host
+    - Id: 66014925
+      Key: you
+    - Id: 16175735
+      Key: state_ready
+    - Id: 96222377
+      Key: state_waiting
+    - Id: 54822931
+      Key: kick
+    - Id: 48916132
+      Key: wait_players
+    - Id: 10645062
+      Key: all_ready
+    - Id: 76076821
+      Key: wait_host
+    - Id: 33211459
+      Key: mode
+    - Id: 44438714
+      Key: mode1
+    - Id: 36105285
+      Key: mode2
+    - Id: 13709402
+      Key: mode3
+    - Id: 80012287
+      Key: mode4
+    - Id: 74133770
+      Key: joined
+    - Id: 56325874
+      Key: left
+  - Id: 65552459
+    SectionName: settings
+    SectionSheet:
+    - Id: 36498214
+      Key: title
+    - Id: 62459419
+      Key: sec_game
+    - Id: 36652437
+      Key: sec_video
+    - Id: 38552044
+      Key: sec_audio
+    - Id: 81733268
+      Key: language
+    - Id: 41464974
+      Key: name
+    - Id: 90246999
+      Key: name_steam
+    - Id: 55432202
+      Key: sens
+    - Id: 23004517
+      Key: volume
+    - Id: 21164294
+      Key: fullscreen
+    - Id: 30112250
+      Key: vsync
+    - Id: 23709495
+      Key: quality
+    - Id: 77683924
+      Key: resolution
+  - Id: 47142713
+    SectionName: msg
+    SectionSheet:
+    - Id: 27898404
+      Key: connecting
+    - Id: 72690724
+      Key: connecting_to
+    - Id: 82812113
+      Key: creating
+    - Id: 85096885
+      Key: creating_steam
+    - Id: 32453617
+      Key: joining
+    - Id: 22471417
+      Key: cancel
+    - Id: 69181033
+      Key: ok
+    - Id: 90116612
+      Key: yes
+    - Id: 89677840
+      Key: no
+    - Id: 62214015
+      Key: failed
+    - Id: 64270214
+      Key: unreachable
+    - Id: 35472747
+      Key: disconnected
+    - Id: 86149956
+      Key: kicked
+    - Id: 99958875
+      Key: full
+    - Id: 54780774
+      Key: not_found
+    - Id: 96502977
+      Key: create_failed
+    - Id: 41183163
+      Key: version
+    - Id: 93096879
+      Key: invalid_code
+    - Id: 15950512
+      Key: connection
+    - Id: 48571071
+      Key: quit_title
+    - Id: 10286480
+      Key: quit_confirm
+    - Id: 65924546
+      Key: leave_title
+    - Id: 33267263
+      Key: leave_host
+    - Id: 18541583
+      Key: leave_client
+    - Id: 10061893
+      Key: get_ready
+    - Id: 81335112
+      Key: octopus
+  - Id: 42099039
+    SectionName: hud
+    SectionSheet:
+    - Id: 46242650
+      Key: biome1
+    - Id: 62715655
+      Key: controls
+    - Id: 79326119
+      Key: esc_pause
+    - Id: 29991008
+      Key: esc_menu
+    - Id: 34166140
+      Key: paused
+    - Id: 91587256
+      Key: paused_single
+    - Id: 96775107
+      Key: paused_coop
+    - Id: 76623773
+      Key: resume
+    - Id: 48362399
+      Key: respawn
+    - Id: 54458177
+      Key: to_lobby
+    - Id: 93277803
+      Key: to_menu
+    - Id: 66074653
+      Key: camp
+    - Id: 22992555
+      Key: respawned
+    - Id: 14455194
+      Key: gave_up
+    - Id: 43515210
+      Key: summit
+    - Id: 56544271
+      Key: summit_text
+    - Id: 94622246
+      Key: state_grab
+    - Id: 48333244
+      Key: state_fist
+    - Id: 26084975
+      Key: state_free
+    - Id: 60412424
+      Key: address
+    - Id: 26007057
+      Key: connected
+  - Id: 90629069
+    SectionName: limb
+    SectionSheet:
+    - Id: 92969912
+      Key: 0
+    - Id: 44774961
+      Key: 1
+    - Id: 66626888
+      Key: 2
+    - Id: 77332952
+      Key: 3
+    - Id: 98882386
+      Key: none
+  - Id: 13726791
+    SectionName: profile
+    SectionSheet:
+    - Id: 80642767
+      Key: default
   Languages:
+  - {fileID: 11400000, guid: d2fca627cb74a4a2e992073057941bb3, type: 2}
   - {fileID: 11400000, guid: abffa052e1fbdf0409f13f98e5dbf44b, type: 2}
   - {fileID: 11400000, guid: 2d8b8ed6b39e3784a861caee8108fec5, type: 2}

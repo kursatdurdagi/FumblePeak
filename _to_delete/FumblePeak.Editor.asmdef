@@ -1,0 +1,21 @@
+{
+    "name": "FumblePeak.Editor",
+    "rootNamespace": "FumblePeak.EditorTools",
+    "references": [
+        "FumblePeak.Runtime",
+        "Mirror",
+        "kcp2k",
+        "Mirror.Transports"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

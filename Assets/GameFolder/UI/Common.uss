@@ -1,0 +1,120 @@
+/* ===== Fumble Peak - ortak stiller ===== */
+:root {
+    --accent: #FF7A33;
+    --accent-dark: #C9541A;
+    --ink: #F4EFE6;
+    --ink-dim: rgba(244, 239, 230, 0.62);
+    --panel: rgba(12, 14, 26, 0.78);
+    --panel-border: rgba(255, 255, 255, 0.10);
+    --danger: #FF5A4E;
+}
+
+.logo { align-items: flex-start; }
+.logo__top {
+    font-size: 64px;
+    -unity-font-style: bold;
+    color: var(--ink);
+    letter-spacing: 10px;
+    margin: 0; padding: 0;
+    -unity-text-outline-width: 0;
+}
+.logo__bottom {
+    font-size: 110px;
+    -unity-font-style: bold;
+    color: var(--accent);
+    letter-spacing: 18px;
+    margin: -28px 0 0 0; padding: 0;
+    rotate: -3deg;
+}
+.logo--big { align-items: center; }
+.logo--big .logo__top { font-size: 96px; }
+.logo--big .logo__bottom { font-size: 170px; margin-top: -44px; }
+
+.menu-btn {
+    height: 58px;
+    min-width: 340px;
+    margin: 6px 0;
+    padding: 0 26px;
+    border-width: 0;
+    border-left-width: 4px;
+    border-color: transparent;
+    border-radius: 6px;
+    background-color: rgba(255, 255, 255, 0.06);
+    color: var(--ink);
+    font-size: 22px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-left;
+    letter-spacing: 3px;
+    translate: 0 0;
+    transition-property: background-color, translate, border-color, color, scale;
+    transition-duration: 0.15s, 0.18s, 0.15s, 0.15s, 0.1s;
+    transition-timing-function: ease-out, ease-out-back, ease-out, ease-out, ease-out;
+}
+.menu-btn:hover {
+    background-color: rgba(255, 255, 255, 0.13);
+    border-color: var(--accent);
+    translate: 12px 0;
+}
+.menu-btn:active { scale: 0.97 0.97; }
+.menu-btn:disabled { opacity: 0.35; }
+.menu-btn--primary { background-color: var(--accent); color: #1A0E06; }
+.menu-btn--primary:hover { background-color: #FF955C; border-color: #FFFFFF; }
+.menu-btn--ghost { background-color: transparent; color: var(--ink-dim); }
+.menu-btn--ghost:hover { background-color: rgba(255, 255, 255, 0.06); color: var(--ink); }
+
+.field { margin: 8px 0; min-width: 340px; }
+.field > Label, .field .unity-base-field__label {
+    color: var(--ink-dim);
+    font-size: 16px;
+    min-width: 120px;
+}
+.field .unity-base-text-field__input, .field TextInput {
+    background-color: rgba(255, 255, 255, 0.08);
+    border-color: var(--panel-border);
+    border-radius: 6px;
+    color: var(--ink);
+    font-size: 20px;
+    height: 44px;
+    padding-left: 12px;
+}
+
+.hint { color: var(--ink-dim); font-size: 17px; white-space: normal; max-width: 420px; margin: 4px 0 12px 0; }
+.hint--small { font-size: 14px; margin-top: 8px; }
+.page-title { color: var(--ink); font-size: 30px; -unity-font-style: bold; letter-spacing: 4px; margin-bottom: 6px; }
+
+.card {
+    background-color: var(--panel);
+    border-width: 1px;
+    border-color: var(--panel-border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+    width: 440px;
+}
+.card__title { color: var(--accent); font-size: 16px; -unity-font-style: bold; letter-spacing: 4px; margin-bottom: 10px; }
+.card__line { color: var(--ink); font-size: 17px; white-space: normal; margin: 3px 0; }
+.card__line--key { color: #FFD7BF; -unity-font-style: bold; }
+.card__line--warn { color: #FF9C8F; }
+
+.small-btn {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-width: 0;
+    border-radius: 6px;
+    color: var(--ink);
+    font-size: 14px;
+    padding: 6px 12px;
+}
+.small-btn:hover { background-color: var(--accent); color: #1A0E06; }
+
+/* Açılır listeler (DropdownField) */
+.field .unity-base-popup-field__input {
+    background-color: rgba(255, 255, 255, 0.08);
+    border-color: var(--panel-border);
+    border-radius: 6px;
+    color: var(--ink);
+    font-size: 18px;
+    height: 40px;
+    padding-left: 12px;
+}
+.field .unity-base-popup-field__text { color: var(--ink); }
+.field .unity-toggle__checkmark { width: 22px; height: 22px; border-radius: 4px; background-color: rgba(255, 255, 255, 0.1); border-color: var(--panel-border); }

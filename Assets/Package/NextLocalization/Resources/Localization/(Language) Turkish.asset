@@ -1,0 +1,608 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 107ec162e9a39314782d731393645d02, type: 3}
+  m_Name: (Language) Turkish
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizationLanguage
+  LanguageName: Turkish
+  Strings:
+  - SectionId: 40209645
+    EntryId: 28080632
+    Key: intro.top
+    Value: "1 BEDEN \xB7 4 UZUV \xB7 0 KOORD\u0130NASYON"
+  - SectionId: 40209645
+    EntryId: 35911328
+    Key: intro.tagline
+    Value: "Biri erken b\u0131rak\u0131rsa, hepimiz d\xFC\u015Feriz."
+  - SectionId: 40209645
+    EntryId: 27176940
+    Key: intro.press
+    Value: "DEVAM ETMEK \u0130\xC7\u0130N B\u0130R TU\u015EA BAS"
+  - SectionId: 76708446
+    EntryId: 57603178
+    Key: menu.single
+    Value: TEK OYUNCU
+  - SectionId: 76708446
+    EntryId: 10478280
+    Key: menu.single_desc
+    Value: "Ahtapot modu: d\xF6rt uzuv da sende."
+  - SectionId: 76708446
+    EntryId: 76553287
+    Key: menu.multi
+    Value: "\xC7OK OYUNCULU"
+  - SectionId: 76708446
+    EntryId: 46816222
+    Key: menu.multi_desc
+    Value: "2-4 ki\u015Filik co-op. Lobi kur ya da arkada\u015F\u0131na kat\u0131l."
+  - SectionId: 76708446
+    EntryId: 52933792
+    Key: menu.settings
+    Value: AYARLAR
+  - SectionId: 76708446
+    EntryId: 79536307
+    Key: menu.quit
+    Value: "\xC7IKI\u015E"
+  - SectionId: 76708446
+    EntryId: 73548192
+    Key: menu.back
+    Value: "\u2190 GER\u0130"
+  - SectionId: 76708446
+    EntryId: 41465958
+    Key: menu.steam_ok
+    Value: "Steam ba\u011Fl\u0131 \xB7 {0}"
+  - SectionId: 76708446
+    EntryId: 23623382
+    Key: menu.steam_off
+    Value: "Steam bulunamad\u0131 \xB7 Yerel a\u011F modu"
+  - SectionId: 89308091
+    EntryId: 37999102
+    Key: howto.title
+    Value: NASIL OYNANIR
+  - SectionId: 89308091
+    EntryId: 32644992
+    Key: howto.l1
+    Value: "Herkes bedenin bir uzvunu y\xF6netir."
+  - SectionId: 89308091
+    EntryId: 26149491
+    Key: howto.l2
+    Value: "FARE \u2014 uzvunu y\xF6nlendir"
+  - SectionId: 89308091
+    EntryId: 36193593
+    Key: howto.l3
+    Value: "SOL TIK \u2014 tutun / b\u0131rak"
+  - SectionId: 89308091
+    EntryId: 95328796
+    Key: howto.l4
+    Value: "SA\u011E TIK \u2014 tutun + di\u011Fer uzva ge\xE7"
+  - SectionId: 89308091
+    EntryId: 73969794
+    Key: howto.l5
+    Value: "Q / E / A / D \u2014 uzuv se\xE7"
+  - SectionId: 89308091
+    EntryId: 27629657
+    Key: howto.l6
+    Value: "Tutunurken fareyi A\u015EA\u011EI \xE7ek \u2192 beden YUKARI \xE7\u0131kar."
+  - SectionId: 89308091
+    EntryId: 79449286
+    Key: howto.l7
+    Value: "Ayn\u0131 yerde fazla kalma: kollar k\u0131zar\u0131r, titrer ve b\u0131rak\u0131r!"
+  - SectionId: 89308091
+    EntryId: 25288826
+    Key: howto.players
+    Value: "OYUNCU DA\u011EILIMI"
+  - SectionId: 89308091
+    EntryId: 70488937
+    Key: howto.p1
+    Value: "1 \u2014 Ahtapot modu (4 uzuv)"
+  - SectionId: 89308091
+    EntryId: 38118160
+    Key: howto.p2
+    Value: "2 \u2014 \xC7apraz ba\u011F (kol + kar\u015F\u0131 bacak)"
+  - SectionId: 89308091
+    EntryId: 40755791
+    Key: howto.p3
+    Value: "3 \u2014 Asimetrik (biri iki bacak)"
+  - SectionId: 89308091
+    EntryId: 75718668
+    Key: howto.p4
+    Value: "4 \u2014 Tam kaos (herkese bir uzuv)"
+  - SectionId: 98072823
+    EntryId: 67719605
+    Key: mp.title
+    Value: "\xC7OK OYUNCULU"
+  - SectionId: 98072823
+    EntryId: 48755742
+    Key: mp.host
+    Value: "LOB\u0130 KUR"
+  - SectionId: 98072823
+    EntryId: 62855325
+    Key: mp.host_steam
+    Value: "STEAM LOB\u0130S\u0130 KUR"
+  - SectionId: 98072823
+    EntryId: 32339422
+    Key: mp.privacy
+    Value: Gizlilik
+  - SectionId: 98072823
+    EntryId: 36674409
+    Key: mp.privacy_friends
+    Value: "Arkada\u015Flar"
+  - SectionId: 98072823
+    EntryId: 71993921
+    Key: mp.privacy_public
+    Value: "Herkese a\xE7\u0131k"
+  - SectionId: 98072823
+    EntryId: 14635762
+    Key: mp.privacy_invite
+    Value: Sadece davet
+  - SectionId: 98072823
+    EntryId: 84457222
+    Key: mp.section_host
+    Value: "LOB\u0130 KUR"
+  - SectionId: 98072823
+    EntryId: 23243139
+    Key: mp.section_join
+    Value: KATIL
+  - SectionId: 98072823
+    EntryId: 73759853
+    Key: mp.code
+    Value: Lobi kodu
+  - SectionId: 98072823
+    EntryId: 88059731
+    Key: mp.code_join
+    Value: "KOD \u0130LE KATIL"
+  - SectionId: 98072823
+    EntryId: 89592749
+    Key: mp.section_lan
+    Value: "YEREL A\u011E / IP"
+  - SectionId: 98072823
+    EntryId: 28817126
+    Key: mp.address
+    Value: Adres
+  - SectionId: 98072823
+    EntryId: 40906623
+    Key: mp.lan_host
+    Value: "IP \u0130LE LOB\u0130 KUR"
+  - SectionId: 98072823
+    EntryId: 33879686
+    Key: mp.lan_join
+    Value: "IP \u0130LE BA\u011ELAN"
+  - SectionId: 98072823
+    EntryId: 10562274
+    Key: mp.lan_hint
+    Value: "Ayn\u0131 a\u011Fdaysan\u0131z host'un yerel IP'sini girin. \u0130nternet
+      \xFCzerinden host UDP {0} portunu a\xE7mal\u0131."
+  - SectionId: 98072823
+    EntryId: 50756612
+    Key: mp.my_ip
+    Value: 'Senin yerel IP''n: {0}'
+  - SectionId: 98072823
+    EntryId: 14438547
+    Key: mp.tab_friends
+    Value: "ARKADA\u015ELAR"
+  - SectionId: 98072823
+    EntryId: 12324076
+    Key: mp.tab_public
+    Value: "A\xC7IK LOB\u0130LER"
+  - SectionId: 98072823
+    EntryId: 45157018
+    Key: mp.friends_empty
+    Value: "\u015Eu an Fumble Peak oynayan arkada\u015F\u0131n yok."
+  - SectionId: 98072823
+    EntryId: 37670596
+    Key: mp.public_empty
+    Value: "A\xE7\u0131k lobi bulunamad\u0131."
+  - SectionId: 98072823
+    EntryId: 13971723
+    Key: mp.nosteam
+    Value: "Steam a\xE7\u0131k de\u011Fil. Arkada\u015F listesi ve davetler i\xE7in
+      Steam'i ba\u015Flat."
+  - SectionId: 98072823
+    EntryId: 21489169
+    Key: mp.refresh
+    Value: "YEN\u0130LE"
+  - SectionId: 98072823
+    EntryId: 48642262
+    Key: mp.join
+    Value: KATIL
+  - SectionId: 98072823
+    EntryId: 42347968
+    Key: mp.friend_in_lobby
+    Value: Lobide
+  - SectionId: 98072823
+    EntryId: 24568421
+    Key: mp.friend_playing
+    Value: Oynuyor
+  - SectionId: 98072823
+    EntryId: 10181356
+    Key: mp.players
+    Value: '{0}/{1} oyuncu'
+  - SectionId: 98072823
+    EntryId: 28857021
+    Key: mp.loading
+    Value: "Y\xFCkleniyor..."
+  - SectionId: 63891677
+    EntryId: 29273638
+    Key: lobby.title
+    Value: "LOB\u0130"
+  - SectionId: 63891677
+    EntryId: 53744008
+    Key: lobby.code
+    Value: Lobi kodu
+  - SectionId: 63891677
+    EntryId: 72954902
+    Key: lobby.address
+    Value: Adres
+  - SectionId: 63891677
+    EntryId: 16715737
+    Key: lobby.offline
+    Value: Yerel oturum
+  - SectionId: 63891677
+    EntryId: 35321227
+    Key: lobby.copy
+    Value: KOPYALA
+  - SectionId: 63891677
+    EntryId: 79849408
+    Key: lobby.copied
+    Value: "Kopyaland\u0131!"
+  - SectionId: 63891677
+    EntryId: 60068623
+    Key: lobby.invite
+    Value: "ARKADA\u015E DAVET ET"
+  - SectionId: 63891677
+    EntryId: 28174076
+    Key: lobby.ready
+    Value: HAZIRIM
+  - SectionId: 63891677
+    EntryId: 12510133
+    Key: lobby.unready
+    Value: "HAZIR DE\u011E\u0130L\u0130M"
+  - SectionId: 63891677
+    EntryId: 57402114
+    Key: lobby.start
+    Value: "OYUNU BA\u015ELAT"
+  - SectionId: 63891677
+    EntryId: 42764003
+    Key: lobby.leave
+    Value: "LOB\u0130DEN AYRIL"
+  - SectionId: 63891677
+    EntryId: 82482396
+    Key: lobby.empty
+    Value: "Bo\u015F yer"
+  - SectionId: 63891677
+    EntryId: 71920182
+    Key: lobby.empty_hint
+    Value: "Arkada\u015F\u0131n\u0131 davet et"
+  - SectionId: 63891677
+    EntryId: 42025398
+    Key: lobby.host
+    Value: HOST
+  - SectionId: 63891677
+    EntryId: 66014925
+    Key: lobby.you
+    Value: (sen)
+  - SectionId: 63891677
+    EntryId: 16175735
+    Key: lobby.state_ready
+    Value: HAZIR
+  - SectionId: 63891677
+    EntryId: 96222377
+    Key: lobby.state_waiting
+    Value: "BEKL\u0130YOR"
+  - SectionId: 63891677
+    EntryId: 54822931
+    Key: lobby.kick
+    Value: AT
+  - SectionId: 63891677
+    EntryId: 48916132
+    Key: lobby.wait_players
+    Value: "Oyuncular\u0131n haz\u0131r olmas\u0131 bekleniyor..."
+  - SectionId: 63891677
+    EntryId: 10645062
+    Key: lobby.all_ready
+    Value: "Herkes haz\u0131r! Ba\u015Flatabilirsin."
+  - SectionId: 63891677
+    EntryId: 76076821
+    Key: lobby.wait_host
+    Value: "Host'un oyunu ba\u015Flatmas\u0131 bekleniyor..."
+  - SectionId: 63891677
+    EntryId: 33211459
+    Key: lobby.mode
+    Value: 'Mod: {0}'
+  - SectionId: 63891677
+    EntryId: 44438714
+    Key: lobby.mode1
+    Value: Ahtapot modu
+  - SectionId: 63891677
+    EntryId: 36105285
+    Key: lobby.mode2
+    Value: "\xC7apraz ba\u011F"
+  - SectionId: 63891677
+    EntryId: 13709402
+    Key: lobby.mode3
+    Value: Asimetrik
+  - SectionId: 63891677
+    EntryId: 80012287
+    Key: lobby.mode4
+    Value: Tam kaos
+  - SectionId: 63891677
+    EntryId: 74133770
+    Key: lobby.joined
+    Value: "{0} lobiye kat\u0131ld\u0131"
+  - SectionId: 63891677
+    EntryId: 56325874
+    Key: lobby.left
+    Value: "{0} ayr\u0131ld\u0131"
+  - SectionId: 65552459
+    EntryId: 36498214
+    Key: settings.title
+    Value: AYARLAR
+  - SectionId: 65552459
+    EntryId: 62459419
+    Key: settings.sec_game
+    Value: OYUN
+  - SectionId: 65552459
+    EntryId: 36652437
+    Key: settings.sec_video
+    Value: "G\xD6R\xDCNT\xDC"
+  - SectionId: 65552459
+    EntryId: 38552044
+    Key: settings.sec_audio
+    Value: SES
+  - SectionId: 65552459
+    EntryId: 81733268
+    Key: settings.language
+    Value: Dil
+  - SectionId: 65552459
+    EntryId: 41464974
+    Key: settings.name
+    Value: "Oyuncu ad\u0131"
+  - SectionId: 65552459
+    EntryId: 90246999
+    Key: settings.name_steam
+    Value: "Steam ad\u0131n kullan\u0131l\u0131yor."
+  - SectionId: 65552459
+    EntryId: 55432202
+    Key: settings.sens
+    Value: Fare hassasiyeti
+  - SectionId: 65552459
+    EntryId: 23004517
+    Key: settings.volume
+    Value: Ana ses
+  - SectionId: 65552459
+    EntryId: 21164294
+    Key: settings.fullscreen
+    Value: Tam ekran
+  - SectionId: 65552459
+    EntryId: 30112250
+    Key: settings.vsync
+    Value: Dikey senkronizasyon (V-Sync)
+  - SectionId: 65552459
+    EntryId: 23709495
+    Key: settings.quality
+    Value: Grafik kalitesi
+  - SectionId: 65552459
+    EntryId: 77683924
+    Key: settings.resolution
+    Value: "\xC7\xF6z\xFCn\xFCrl\xFCk"
+  - SectionId: 47142713
+    EntryId: 27898404
+    Key: msg.connecting
+    Value: "BA\u011ELANILIYOR"
+  - SectionId: 47142713
+    EntryId: 72690724
+    Key: msg.connecting_to
+    Value: "{0} adresine ba\u011Flan\u0131l\u0131yor..."
+  - SectionId: 47142713
+    EntryId: 82812113
+    Key: msg.creating
+    Value: "LOB\u0130 KURULUYOR"
+  - SectionId: 47142713
+    EntryId: 85096885
+    Key: msg.creating_steam
+    Value: "Steam lobisi haz\u0131rlan\u0131yor..."
+  - SectionId: 47142713
+    EntryId: 32453617
+    Key: msg.joining
+    Value: "Lobiye kat\u0131l\u0131n\u0131yor..."
+  - SectionId: 47142713
+    EntryId: 22471417
+    Key: msg.cancel
+    Value: "\u0130PTAL"
+  - SectionId: 47142713
+    EntryId: 69181033
+    Key: msg.ok
+    Value: TAMAM
+  - SectionId: 47142713
+    EntryId: 90116612
+    Key: msg.yes
+    Value: EVET
+  - SectionId: 47142713
+    EntryId: 89677840
+    Key: msg.no
+    Value: HAYIR
+  - SectionId: 47142713
+    EntryId: 62214015
+    Key: msg.failed
+    Value: "BA\u011ELANTI KURULAMADI"
+  - SectionId: 47142713
+    EntryId: 64270214
+    Key: msg.unreachable
+    Value: "Sunucuya ula\u015F\u0131lamad\u0131."
+  - SectionId: 47142713
+    EntryId: 35472747
+    Key: msg.disconnected
+    Value: "Ba\u011Flant\u0131 koptu ya da host oturumu kapatt\u0131."
+  - SectionId: 47142713
+    EntryId: 86149956
+    Key: msg.kicked
+    Value: "Host seni lobiden att\u0131."
+  - SectionId: 47142713
+    EntryId: 99958875
+    Key: msg.full
+    Value: Lobi dolu (4/4).
+  - SectionId: 47142713
+    EntryId: 54780774
+    Key: msg.not_found
+    Value: "Lobi bulunamad\u0131 ya da kapanm\u0131\u015F."
+  - SectionId: 47142713
+    EntryId: 96502977
+    Key: msg.create_failed
+    Value: "Steam lobisi olu\u015Fturulamad\u0131 ({0})."
+  - SectionId: 47142713
+    EntryId: 41183163
+    Key: msg.version
+    Value: "Farkl\u0131 oyun s\xFCr\xFCm\xFC (host: {0}, sen: {1})."
+  - SectionId: 47142713
+    EntryId: 93096879
+    Key: msg.invalid_code
+    Value: "Ge\xE7ersiz lobi kodu. Kod sadece rakamlardan olu\u015Fur."
+  - SectionId: 47142713
+    EntryId: 15950512
+    Key: msg.connection
+    Value: "BA\u011ELANTI"
+  - SectionId: 47142713
+    EntryId: 48571071
+    Key: msg.quit_title
+    Value: "\xC7IKI\u015E"
+  - SectionId: 47142713
+    EntryId: 10286480
+    Key: msg.quit_confirm
+    Value: "Oyundan \xE7\u0131kmak istiyor musun?"
+  - SectionId: 47142713
+    EntryId: 65924546
+    Key: msg.leave_title
+    Value: "LOB\u0130DEN AYRIL"
+  - SectionId: 47142713
+    EntryId: 33267263
+    Key: msg.leave_host
+    Value: "Sen host'sun: ayr\u0131l\u0131rsan lobi herkes i\xE7in kapan\u0131r."
+  - SectionId: 47142713
+    EntryId: 18541583
+    Key: msg.leave_client
+    Value: "Lobiden ayr\u0131lmak istiyor musun?"
+  - SectionId: 47142713
+    EntryId: 10061893
+    Key: msg.get_ready
+    Value: "Z\u0130RVEYE HAZIRLAN"
+  - SectionId: 47142713
+    EntryId: 81335112
+    Key: msg.octopus
+    Value: AHTAPOT MODU
+  - SectionId: 42099039
+    EntryId: 46242650
+    Key: hud.biome1
+    Value: "BA\u015ELANGI\xC7 VAD\u0130S\u0130"
+  - SectionId: 42099039
+    EntryId: 62715655
+    Key: hud.controls
+    Value: "FARE uzvu y\xF6nlendir  \xB7  SOL TIK tutun/b\u0131rak  \xB7  SA\u011E
+      TIK tutun + di\u011Fer uzuv  \xB7  Q/E/A/D uzuv se\xE7  \xB7  ESC {0}"
+  - SectionId: 42099039
+    EntryId: 79326119
+    Key: hud.esc_pause
+    Value: duraklat
+  - SectionId: 42099039
+    EntryId: 29991008
+    Key: hud.esc_menu
+    Value: "men\xFC"
+  - SectionId: 42099039
+    EntryId: 34166140
+    Key: hud.paused
+    Value: DURAKLATILDI
+  - SectionId: 42099039
+    EntryId: 91587256
+    Key: hud.paused_single
+    Value: "Oyun duraklat\u0131ld\u0131."
+  - SectionId: 42099039
+    EntryId: 96775107
+    Key: hud.paused_coop
+    Value: "(Oyun arka planda devam ediyor \u2014 arkada\u015Flar\u0131n h\xE2l\xE2
+      as\u0131l\u0131!)"
+  - SectionId: 42099039
+    EntryId: 76623773
+    Key: hud.resume
+    Value: DEVAM ET
+  - SectionId: 42099039
+    EntryId: 48362399
+    Key: hud.respawn
+    Value: "KAMPA D\xD6N"
+  - SectionId: 42099039
+    EntryId: 54458177
+    Key: hud.to_lobby
+    Value: "LOB\u0130YE D\xD6N (HERKES)"
+  - SectionId: 42099039
+    EntryId: 93277803
+    Key: hud.to_menu
+    Value: "ANA MEN\xDCYE D\xD6N"
+  - SectionId: 42099039
+    EntryId: 66074653
+    Key: hud.camp
+    Value: "KAMP ATE\u015E\u0130! Yeni d\xF6n\xFC\u015F noktas\u0131"
+  - SectionId: 42099039
+    EntryId: 22992555
+    Key: hud.respawned
+    Value: "Kampa geri d\xF6n\xFCld\xFC"
+  - SectionId: 42099039
+    EntryId: 14455194
+    Key: hud.gave_up
+    Value: '{0} pes etti!'
+  - SectionId: 42099039
+    EntryId: 43515210
+    Key: hud.summit
+    Value: "Z\u0130RVE!"
+  - SectionId: 42099039
+    EntryId: 56544271
+    Key: hud.summit_text
+    Value: "Kimse kimseyi b\u0131rakmad\u0131. (Pek say\u0131lmaz.)"
+  - SectionId: 42099039
+    EntryId: 94622246
+    Key: hud.state_grab
+    Value: TUTUYOR
+  - SectionId: 42099039
+    EntryId: 48333244
+    Key: hud.state_fist
+    Value: YUMRUK
+  - SectionId: 42099039
+    EntryId: 26084975
+    Key: hud.state_free
+    Value: SERBEST
+  - SectionId: 42099039
+    EntryId: 60412424
+    Key: hud.address
+    Value: 'Adres (port {0}):'
+  - SectionId: 42099039
+    EntryId: 26007057
+    Key: hud.connected
+    Value: "Ba\u011Fl\u0131:"
+  - SectionId: 90629069
+    EntryId: 92969912
+    Key: limb.0
+    Value: Sol Kol
+  - SectionId: 90629069
+    EntryId: 44774961
+    Key: limb.1
+    Value: "Sa\u011F Kol"
+  - SectionId: 90629069
+    EntryId: 66626888
+    Key: limb.2
+    Value: Sol Bacak
+  - SectionId: 90629069
+    EntryId: 77332952
+    Key: limb.3
+    Value: "Sa\u011F Bacak"
+  - SectionId: 90629069
+    EntryId: 98882386
+    Key: limb.none
+    Value: "\u0130zleyici"
+  - SectionId: 13726791
+    EntryId: 80642767
+    Key: profile.default
+    Value: "Da\u011Fc\u0131"

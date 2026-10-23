@@ -1,0 +1,181 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="MainMenu.uss" />
+    <!-- Metni "#anahtar" olan tüm öğeler UILocalizer ile NextLocalization'dan çevrilir. -->
+    <ui:VisualElement name="root" class="root">
+
+        <!-- ================= GİRİŞ ================= -->
+        <ui:VisualElement name="intro" class="intro">
+            <ui:Label name="intro-studio" text="#intro.top" class="intro-studio" />
+            <ui:VisualElement name="intro-logo" class="logo logo--big">
+                <ui:Label text="FUMBLE" class="logo__top" />
+                <ui:Label text="PEAK" class="logo__bottom" />
+            </ui:VisualElement>
+            <ui:Label name="intro-tagline" text="#intro.tagline" class="tagline" />
+            <ui:Label name="press-any" text="#intro.press" class="press-any" />
+        </ui:VisualElement>
+
+        <!-- ================= MENÜ ================= -->
+        <ui:VisualElement name="menu" class="menu menu--hidden">
+            <ui:VisualElement class="menu__left">
+                <ui:VisualElement class="logo logo--small">
+                    <ui:Label text="FUMBLE" class="logo__top" />
+                    <ui:Label text="PEAK" class="logo__bottom" />
+                </ui:VisualElement>
+
+                <!-- Ana sayfa -->
+                <ui:VisualElement name="page-main" class="page">
+                    <ui:Button name="btn-single" class="tile tile--primary">
+                        <ui:Label text="#menu.single" class="tile__title" />
+                        <ui:Label text="#menu.single_desc" class="tile__desc" />
+                    </ui:Button>
+                    <ui:Button name="btn-multi" class="tile">
+                        <ui:Label text="#menu.multi" class="tile__title" />
+                        <ui:Label text="#menu.multi_desc" class="tile__desc" />
+                    </ui:Button>
+                    <ui:Button name="btn-settings" text="#menu.settings" class="menu-btn" />
+                    <ui:Button name="btn-quit" text="#menu.quit" class="menu-btn menu-btn--ghost" />
+                </ui:VisualElement>
+
+                <!-- Çok oyunculu -->
+                <ui:ScrollView name="page-multi" class="page page--hidden page--scroll">
+                    <ui:Label text="#mp.title" class="page-title" />
+
+                    <ui:Label text="#mp.section_host" class="section-label" />
+                    <ui:VisualElement class="row">
+                        <ui:Button name="btn-host" text="#mp.host" class="menu-btn menu-btn--primary menu-btn--grow" />
+                    </ui:VisualElement>
+                    <ui:DropdownField name="dd-privacy" label="#mp.privacy" class="field" />
+
+                    <ui:Label text="#mp.section_join" class="section-label" />
+                    <ui:VisualElement class="row">
+                        <ui:TextField name="field-lobby" label="#mp.code" class="field field--grow" />
+                        <ui:Button name="btn-join-code" text="#mp.join" class="small-btn small-btn--accent" />
+                    </ui:VisualElement>
+
+                    <ui:Label text="#mp.section_lan" class="section-label" />
+                    <ui:VisualElement class="row">
+                        <ui:TextField name="field-ip" label="#mp.address" class="field field--grow" />
+                        <ui:Button name="btn-lan-join" text="#mp.lan_join" class="small-btn small-btn--accent" />
+                    </ui:VisualElement>
+                    <ui:Button name="btn-lan-host" text="#mp.lan_host" class="menu-btn menu-btn--small" />
+                    <ui:Label name="lan-hint" text="" class="hint" />
+                    <ui:Label name="lan-myip" text="" class="hint hint--small" />
+
+                    <ui:Button name="btn-back-multi" text="#menu.back" class="menu-btn menu-btn--ghost" />
+                </ui:ScrollView>
+
+                <!-- Ayarlar -->
+                <ui:ScrollView name="page-settings" class="page page--hidden page--scroll">
+                    <ui:Label text="#settings.title" class="page-title" />
+
+                    <ui:Label text="#settings.sec_game" class="section-label" />
+                    <ui:DropdownField name="dd-language" label="#settings.language" class="field" />
+                    <ui:TextField name="field-name" label="#settings.name" class="field" />
+                    <ui:Label name="name-steam-hint" text="#settings.name_steam" class="hint hint--small" />
+                    <ui:Slider name="slider-sens" label="#settings.sens" low-value="0.3" high-value="3" class="field" />
+
+                    <ui:Label text="#settings.sec_video" class="section-label" />
+                    <ui:Toggle name="toggle-fullscreen" label="#settings.fullscreen" class="field" />
+                    <ui:DropdownField name="dd-resolution" label="#settings.resolution" class="field" />
+                    <ui:DropdownField name="dd-quality" label="#settings.quality" class="field" />
+                    <ui:Toggle name="toggle-vsync" label="#settings.vsync" class="field" />
+
+                    <ui:Label text="#settings.sec_audio" class="section-label" />
+                    <ui:Slider name="slider-volume" label="#settings.volume" low-value="0" high-value="1" class="field" />
+
+                    <ui:Button name="btn-back-settings" text="#menu.back" class="menu-btn menu-btn--ghost" />
+                </ui:ScrollView>
+            </ui:VisualElement>
+
+            <ui:VisualElement class="menu__right">
+                <!-- Nasıl oynanır -->
+                <ui:VisualElement name="panel-howto" class="panel">
+                    <ui:VisualElement class="card">
+                        <ui:Label text="#howto.title" class="card__title" />
+                        <ui:Label text="#howto.l1" class="card__line" />
+                        <ui:Label text="#howto.l2" class="card__line card__line--key" />
+                        <ui:Label text="#howto.l3" class="card__line card__line--key" />
+                        <ui:Label text="#howto.l4" class="card__line card__line--key" />
+                        <ui:Label text="#howto.l5" class="card__line card__line--key" />
+                        <ui:Label text="#howto.l6" class="card__line" />
+                        <ui:Label text="#howto.l7" class="card__line card__line--warn" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="card">
+                        <ui:Label text="#howto.players" class="card__title" />
+                        <ui:Label text="#howto.p1" class="card__line" />
+                        <ui:Label text="#howto.p2" class="card__line" />
+                        <ui:Label text="#howto.p3" class="card__line" />
+                        <ui:Label text="#howto.p4" class="card__line" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <!-- Steam arkadaşları / açık lobiler -->
+                <ui:VisualElement name="panel-browser" class="panel panel--hidden">
+                    <ui:VisualElement class="card card--browser">
+                        <ui:VisualElement class="tabs">
+                            <ui:Button name="tab-friends" text="#mp.tab_friends" class="tab tab--active" />
+                            <ui:Button name="tab-public" text="#mp.tab_public" class="tab" />
+                            <ui:VisualElement class="spacer" />
+                            <ui:Button name="btn-refresh" text="#mp.refresh" class="small-btn" />
+                        </ui:VisualElement>
+                        <ui:ScrollView name="browser-list" class="browser-list" />
+                        <ui:Label name="browser-empty" text="" class="hint browser-empty" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement class="status-bar">
+                <ui:VisualElement name="steam-dot" class="dot" />
+                <ui:Label name="steam-status" text="" class="status-text" />
+                <ui:Label name="version" text="v0.1" class="status-text status-text--right" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- ================= LOBİ ================= -->
+        <ui:VisualElement name="lobby" class="lobby lobby--hidden">
+            <ui:VisualElement class="lobby__header">
+                <ui:VisualElement>
+                    <ui:Label text="#lobby.title" class="lobby__title" />
+                    <ui:Label name="lobby-mode" text="" class="lobby__mode" />
+                </ui:VisualElement>
+                <ui:VisualElement class="spacer" />
+                <ui:VisualElement class="lobby__info">
+                    <ui:VisualElement class="code-row">
+                        <ui:Label name="lobby-code-label" text="" class="code-row__label" />
+                        <ui:Label name="lobby-code" text="" class="code-row__code" />
+                        <ui:Button name="btn-copy" text="#lobby.copy" class="small-btn" />
+                    </ui:VisualElement>
+                    <ui:DropdownField name="dd-lobby-privacy" label="#mp.privacy" class="field field--compact" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement name="lobby-slots" class="lobby__slots" />
+
+            <ui:Label name="lobby-status" text="" class="lobby__status" />
+
+            <ui:VisualElement class="lobby__actions">
+                <ui:Button name="btn-lobby-leave" text="#lobby.leave" class="menu-btn menu-btn--ghost menu-btn--center" />
+                <ui:VisualElement class="spacer" />
+                <ui:Button name="btn-lobby-invite" text="#lobby.invite" class="menu-btn menu-btn--center" />
+                <ui:Button name="btn-lobby-ready" text="#lobby.ready" class="menu-btn menu-btn--primary menu-btn--center" />
+                <ui:Button name="btn-lobby-start" text="#lobby.start" class="menu-btn menu-btn--primary menu-btn--center" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- ================= MODAL ================= -->
+        <ui:VisualElement name="modal" class="modal modal--hidden">
+            <ui:VisualElement class="modal__card">
+                <ui:VisualElement name="spinner" class="spinner" />
+                <ui:Label name="modal-title" text="" class="modal__title" />
+                <ui:Label name="modal-text" text="" class="modal__text" />
+                <ui:VisualElement class="modal__buttons">
+                    <ui:Button name="modal-btn-secondary" text="" class="menu-btn menu-btn--ghost modal__btn" />
+                    <ui:Button name="modal-btn-primary" text="" class="menu-btn menu-btn--primary modal__btn" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- ================= BİLDİRİMLER ================= -->
+        <ui:VisualElement name="toast-stack" class="toast-stack" />
+    </ui:VisualElement>
+</ui:UXML>
