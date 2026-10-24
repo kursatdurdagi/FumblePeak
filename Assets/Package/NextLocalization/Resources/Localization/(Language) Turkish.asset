@@ -33,7 +33,7 @@ MonoBehaviour:
   - SectionId: 76708446
     EntryId: 10478280
     Key: menu.single_desc
-    Value: "Ahtapot modu: d\xF6rt uzuv da sende."
+    Value: "Ahtapot modu: d\xF6rt uzuv da sende!"
   - SectionId: 76708446
     EntryId: 76553287
     Key: menu.multi
@@ -73,27 +73,30 @@ MonoBehaviour:
   - SectionId: 89308091
     EntryId: 26149491
     Key: howto.l2
-    Value: "FARE \u2014 uzvunu y\xF6nlendir"
+    Value: "FARE \u2014 elini / aya\u011F\u0131n\u0131 hareket ettir"
   - SectionId: 89308091
     EntryId: 36193593
     Key: howto.l3
-    Value: "SOL TIK \u2014 tutun / b\u0131rak"
+    Value: "SOL TIK \u2014 imlecin alt\u0131ndaki kayaya tutun"
   - SectionId: 89308091
     EntryId: 95328796
     Key: howto.l4
-    Value: "SA\u011E TIK \u2014 tutun + di\u011Fer uzva ge\xE7"
+    Value: "Tutununca kontrol di\u011Fer ele ge\xE7er: yukar\u0131 uzan, t\u0131kla,
+      tekrarla!"
   - SectionId: 89308091
     EntryId: 73969794
     Key: howto.l5
-    Value: "Q / E / A / D \u2014 uzuv se\xE7"
+    Value: "Q / E / A / D \u2014 uzuv se\xE7  \xB7  SA\u011E TIK \u2014 b\u0131rak"
   - SectionId: 89308091
     EntryId: 27629657
     Key: howto.l6
-    Value: "Tutunurken fareyi A\u015EA\u011EI \xE7ek \u2192 beden YUKARI \xE7\u0131kar."
+    Value: "Tutunan el seni kendili\u011Finden yukar\u0131 \xE7eker. Parlayan kaya
+      = tutunabilece\u011Fin yer."
   - SectionId: 89308091
     EntryId: 79449286
     Key: howto.l7
-    Value: "Ayn\u0131 yerde fazla kalma: kollar k\u0131zar\u0131r, titrer ve b\u0131rak\u0131r!"
+    Value: "Tek kolla uzun s\xFCre as\u0131l\u0131 kalma: kollar k\u0131zar\u0131r,
+      titrer ve b\u0131rak\u0131r!"
   - SectionId: 89308091
     EntryId: 25288826
     Key: howto.players
@@ -503,8 +506,8 @@ MonoBehaviour:
   - SectionId: 42099039
     EntryId: 62715655
     Key: hud.controls
-    Value: "FARE uzvu y\xF6nlendir  \xB7  SOL TIK tutun/b\u0131rak  \xB7  SA\u011E
-      TIK tutun + di\u011Fer uzuv  \xB7  Q/E/A/D uzuv se\xE7  \xB7  ESC {0}"
+    Value: "FARE uzan  \xB7  SOL TIK tutun  \xB7  SA\u011E TIK b\u0131rak  \xB7 
+      Q/E/A/D uzuv se\xE7  \xB7  H gizle  \xB7  ESC {0}"
   - SectionId: 42099039
     EntryId: 79326119
     Key: hud.esc_pause
@@ -606,3 +609,38 @@ MonoBehaviour:
     EntryId: 80642767
     Key: profile.default
     Value: "Da\u011Fc\u0131"
+  - SectionId: 26866803
+    EntryId: 71927208
+    Key: tut.1
+    Value: "Fareyi oynat: renkli nokta senin elin. Parlayan bir kayan\u0131n \xFCst\xFCne
+      getir ve SOL TIKLA!"
+  - SectionId: 26866803
+    EntryId: 77587987
+    Key: tut.2
+    Value: "S\xFCper! Kontrol di\u011Fer eline ge\xE7ti. Daha yukar\u0131daki bir
+      kayaya uzan ve t\u0131kla."
+  - SectionId: 26866803
+    EntryId: 41165983
+    Key: tut.3
+    Value: "Harika! Tutunan el seni yukar\u0131 \xE7eker. B\xF6yle devam et, zirve
+      seni bekliyor!"
+  - SectionId: 76708446
+    EntryId: 24625004
+    Key: menu.hic
+    Value: "H\u0131k!"
+  - SectionId: 76708446
+    EntryId: 52971839
+    Key: menu.burp
+    Value: "B\xF6\u011F\u011Frk!"
+  - SectionId: 76708446
+    EntryId: 28732942
+    Key: menu.nature
+    Value: "Do\u011Fa \xE7a\u011F\u0131r\u0131yor..."
+  - SectionId: 76708446
+    EntryId: 42187450
+    Key: menu.ahh
+    Value: Ohhh, oh be...
+  - SectionId: 76708446
+    EntryId: 29175290
+    Key: menu.scream
+    Value: AAAAAAA!

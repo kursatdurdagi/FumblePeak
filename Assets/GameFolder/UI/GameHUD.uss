@@ -3,74 +3,70 @@
 .hud { flex-grow: 1; }
 
 /* Oyuncu listesi */
-.roster { position: absolute; left: 28px; top: 24px; }
+.roster { position: absolute; left: 24px; top: 22px; }
 .roster-item {
-    flex-direction: row;
-    align-items: center;
-    background-color: rgba(10, 12, 22, 0.55);
-    border-radius: 20px;
-    padding: 6px 16px 6px 8px;
-    margin-bottom: 8px;
-    border-width: 2px;
-    border-color: transparent;
+    flex-direction: row; align-items: center;
+    background-color: rgba(255, 248, 238, 0.92);
+    border-radius: 22px; border-bottom-width: 4px; border-color: #EAD7C1;
+    padding: 5px 14px 5px 6px; margin-bottom: 8px;
 }
-.roster-item--local { border-color: rgba(255, 255, 255, 0.55); }
-.roster-item__dot { width: 18px; height: 18px; border-radius: 9px; margin-right: 10px; }
-.roster-item__name { color: var(--ink); font-size: 17px; -unity-font-style: bold; margin-right: 10px; }
-.roster-item__limbs { color: var(--ink-dim); font-size: 15px; }
+.roster-item--local { background-color: var(--white); }
+.roster-item__dot { width: 26px; height: 26px; border-radius: 13px; margin-right: 10px; border-width: 3px; border-color: var(--white); }
+.roster-item__name { -unity-font-definition: url("Fonts/Baloo2-ExtraBold.ttf"); color: var(--ink); font-size: 19px; margin-right: 8px; padding-top: 3px; }
 .limb-chip {
-    font-size: 14px;
-    color: var(--ink-dim);
-    padding: 2px 8px;
-    border-radius: 10px;
-    margin-left: 4px;
-    background-color: rgba(255, 255, 255, 0.06);
+    -unity-font-definition: url("Fonts/Nunito-ExtraBold.ttf");
+    font-size: 13px; color: var(--ink-soft);
+    padding: 2px 10px; border-radius: 12px; margin-left: 4px;
+    background-color: var(--cream-2);
 }
-.limb-chip--active { color: #1A0E06; background-color: var(--accent); -unity-font-style: bold; }
+.limb-chip--active { color: var(--white); background-color: var(--coral); }
 
 /* Bildirim */
 .toast {
-    position: absolute;
-    left: 0; right: 0; top: 110px;
+    position: absolute; left: 0; right: 0; top: 96px;
     align-items: center;
-    opacity: 0;
-    translate: 0 -20px;
-    transition-property: opacity, translate;
-    transition-duration: 0.25s, 0.35s;
-    transition-timing-function: ease-out, ease-out-back;
+    opacity: 0; translate: 0 -24px; scale: 0.85 0.85;
+    transition-property: opacity, translate, scale;
+    transition-duration: 0.25s, 0.4s, 0.4s;
+    transition-timing-function: ease-out, ease-out-back, ease-out-back;
 }
-.toast--show { opacity: 1; translate: 0 0; }
+.toast--show { opacity: 1; translate: 0 0; scale: 1 1; }
 .toast__text {
-    background-color: rgba(10, 12, 22, 0.75);
-    color: var(--ink);
-    font-size: 26px;
-    -unity-font-style: bold;
-    letter-spacing: 3px;
-    padding: 10px 26px;
-    border-radius: 8px;
+    -unity-font-definition: url("Fonts/Baloo2-ExtraBold.ttf");
+    background-color: var(--cream);
+    border-bottom-width: 6px; border-color: #EAD7C1;
+    color: var(--ink); font-size: 30px;
+    padding: 10px 30px 4px 30px; border-radius: 26px;
 }
 
 /* Zirve */
 .summit {
-    position: absolute;
-    left: 0; right: 0; top: 0; bottom: 0;
+    position: absolute; left: 0; right: 0; top: 0; bottom: 0;
     align-items: center; justify-content: center;
-    opacity: 1; scale: 1 1;
-    transition-property: opacity, scale;
-    transition-duration: 0.4s, 0.9s;
-    transition-timing-function: ease-out, ease-out-elastic;
+    opacity: 1; scale: 1 1; rotate: 0deg;
+    transition-property: opacity, scale, rotate;
+    transition-duration: 0.4s, 0.9s, 0.9s;
+    transition-timing-function: ease-out, ease-out-elastic, ease-out-elastic;
 }
-.summit--hidden { opacity: 0; scale: 0.3 0.3; }
-.summit__title { font-size: 150px; color: var(--accent); -unity-font-style: bold; letter-spacing: 16px; }
-.summit__text { font-size: 26px; color: var(--ink); }
+.summit--hidden { opacity: 0; scale: 0.3 0.3; rotate: -12deg; }
+.summit__title {
+    -unity-font-definition: url("Fonts/Baloo2-ExtraBold.ttf");
+    font-size: 170px; color: var(--sun);
+    -unity-text-outline-width: 6px; -unity-text-outline-color: var(--ink);
+    text-shadow: 0 10px 0 rgba(59, 47, 74, 0.35);
+}
+.summit__text {
+    -unity-font-definition: url("Fonts/Baloo2-ExtraBold.ttf");
+    font-size: 30px; color: var(--ink);
+    background-color: var(--cream); border-radius: 22px; padding: 8px 24px 2px 24px; margin-top: -20px;
+}
 
 /* Kontroller */
 .controls {
-    position: absolute;
-    bottom: 22px; left: 0; right: 0;
+    -unity-font-definition: url("Fonts/Nunito-ExtraBold.ttf");
+    position: absolute; bottom: 14px; left: 0; right: 0;
     -unity-text-align: middle-center;
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 16px;
+    color: var(--ink); font-size: 15px;
     opacity: 1;
     transition-property: opacity;
     transition-duration: 1.2s;
@@ -79,71 +75,64 @@
 
 /* Duraklat */
 .pause {
-    position: absolute;
-    left: 0; right: 0; top: 0; bottom: 0;
-    background-color: rgba(5, 6, 12, 0.6);
+    position: absolute; left: 0; right: 0; top: 0; bottom: 0;
+    background-color: rgba(59, 47, 74, 0.4);
     align-items: center; justify-content: center;
-    opacity: 1;
-    transition-property: opacity;
-    transition-duration: 0.18s;
 }
-.pause--hidden { opacity: 0; display: none; }
+.pause--hidden { display: none; }
 .pause__card {
-    background-color: #151A2B;
-    border-radius: 12px;
-    border-width: 1px;
-    border-color: var(--panel-border);
-    padding: 32px 40px;
-    min-width: 460px;
+    background-color: var(--cream);
+    border-radius: 34px; border-bottom-width: 9px; border-color: #EAD7C1;
+    padding: 28px 36px 24px 36px;
+    min-width: 470px;
 }
-.lobby-row { flex-direction: row; align-items: center; margin-bottom: 14px; }
-.lobby-row__label { color: var(--ink-dim); font-size: 16px; margin-right: 8px; }
-.lobby-row__code { color: var(--ink); font-size: 18px; -unity-font-style: bold; flex-grow: 1; }
-.small-btn {
-    background-color: rgba(255, 255, 255, 0.1);
-    border-width: 0;
-    border-radius: 6px;
-    color: var(--ink);
-    font-size: 14px;
-    padding: 6px 12px;
+.lobby-row {
+    flex-direction: row; align-items: center; margin: 4px 0 12px 0;
+    background-color: var(--white); border-radius: 16px; padding: 6px 6px 6px 14px;
 }
-.small-btn:hover { background-color: var(--accent); color: #1A0E06; }
+.lobby-row__label { color: var(--ink-soft); font-size: 15px; margin-right: 8px; }
+.lobby-row__code { -unity-font-definition: url("Fonts/Baloo2-ExtraBold.ttf"); color: var(--ink); font-size: 20px; flex-grow: 1; padding-top: 3px; }
 
-/* Uzuv paneli (birden çok uzuv yöneten oyuncu / tek oyuncu) */
+/* Uzuv paneli */
 .limb-panel {
-    position: absolute;
-    left: 0; right: 0; bottom: 54px;
-    flex-direction: row;
-    justify-content: center;
+    position: absolute; left: 0; right: 0; bottom: 44px;
+    flex-direction: row; justify-content: center;
 }
 .limb-card {
-    width: 150px;
-    margin: 0 6px;
-    padding: 8px 10px;
-    border-radius: 10px;
-    background-color: rgba(10, 12, 22, 0.6);
-    border-width: 2px;
-    border-color: transparent;
-    flex-direction: row;
-    align-items: center;
-    translate: 0 0;
-    transition-property: translate, border-color, background-color;
-    transition-duration: 0.15s, 0.15s, 0.15s;
-    transition-timing-function: ease-out-back, ease-out, ease-out;
+    width: 160px; margin: 0 6px; padding: 8px 12px 8px 8px;
+    border-radius: 22px; border-bottom-width: 5px; border-color: #EAD7C1;
+    background-color: rgba(255, 248, 238, 0.92);
+    flex-direction: row; align-items: center;
+    translate: 0 0; scale: 1 1;
+    transition-property: translate, scale, background-color;
+    transition-duration: 0.18s, 0.25s, 0.15s;
+    transition-timing-function: ease-out-back, ease-out-back, ease-out;
 }
-.limb-card--active { border-color: var(--accent); translate: 0 -8px; background-color: rgba(30, 20, 14, 0.8); }
+.limb-card--active { translate: 0 -10px; scale: 1.06 1.06; background-color: var(--white); border-color: var(--coral); }
 .limb-card__key {
-    width: 30px; height: 30px;
-    border-radius: 6px;
-    background-color: rgba(255, 255, 255, 0.12);
-    color: var(--ink);
-    font-size: 16px;
-    -unity-font-style: bold;
-    -unity-text-align: middle-center;
+    -unity-font-definition: url("Fonts/Baloo2-ExtraBold.ttf");
+    width: 38px; height: 38px; border-radius: 13px;
+    background-color: var(--cream-2); color: var(--ink);
+    font-size: 22px; -unity-text-align: middle-center; padding-top: 4px;
     margin-right: 10px;
 }
-.limb-card--active .limb-card__key { background-color: var(--accent); color: #1A0E06; }
-.limb-card__name { color: var(--ink); font-size: 15px; -unity-font-style: bold; }
-.limb-card__state { color: var(--ink-dim); font-size: 12px; letter-spacing: 2px; }
-.limb-card__state--grab { color: #7CE08F; }
-.limb-card__state--fist { color: #FFD27A; }
+.limb-card--active .limb-card__key { background-color: var(--coral); color: var(--white); }
+.limb-card__name { -unity-font-definition: url("Fonts/Baloo2-ExtraBold.ttf"); color: var(--ink); font-size: 18px; }
+.limb-card__state { -unity-font-definition: url("Fonts/Nunito-ExtraBold.ttf"); color: var(--ink-soft); font-size: 12px; letter-spacing: 1px; margin-top: -4px; }
+.limb-card__state--grab { color: var(--mint-dark); }
+.limb-card__state--fist { color: var(--sun-dark); }
+
+/* Eğitim ipucu */
+.tutorial {
+    position: absolute; left: 0; right: 0; top: 150px;
+    align-items: center;
+    opacity: 0; translate: 0 10px;
+    transition-property: opacity, translate; transition-duration: 0.4s, 0.4s;
+}
+.tutorial--show { opacity: 1; translate: 0 0; }
+.tutorial__text {
+    -unity-font-definition: url("Fonts/Nunito-ExtraBold.ttf");
+    background-color: var(--sky); color: var(--white);
+    border-bottom-width: 5px; border-color: var(--sky-dark);
+    font-size: 21px; padding: 10px 26px; border-radius: 22px;
+}

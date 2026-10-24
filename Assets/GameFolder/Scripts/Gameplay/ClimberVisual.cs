@@ -14,6 +14,7 @@ namespace FumblePeak
         public Transform visualRoot;
         public Material markerMaterial;
         public Material steamMaterial;
+        public Material lineMaterial;
         public float smoothing = 18f;
         public Color fatigueColor = new Color(1f, 0.25f, 0.18f);
 
@@ -35,6 +36,7 @@ namespace FumblePeak
         static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
 
         readonly Transform[] markers = new Transform[4];
+        readonly LineRenderer[] lines = new LineRenderer[4];
         readonly Renderer[] markerR = new Renderer[4];
         readonly ParticleSystem[] steam = new ParticleSystem[4];
 
@@ -67,6 +69,7 @@ namespace FumblePeak
                 skinBase[i] = skin[i].sharedMaterial != null && skin[i].sharedMaterial.HasProperty(BaseColor)
                     ? skin[i].sharedMaterial.GetColor(BaseColor) : Color.white;
             mpb = new MaterialPropertyBlock();
+            hoverMpb = new MaterialPropertyBlock();
 
             for (int i = 0; i < 4; i++)
             {
@@ -78,6 +81,14 @@ namespace FumblePeak
                 markerR[i].sharedMaterial = markerMaterial;
                 markerR[i].shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
                 markers[i] = m.transform;
+                var lr = new GameObject("Guide_" + (Limb)i).AddComponent<LineRenderer>();
+                lr.transform.SetParent(transform, false);
+                lr.positionCount = 2;
+                lr.startWidth = 0.035f; lr.endWidth = 0.015f;
+                lr.sharedMaterial = lineMaterial != null ? lineMaterial : steamMaterial;
+                lr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                lr.numCapVertices = 4;
+                lines[i] = lr;
                 steam[i] = CreateSteam(en[i]);
             }
         }
@@ -151,6 +162,8 @@ namespace FumblePeak
                 UpdateMarker(i);
             }
 
+            UpdateHover();
+
             // Kızarma (GDD: 5-8 sn) - nefes nefese kalan bir surat
             float red = Mathf.InverseLerp(0.45f, 0.85f, maxFat);
             for (int s = 0; s < skin.Length; s++)
@@ -164,24 +177,88 @@ namespace FumblePeak
         void UpdateMarker(int i)
         {
             var owner = FumblePlayer.OwnerOf(i);
-            bool show = owner != null;
+            bool isActive = owner != null && owner.ActiveLimb == i;
+            // Sadece aktif uzuvların imleci görünür (kalabalık olmasın); yerel oyuncunun imleci büyük
+            bool show = owner != null && (isActive || body.IsFist(i));
             markers[i].gameObject.SetActive(show);
+            lines[i].enabled = show && isActive && !body.IsGrabbing(i);
             if (!show) return;
 
-            bool isActive = owner.ActiveLimb == i;
-            Vector2 t = owner.isLocalPlayer ? owner.CursorOf(i) : body.Target(i);
-            markers[i].position = new Vector3(t.x, t.y, -0.15f);
-            float pulse = isActive ? 1f + Mathf.Sin(Time.time * 8f) * 0.12f : 1f;
-            float size = (isActive ? 0.16f : 0.07f) * pulse;
-            if (body.IsGrabbing(i)) size *= 0.8f;
+            bool local = owner.isLocalPlayer;
+            Vector2 t = local ? owner.CursorOf(i) : body.Target(i);
+            markers[i].position = new Vector3(t.x, t.y, -0.25f);
+            float pulse = 1f + Mathf.Sin(Time.time * 7f) * 0.1f;
+            float size = (local ? 0.22f : 0.16f) * pulse;
+            if (body.IsFist(i)) size *= 0.75f;
             markers[i].localScale = Vector3.one * size;
 
             var c = owner.Color;
-            c.a = isActive ? 0.95f : 0.45f;
-            if (body.IsFist(i)) c = Color.Lerp(c, Color.white, 0.35f);
+            c.a = local ? 0.9f : 0.7f;
             markerR[i].GetPropertyBlock(mpb);
             mpb.SetColor(BaseColor, c);
             markerR[i].SetPropertyBlock(mpb);
+
+            if (lines[i].enabled)
+            {
+                Vector2 hand = body.RenderEffectorPos(i);
+                lines[i].SetPosition(0, new Vector3(hand.x, hand.y, -0.2f));
+                lines[i].SetPosition(1, new Vector3(t.x, t.y, -0.2f));
+                var lc = owner.Color; lc.a = 0.45f;
+                lines[i].startColor = lc; lc.a = 0.1f; lines[i].endColor = lc;
+            }
+        }
+
+        // ---------- İmlecin altındaki kayayı vurgula (nereye tutunacağın belli olsun) ----------
+        readonly Collider[] hoverBuf = new Collider[12];
+        Renderer hovered;
+        Color hoveredBase;
+        static readonly Color HoverColor = new Color(1f, 0.85f, 0.35f);
+
+        void UpdateHover()
+        {
+            var me = FumblePlayer.Local;
+            Renderer best = null;
+            if (me != null)
+            {
+                int L = me.ActiveLimb;
+                if (!body.IsGrabbing(L))
+                {
+                    Vector2 c = me.CursorOf(L);
+                    int n = Physics.OverlapSphereNonAlloc(new Vector3(c.x, c.y, 0f), 0.4f, hoverBuf, body.gripMask, QueryTriggerInteraction.Collide);
+                    float bd = float.MaxValue;
+                    for (int k = 0; k < n; k++)
+                    {
+                        if (hoverBuf[k].GetComponentInParent<Grip>() == null) continue;
+                        var r = hoverBuf[k].GetComponentInParent<Renderer>();
+                        if (r == null) continue;
+                        float d = ((Vector2)hoverBuf[k].bounds.center - c).sqrMagnitude;
+                        if (d < bd) { bd = d; best = r; }
+                    }
+                }
+            }
+            if (best != hovered)
+            {
+                if (hovered != null) hovered.SetPropertyBlock(null);
+                hovered = best;
+                if (hovered != null)
+                {
+                    var m = hovered.sharedMaterial;
+                    hoveredBase = m != null && m.HasProperty(BaseColor) ? m.GetColor(BaseColor) : Color.white;
+                }
+            }
+            if (hovered != null)
+            {
+                float k = 0.55f + Mathf.Sin(Time.time * 9f) * 0.2f;
+                hoverMpb.SetColor(BaseColor, Color.Lerp(hoveredBase, HoverColor, k));
+                hovered.SetPropertyBlock(hoverMpb);
+            }
+        }
+
+        MaterialPropertyBlock hoverMpb;
+
+        void OnDestroy()
+        {
+            if (hovered != null) hovered.SetPropertyBlock(null);
         }
 
         /// <summary>Analitik iki kemikli IK (D. Holden yöntemi).</summary>

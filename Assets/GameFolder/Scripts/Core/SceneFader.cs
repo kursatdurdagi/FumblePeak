@@ -37,11 +37,11 @@ namespace FumblePeak
             overlay = new VisualElement { name = "fader" };
             overlay.style.position = Position.Absolute;
             overlay.style.left = 0; overlay.style.right = 0; overlay.style.top = 0; overlay.style.bottom = 0;
-            overlay.style.backgroundColor = new Color(0.04f, 0.05f, 0.08f, 1f);
+            overlay.style.backgroundColor = new Color(0.23f, 0.18f, 0.29f, 1f);
             overlay.style.justifyContent = Justify.Center;
             overlay.style.alignItems = Align.Center;
             label = new Label();
-            label.style.color = new Color(1f, 1f, 1f, 0.85f);
+            label.style.color = new Color(1f, 0.97f, 0.93f, 1f);
             label.style.fontSize = 34;
             label.style.unityFontStyleAndWeight = FontStyle.Bold;
             label.style.letterSpacing = 4;

@@ -25,6 +25,13 @@ namespace FumblePeak
         readonly Label[] limbStates = new Label[4];
         static readonly string[] LimbKeys = { "Q", "E", "A", "D" };
 
+        // ---- Kısa eğitim (ilk oyunda) ----
+        VisualElement tutorial;
+        Label tutorialText;
+        int tutStep = -1;
+        float tutStartY, tutTimer;
+        const string TutKey = "fp_tutorial_done";
+
         void OnEnable()
         {
             L.EnsureInit();
@@ -61,6 +68,11 @@ namespace FumblePeak
             summit.Query<VisualElement>().ForEach(e => e.pickingMode = PickingMode.Ignore);
 
             BuildLimbPanel();
+            tutorial = root.Q("tutorial");
+            tutorialText = root.Q<Label>("tutorial-text");
+            tutorial.pickingMode = PickingMode.Ignore;
+            tutorialText.pickingMode = PickingMode.Ignore;
+            if (PlayerPrefs.GetInt(TutKey, 0) == 0) root.schedule.Execute(() => SetTutorial(0)).StartingIn(2500);
             RefreshTexts();
 
             FumblePlayer.RosterChanged += RebuildRoster;
@@ -94,6 +106,7 @@ namespace FumblePeak
         {
             controls.text = L.T("hud.controls", single ? L.T("hud.esc_pause") : L.T("hud.esc_menu"));
             pauseHint.text = single ? L.T("hud.paused_single") : L.T("hud.paused_coop");
+            if (tutStep >= 0 && tutStep <= 2) tutorialText.text = L.T("tut." + (tutStep + 1));
             for (int i = 0; i < 4; i++) limbNames[i].text = LimbUtil.Name(i);
             lastPanelHash = -2;
             RebuildRoster();
@@ -107,6 +120,36 @@ namespace FumblePeak
                 SetPaused(!paused);
             if (kb != null && kb.hKey.wasPressedThisFrame) controls.ToggleInClassList("controls--faded");
             UpdateLimbPanel();
+            UpdateTutorial();
+        }
+
+        void SetTutorial(int step)
+        {
+            tutStep = step;
+            tutTimer = 0f;
+            if (step < 0 || step > 2) { tutorial.RemoveFromClassList("tutorial--show"); return; }
+            tutorialText.text = L.T("tut." + (step + 1));
+            tutorial.AddToClassList("tutorial--show");
+            if (step == 0 && ClimberBody.Instance != null) tutStartY = ClimberBody.Instance.TorsoPos.y;
+        }
+
+        void UpdateTutorial()
+        {
+            if (tutStep < 0) return;
+            var body = ClimberBody.Instance;
+            var me = FumblePlayer.Local;
+            if (body == null || me == null) return;
+            tutTimer += Time.unscaledDeltaTime;
+            bool anyMineGrabbed = false;
+            for (int i = 0; i < 4; i++) if (LimbUtil.Has(me.limbMask, i) && body.IsGrabbing(i)) anyMineGrabbed = true;
+            if (tutStep == 0 && anyMineGrabbed) SetTutorial(1);
+            else if (tutStep == 1 && body.TorsoPos.y > tutStartY + 1.2f) SetTutorial(2);
+            else if (tutStep == 2 && tutTimer > 5f)
+            {
+                SetTutorial(-1);
+                PlayerPrefs.SetInt(TutKey, 1);
+                PlayerPrefs.Save();
+            }
         }
 
         // ---------------- Duraklat ----------------

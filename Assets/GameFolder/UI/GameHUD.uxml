@@ -13,6 +13,10 @@
             <ui:Label name="summit-text" text="#hud.summit_text" class="summit__text" />
         </ui:VisualElement>
 
+        <ui:VisualElement name="tutorial" class="tutorial">
+            <ui:Label name="tutorial-text" text="" class="tutorial__text" />
+        </ui:VisualElement>
+
         <ui:VisualElement name="limb-panel" class="limb-panel" />
 
         <ui:Label name="controls" text="" class="controls" />

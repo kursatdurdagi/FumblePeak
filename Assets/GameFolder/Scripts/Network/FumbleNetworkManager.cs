@@ -137,6 +137,20 @@ namespace FumblePeak
             ServerChangeScene(gameScene);
         }
 
+        /// <summary>Host: herkese menü sinematiğini oynat, bitince oyuna geç.</summary>
+        public void StartGameWithCinematic(float duration)
+        {
+            if (!NetworkServer.active || string.IsNullOrEmpty(gameScene)) return;
+            NetworkServer.SendToAll(new CinematicMessage());
+            StartCoroutine(CinematicThenStart(duration));
+        }
+
+        IEnumerator CinematicThenStart(float duration)
+        {
+            yield return new WaitForSecondsRealtime(Mathf.Max(0f, duration - 0.45f));
+            if (NetworkServer.active) SceneFader.Get().FadeOut(0.4f, StartGame, L.T("msg.get_ready"));
+        }
+
         /// <summary>Host: herkesi lobiye (Ana Menü) geri götür.</summary>
         public void ReturnToLobby()
         {
@@ -273,4 +287,7 @@ namespace FumblePeak
             SteamLobby.Instance?.LeaveLobby();
         }
     }
+
+    /// <summary>Host → herkes: ana menüdeki "zirvede işerken düşme" sinematiğini oynat.</summary>
+    public struct CinematicMessage : NetworkMessage { }
 }

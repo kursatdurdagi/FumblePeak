@@ -28,7 +28,12 @@ namespace FumblePeak.EditorTools
 
             // ---------- Ana menü ----------
             new[] { "menu.single", "TEK OYUNCU", "SINGLEPLAYER", "EINZELSPIELER" },
-            new[] { "menu.single_desc", "Ahtapot modu: dört uzuv da sende.", "Octopus mode: all four limbs are yours.", "Oktopus-Modus: alle vier Gliedmaßen gehören dir." },
+            new[] { "menu.hic", "Hık!", "Hic!", "Hicks!" },
+            new[] { "menu.burp", "Böğğrk!", "Buuurp!", "Rülps!" },
+            new[] { "menu.nature", "Doğa çağırıyor...", "Nature calls...", "Die Natur ruft..." },
+            new[] { "menu.ahh", "Ohhh, oh be...", "Ahhh, that's the stuff...", "Ahhh, herrlich..." },
+            new[] { "menu.scream", "AAAAAAA!", "WAAAAAH!", "AAAAAAH!" },
+            new[] { "menu.single_desc", "Ahtapot modu: dört uzuv da sende!", "Octopus mode: all four limbs are yours!", "Oktopus-Modus: alle vier Gliedmaßen gehören dir!" },
             new[] { "menu.multi", "ÇOK OYUNCULU", "MULTIPLAYER", "MEHRSPIELER" },
             new[] { "menu.multi_desc", "2-4 kişilik co-op. Lobi kur ya da arkadaşına katıl.", "2-4 player co-op. Host a lobby or join a friend.", "Koop für 2-4. Lobby erstellen oder Freunden beitreten." },
             new[] { "menu.settings", "AYARLAR", "SETTINGS", "EINSTELLUNGEN" },
@@ -40,12 +45,12 @@ namespace FumblePeak.EditorTools
             // ---------- Nasıl oynanır ----------
             new[] { "howto.title", "NASIL OYNANIR", "HOW TO PLAY", "SO WIRD GESPIELT" },
             new[] { "howto.l1", "Herkes bedenin bir uzvunu yönetir.", "Everyone controls one limb of the body.", "Jeder steuert eine Gliedmaße des Körpers." },
-            new[] { "howto.l2", "FARE — uzvunu yönlendir", "MOUSE — move your limb", "MAUS — Gliedmaße bewegen" },
-            new[] { "howto.l3", "SOL TIK — tutun / bırak", "LEFT CLICK — grab / release", "LINKSKLICK — greifen / loslassen" },
-            new[] { "howto.l4", "SAĞ TIK — tutun + diğer uzva geç", "RIGHT CLICK — grab + switch limb", "RECHTSKLICK — greifen + wechseln" },
-            new[] { "howto.l5", "Q / E / A / D — uzuv seç", "Q / E / A / D — select limb", "Q / E / A / D — Gliedmaße wählen" },
-            new[] { "howto.l6", "Tutunurken fareyi AŞAĞI çek → beden YUKARI çıkar.", "While holding, pull the mouse DOWN → the body goes UP.", "Beim Festhalten Maus NACH UNTEN ziehen → Körper geht HOCH." },
-            new[] { "howto.l7", "Aynı yerde fazla kalma: kollar kızarır, titrer ve bırakır!", "Don't hang in one spot too long: arms redden, shake and let go!", "Nicht zu lange an einer Stelle: Arme werden rot, zittern und lassen los!" },
+            new[] { "howto.l2", "FARE — elini / ayağını hareket ettir", "MOUSE — move your hand / foot", "MAUS — Hand / Fuß bewegen" },
+            new[] { "howto.l3", "SOL TIK — imlecin altındaki kayaya tutun", "LEFT CLICK — grab the rock under the cursor", "LINKSKLICK — den Stein unter dem Zeiger greifen" },
+            new[] { "howto.l4", "Tutununca kontrol diğer ele geçer: yukarı uzan, tıkla, tekrarla!", "After grabbing, control passes to the other hand: reach up, click, repeat!", "Nach dem Greifen wechselt die Steuerung zur anderen Hand: hoch, klicken, wiederholen!" },
+            new[] { "howto.l5", "Q / E / A / D — uzuv seç  ·  SAĞ TIK — bırak", "Q / E / A / D — select limb  ·  RIGHT CLICK — let go", "Q / E / A / D — Gliedmaße wählen  ·  RECHTSKLICK — loslassen" },
+            new[] { "howto.l6", "Tutunan el seni kendiliğinden yukarı çeker. Parlayan kaya = tutunabileceğin yer.", "The holding hand pulls you up by itself. Glowing rock = where you can grab.", "Die haltende Hand zieht dich von selbst hoch. Leuchtender Stein = greifbar." },
+            new[] { "howto.l7", "Tek kolla uzun süre asılı kalma: kollar kızarır, titrer ve bırakır!", "Don't hang on one arm too long: arms redden, shake and let go!", "Nicht zu lange an einem Arm hängen: Arme werden rot, zittern und lassen los!" },
             new[] { "howto.players", "OYUNCU DAĞILIMI", "PLAYER SPLIT", "SPIELERAUFTEILUNG" },
             new[] { "howto.p1", "1 — Ahtapot modu (4 uzuv)", "1 — Octopus mode (4 limbs)", "1 — Oktopus-Modus (4 Gliedmaßen)" },
             new[] { "howto.p2", "2 — Çapraz bağ (kol + karşı bacak)", "2 — Cross link (arm + opposite leg)", "2 — Kreuzverbindung (Arm + Gegenbein)" },
@@ -157,7 +162,7 @@ namespace FumblePeak.EditorTools
 
             // ---------- Oyun içi ----------
             new[] { "hud.biome1", "BAŞLANGIÇ VADİSİ", "STARTER VALLEY", "STARTTAL" },
-            new[] { "hud.controls", "FARE uzvu yönlendir  ·  SOL TIK tutun/bırak  ·  SAĞ TIK tutun + diğer uzuv  ·  Q/E/A/D uzuv seç  ·  ESC {0}", "MOUSE move limb  ·  LEFT CLICK grab/release  ·  RIGHT CLICK grab + switch  ·  Q/E/A/D select limb  ·  ESC {0}", "MAUS Gliedmaße bewegen  ·  LINKSKLICK greifen/loslassen  ·  RECHTSKLICK greifen + wechseln  ·  Q/E/A/D wählen  ·  ESC {0}" },
+            new[] { "hud.controls", "FARE uzan  ·  SOL TIK tutun  ·  SAĞ TIK bırak  ·  Q/E/A/D uzuv seç  ·  H gizle  ·  ESC {0}", "MOUSE reach  ·  LEFT CLICK grab  ·  RIGHT CLICK let go  ·  Q/E/A/D select limb  ·  H hide  ·  ESC {0}", "MAUS greifen  ·  LINKSKLICK festhalten  ·  RECHTSKLICK loslassen  ·  Q/E/A/D wählen  ·  H ausblenden  ·  ESC {0}" },
             new[] { "hud.esc_pause", "duraklat", "pause", "Pause" },
             new[] { "hud.esc_menu", "menü", "menu", "Menü" },
             new[] { "hud.paused", "DURAKLATILDI", "PAUSED", "PAUSIERT" },
@@ -184,6 +189,9 @@ namespace FumblePeak.EditorTools
             new[] { "limb.2", "Sol Bacak", "Left Leg", "Linkes Bein" },
             new[] { "limb.3", "Sağ Bacak", "Right Leg", "Rechtes Bein" },
             new[] { "limb.none", "İzleyici", "Spectator", "Zuschauer" },
+            new[] { "tut.1", "Fareyi oynat: renkli nokta senin elin. Parlayan bir kayanın üstüne getir ve SOL TIKLA!", "Move the mouse: the colored dot is your hand. Put it on a glowing rock and LEFT CLICK!", "Bewege die Maus: der farbige Punkt ist deine Hand. Auf einen leuchtenden Stein und LINKSKLICK!" },
+            new[] { "tut.2", "Süper! Kontrol diğer eline geçti. Daha yukarıdaki bir kayaya uzan ve tıkla.", "Great! Control passed to your other hand. Reach a higher rock and click.", "Super! Jetzt steuerst du die andere Hand. Greif einen höheren Stein und klick." },
+            new[] { "tut.3", "Harika! Tutunan el seni yukarı çeker. Böyle devam et, zirve seni bekliyor!", "Awesome! The holding hand pulls you up. Keep going, the summit awaits!", "Klasse! Die haltende Hand zieht dich hoch. Weiter so, der Gipfel wartet!" },
             new[] { "profile.default", "Dağcı", "Climber", "Kletterer" },
         };
 

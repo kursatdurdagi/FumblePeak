@@ -1,120 +1,181 @@
-/* ===== Fumble Peak - ortak stiller ===== */
+/* =====================================================================
+   Fumble Peak — ortak "şeker" tema
+   Pastel renkler, kalın yuvarlak fontlar, alt kenarı koyu 3B butonlar.
+   ===================================================================== */
 :root {
-    --accent: #FF7A33;
-    --accent-dark: #C9541A;
-    --ink: #F4EFE6;
-    --ink-dim: rgba(244, 239, 230, 0.62);
-    --panel: rgba(12, 14, 26, 0.78);
-    --panel-border: rgba(255, 255, 255, 0.10);
-    --danger: #FF5A4E;
+    --ink: #3B2F4A;            /* koyu mürdüm: ana yazı */
+    --ink-soft: #6E6280;
+    --cream: #FFF8EE;
+    --cream-2: #FFEEDB;
+    --coral: #FF6F61;
+    --coral-dark: #D9483C;
+    --mint: #4FD1A5;
+    --mint-dark: #2FA67E;
+    --sky: #6EC6FF;
+    --sky-dark: #3C97D6;
+    --sun: #FFC94D;
+    --sun-dark: #E0A21E;
+    --lilac: #B69CFF;
+    --lilac-dark: #8C6EE6;
+    --white: #FFFFFF;
+
+    -unity-font-definition: url("Fonts/Nunito-SemiBold.ttf");
+    color: var(--ink);
 }
 
+/* ---------- Logo ---------- */
 .logo { align-items: flex-start; }
 .logo__top {
-    font-size: 64px;
-    -unity-font-style: bold;
-    color: var(--ink);
-    letter-spacing: 10px;
+    -unity-font-definition: url("Fonts/Baloo2-ExtraBold.ttf");
+    font-size: 70px;
+    color: var(--white);
+    letter-spacing: 6px;
     margin: 0; padding: 0;
-    -unity-text-outline-width: 0;
+    -unity-text-outline-width: 4px;
+    -unity-text-outline-color: var(--ink);
+    text-shadow: 0 6px 0 rgba(59, 47, 74, 0.35);
 }
 .logo__bottom {
-    font-size: 110px;
-    -unity-font-style: bold;
-    color: var(--accent);
-    letter-spacing: 18px;
-    margin: -28px 0 0 0; padding: 0;
-    rotate: -3deg;
+    -unity-font-definition: url("Fonts/Baloo2-ExtraBold.ttf");
+    font-size: 116px;
+    color: var(--coral);
+    letter-spacing: 10px;
+    margin: -46px 0 0 0; padding: 0;
+    rotate: -4deg;
+    -unity-text-outline-width: 5px;
+    -unity-text-outline-color: var(--ink);
+    text-shadow: 0 8px 0 rgba(59, 47, 74, 0.35);
 }
 .logo--big { align-items: center; }
-.logo--big .logo__top { font-size: 96px; }
-.logo--big .logo__bottom { font-size: 170px; margin-top: -44px; }
+.logo--big .logo__top { font-size: 108px; }
+.logo--big .logo__bottom { font-size: 180px; margin-top: -78px; }
+.logo--small .logo__top { font-size: 56px; }
+.logo--small .logo__bottom { font-size: 92px; margin-top: -40px; }
 
+/* ---------- Butonlar ---------- */
 .menu-btn {
-    height: 58px;
-    min-width: 340px;
-    margin: 6px 0;
-    padding: 0 26px;
+    -unity-font-definition: url("Fonts/Baloo2-ExtraBold.ttf");
+    height: 60px;
+    min-width: 320px;
+    margin: 7px 0;
+    padding: 2px 26px 0 26px;
     border-width: 0;
-    border-left-width: 4px;
-    border-color: transparent;
-    border-radius: 6px;
-    background-color: rgba(255, 255, 255, 0.06);
+    border-bottom-width: 6px;
+    border-radius: 20px;
+    background-color: var(--white);
+    border-color: #E6D6C4;
     color: var(--ink);
-    font-size: 22px;
-    -unity-font-style: bold;
+    font-size: 25px;
+    letter-spacing: 1px;
     -unity-text-align: middle-left;
-    letter-spacing: 3px;
     translate: 0 0;
-    transition-property: background-color, translate, border-color, color, scale;
-    transition-duration: 0.15s, 0.18s, 0.15s, 0.15s, 0.1s;
-    transition-timing-function: ease-out, ease-out-back, ease-out, ease-out, ease-out;
+    scale: 1 1;
+    transition-property: translate, scale, background-color, border-bottom-width;
+    transition-duration: 0.12s, 0.18s, 0.12s, 0.08s;
+    transition-timing-function: ease-out, ease-out-back, ease-out, ease-out;
 }
-.menu-btn:hover {
-    background-color: rgba(255, 255, 255, 0.13);
-    border-color: var(--accent);
-    translate: 12px 0;
-}
-.menu-btn:active { scale: 0.97 0.97; }
-.menu-btn:disabled { opacity: 0.35; }
-.menu-btn--primary { background-color: var(--accent); color: #1A0E06; }
-.menu-btn--primary:hover { background-color: #FF955C; border-color: #FFFFFF; }
-.menu-btn--ghost { background-color: transparent; color: var(--ink-dim); }
-.menu-btn--ghost:hover { background-color: rgba(255, 255, 255, 0.06); color: var(--ink); }
+.menu-btn:hover { translate: 0 -3px; scale: 1.03 1.03; background-color: #FFFDF8; }
+.menu-btn:active { translate: 0 4px; border-bottom-width: 2px; scale: 0.98 0.98; }
+.menu-btn:disabled { opacity: 0.45; }
+.menu-btn--primary { background-color: var(--coral); border-color: var(--coral-dark); color: var(--white); }
+.menu-btn--primary:hover { background-color: #FF8478; }
+.menu-btn--ghost { background-color: rgba(255, 255, 255, 0.45); border-color: rgba(59, 47, 74, 0.12); color: var(--ink); }
+.menu-btn--ghost:hover { background-color: rgba(255, 255, 255, 0.75); }
+.menu-btn--grow { flex-grow: 1; }
+.menu-btn--small { height: 48px; font-size: 19px; }
+.menu-btn--center { -unity-text-align: middle-center; min-width: 220px; margin: 0 7px; }
 
-.field { margin: 8px 0; min-width: 340px; }
-.field > Label, .field .unity-base-field__label {
-    color: var(--ink-dim);
+.small-btn {
+    -unity-font-definition: url("Fonts/Baloo2-ExtraBold.ttf");
+    background-color: var(--white);
+    border-width: 0;
+    border-bottom-width: 4px;
+    border-color: #E6D6C4;
+    border-radius: 14px;
+    color: var(--ink);
     font-size: 16px;
-    min-width: 120px;
+    padding: 4px 14px 0 14px;
+    margin-left: 8px;
+    transition-property: translate, scale;
+    transition-duration: 0.1s, 0.15s;
+}
+.small-btn:hover { translate: 0 -2px; scale: 1.04 1.04; }
+.small-btn:active { translate: 0 2px; border-bottom-width: 1px; }
+.small-btn--accent { background-color: var(--mint); border-color: var(--mint-dark); color: var(--white); }
+
+/* ---------- Alanlar ---------- */
+.field { margin: 7px 0; min-width: 320px; }
+.field .unity-base-field__label, .field > Label {
+    color: var(--ink-soft);
+    font-size: 17px;
+    min-width: 150px;
+    -unity-font-definition: url("Fonts/Nunito-ExtraBold.ttf");
 }
 .field .unity-base-text-field__input, .field TextInput {
-    background-color: rgba(255, 255, 255, 0.08);
-    border-color: var(--panel-border);
-    border-radius: 6px;
+    background-color: var(--white);
+    border-width: 3px;
+    border-color: #EADBC9;
+    border-radius: 14px;
     color: var(--ink);
-    font-size: 20px;
+    font-size: 19px;
     height: 44px;
     padding-left: 12px;
 }
-
-.hint { color: var(--ink-dim); font-size: 17px; white-space: normal; max-width: 420px; margin: 4px 0 12px 0; }
-.hint--small { font-size: 14px; margin-top: 8px; }
-.page-title { color: var(--ink); font-size: 30px; -unity-font-style: bold; letter-spacing: 4px; margin-bottom: 6px; }
-
-.card {
-    background-color: var(--panel);
-    border-width: 1px;
-    border-color: var(--panel-border);
-    border-radius: 10px;
-    padding: 20px 24px;
-    margin-bottom: 16px;
-    width: 440px;
-}
-.card__title { color: var(--accent); font-size: 16px; -unity-font-style: bold; letter-spacing: 4px; margin-bottom: 10px; }
-.card__line { color: var(--ink); font-size: 17px; white-space: normal; margin: 3px 0; }
-.card__line--key { color: #FFD7BF; -unity-font-style: bold; }
-.card__line--warn { color: #FF9C8F; }
-
-.small-btn {
-    background-color: rgba(255, 255, 255, 0.1);
-    border-width: 0;
-    border-radius: 6px;
-    color: var(--ink);
-    font-size: 14px;
-    padding: 6px 12px;
-}
-.small-btn:hover { background-color: var(--accent); color: #1A0E06; }
-
-/* Açılır listeler (DropdownField) */
 .field .unity-base-popup-field__input {
-    background-color: rgba(255, 255, 255, 0.08);
-    border-color: var(--panel-border);
-    border-radius: 6px;
+    background-color: var(--white);
+    border-width: 3px;
+    border-color: #EADBC9;
+    border-radius: 14px;
     color: var(--ink);
     font-size: 18px;
-    height: 40px;
+    height: 42px;
     padding-left: 12px;
 }
 .field .unity-base-popup-field__text { color: var(--ink); }
-.field .unity-toggle__checkmark { width: 22px; height: 22px; border-radius: 4px; background-color: rgba(255, 255, 255, 0.1); border-color: var(--panel-border); }
+.field .unity-toggle__checkmark {
+    width: 26px; height: 26px;
+    border-radius: 8px;
+    background-color: var(--white);
+    border-width: 3px;
+    border-color: #EADBC9;
+}
+.field .unity-base-slider__tracker { background-color: #EADBC9; border-radius: 6px; height: 8px; border-width: 0; }
+.field .unity-base-slider__dragger { background-color: var(--coral); border-radius: 12px; width: 22px; height: 22px; border-width: 3px; border-color: var(--white); margin-top: -7px; }
+
+/* ---------- Yazılar ---------- */
+.hint { color: var(--ink-soft); font-size: 17px; white-space: normal; max-width: 460px; margin: 4px 0 10px 0; }
+.hint--small { font-size: 14px; margin-top: 6px; }
+.page-title {
+    -unity-font-definition: url("Fonts/Baloo2-ExtraBold.ttf");
+    color: var(--ink);
+    font-size: 40px;
+    margin-bottom: 2px;
+}
+.section-label {
+    -unity-font-definition: url("Fonts/Nunito-ExtraBold.ttf");
+    color: var(--coral);
+    font-size: 14px;
+    letter-spacing: 3px;
+    margin: 16px 0 2px 4px;
+}
+
+/* ---------- Kartlar ---------- */
+.card {
+    background-color: var(--cream);
+    border-width: 0;
+    border-bottom-width: 7px;
+    border-color: #EAD7C1;
+    border-radius: 26px;
+    padding: 20px 24px 18px 24px;
+    margin-bottom: 16px;
+    width: 460px;
+}
+.card__title {
+    -unity-font-definition: url("Fonts/Baloo2-ExtraBold.ttf");
+    color: var(--coral);
+    font-size: 24px;
+    margin-bottom: 6px;
+}
+.card__line { color: var(--ink); font-size: 17px; white-space: normal; margin: 3px 0; }
+.card__line--key { -unity-font-definition: url("Fonts/Nunito-ExtraBold.ttf"); color: var(--ink); }
+.card__line--warn { color: var(--coral-dark); }

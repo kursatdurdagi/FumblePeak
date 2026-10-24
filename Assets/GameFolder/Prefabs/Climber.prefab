@@ -599,7 +599,7 @@ Transform:
   m_GameObject: {fileID: 2032988449721245616}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.36311463, y: 1.8688036, z: 0}
+  m_LocalPosition: {x: 0.4012425, y: 1.9777403, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -678,7 +678,7 @@ ConfigurableJoint:
     spring: 0
     damper: 0
   m_LinearLimit:
-    limit: 0.5431358
+    limit: 0.6789198
     bounciness: 0
     contactDistance: 0
   m_AngularXLimitSpring:
@@ -2084,8 +2084,8 @@ MonoBehaviour:
   - {x: -0.09809556, y: -0.056037426, z: 0}
   - {x: 0.09822475, y: -0.055811048, z: 0}
   reach:
-  - 0.54298687
-  - 0.5431358
+  - 0.6787336
+  - 0.6789198
   - 0.822298
   - 0.8234314
   limbSpring: 220
@@ -2095,6 +2095,9 @@ MonoBehaviour:
   gravityCompensation: 0.9
   maxPullAccel: 45
   shoulderAboveHand: 0.3
+  autoPullSpeed: 1.7
+  armHang: -0.2
+  autoLegs: 1
   singlePlayerDrain: 0.45
   uprightStrength: 140
   uprightDamping: 14
@@ -2127,6 +2130,7 @@ MonoBehaviour:
   visualRoot: {fileID: 1431833365862240114}
   markerMaterial: {fileID: 2100000, guid: fe1313d9b306d49b6a07572cafe016f6, type: 2}
   steamMaterial: {fileID: 2100000, guid: e823cd5b5d27c0f4b8256e7c12ee3e6d, type: 2}
+  lineMaterial: {fileID: 2100000, guid: 023438e6b190e45fab85426b41e1f528, type: 2}
   smoothing: 18
   fatigueColor: {r: 1, g: 0.25, b: 0.18, a: 1}
 --- !u!1 &5161086103479740303
@@ -3118,7 +3122,7 @@ Transform:
   m_GameObject: {fileID: 7202802077958252025}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.36343566, y: 1.8686838, z: 0}
+  m_LocalPosition: {x: -0.40155303, y: 1.9775907, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3197,7 +3201,7 @@ ConfigurableJoint:
     spring: 0
     damper: 0
   m_LinearLimit:
-    limit: 0.54298687
+    limit: 0.6787336
     bounciness: 0
     contactDistance: 0
   m_AngularXLimitSpring:

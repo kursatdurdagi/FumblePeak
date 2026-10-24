@@ -49,7 +49,7 @@ MonoBehaviour:
   - SectionId: 76708446
     EntryId: 10478280
     Key: menu.single_desc
-    Value: "Oktopus-Modus: alle vier Gliedma\xDFen geh\xF6ren dir."
+    Value: "Oktopus-Modus: alle vier Gliedma\xDFen geh\xF6ren dir!"
   - SectionId: 76708446
     EntryId: 76553287
     Key: menu.multi
@@ -89,27 +89,30 @@ MonoBehaviour:
   - SectionId: 89308091
     EntryId: 26149491
     Key: howto.l2
-    Value: "MAUS \u2014 Gliedma\xDFe bewegen"
+    Value: "MAUS \u2014 Hand / Fu\xDF bewegen"
   - SectionId: 89308091
     EntryId: 36193593
     Key: howto.l3
-    Value: "LINKSKLICK \u2014 greifen / loslassen"
+    Value: "LINKSKLICK \u2014 den Stein unter dem Zeiger greifen"
   - SectionId: 89308091
     EntryId: 95328796
     Key: howto.l4
-    Value: "RECHTSKLICK \u2014 greifen + wechseln"
+    Value: 'Nach dem Greifen wechselt die Steuerung zur anderen Hand: hoch, klicken,
+      wiederholen!'
   - SectionId: 89308091
     EntryId: 73969794
     Key: howto.l5
-    Value: "Q / E / A / D \u2014 Gliedma\xDFe w\xE4hlen"
+    Value: "Q / E / A / D \u2014 Gliedma\xDFe w\xE4hlen  \xB7  RECHTSKLICK \u2014
+      loslassen"
   - SectionId: 89308091
     EntryId: 27629657
     Key: howto.l6
-    Value: "Beim Festhalten Maus NACH UNTEN ziehen \u2192 K\xF6rper geht HOCH."
+    Value: Die haltende Hand zieht dich von selbst hoch. Leuchtender Stein = greifbar.
   - SectionId: 89308091
     EntryId: 79449286
     Key: howto.l7
-    Value: 'Nicht zu lange an einer Stelle: Arme werden rot, zittern und lassen los!'
+    Value: "Nicht zu lange an einem Arm h\xE4ngen: Arme werden rot, zittern und lassen
+      los!"
   - SectionId: 89308091
     EntryId: 25288826
     Key: howto.players
@@ -518,8 +521,8 @@ MonoBehaviour:
   - SectionId: 42099039
     EntryId: 62715655
     Key: hud.controls
-    Value: "MAUS Gliedma\xDFe bewegen  \xB7  LINKSKLICK greifen/loslassen  \xB7 
-      RECHTSKLICK greifen + wechseln  \xB7  Q/E/A/D w\xE4hlen  \xB7  ESC {0}"
+    Value: "MAUS greifen  \xB7  LINKSKLICK festhalten  \xB7  RECHTSKLICK loslassen 
+      \xB7  Q/E/A/D w\xE4hlen  \xB7  H ausblenden  \xB7  ESC {0}"
   - SectionId: 42099039
     EntryId: 79326119
     Key: hud.esc_pause
@@ -620,3 +623,37 @@ MonoBehaviour:
     EntryId: 80642767
     Key: profile.default
     Value: Kletterer
+  - SectionId: 26866803
+    EntryId: 71927208
+    Key: tut.1
+    Value: 'Bewege die Maus: der farbige Punkt ist deine Hand. Auf einen leuchtenden
+      Stein und LINKSKLICK!'
+  - SectionId: 26866803
+    EntryId: 77587987
+    Key: tut.2
+    Value: "Super! Jetzt steuerst du die andere Hand. Greif einen h\xF6heren Stein
+      und klick."
+  - SectionId: 26866803
+    EntryId: 41165983
+    Key: tut.3
+    Value: Klasse! Die haltende Hand zieht dich hoch. Weiter so, der Gipfel wartet!
+  - SectionId: 76708446
+    EntryId: 24625004
+    Key: menu.hic
+    Value: Hicks!
+  - SectionId: 76708446
+    EntryId: 52971839
+    Key: menu.burp
+    Value: "R\xFClps!"
+  - SectionId: 76708446
+    EntryId: 28732942
+    Key: menu.nature
+    Value: Die Natur ruft...
+  - SectionId: 76708446
+    EntryId: 42187450
+    Key: menu.ahh
+    Value: Ahhh, herrlich...
+  - SectionId: 76708446
+    EntryId: 29175290
+    Key: menu.scream
+    Value: AAAAAAH!

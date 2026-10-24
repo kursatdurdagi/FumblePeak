@@ -38,6 +38,11 @@ namespace FumblePeak
         TextField fieldLobby, fieldIp, fieldName;
         DropdownField ddPrivacy, ddLobbyPrivacy, ddLanguage, ddResolution, ddQuality;
         MountainBackground bg;
+        MenuStage stage;
+        VisualElement inner;
+        Label speech;
+        float speechUntil;
+        bool cinematic, cineHandler;
         UILocalizer loc;
 
         Action modalPrimaryAction, modalSecondaryAction;
@@ -56,9 +61,21 @@ namespace FumblePeak
         {
             L.EnsureInit();
             root = GetComponent<UIDocument>().rootVisualElement;
-            var inner = root.Q("root") ?? root;
-            bg = new MountainBackground();
-            inner.Insert(0, bg);
+            inner = root.Q("root") ?? root;
+            stage = FindAnyObjectByType<MenuStage>();
+            if (stage != null)
+            {
+                inner.AddToClassList("root--stage");
+                speech = new Label { pickingMode = PickingMode.Ignore };
+                speech.AddToClassList("speech");
+                inner.Add(speech);
+                MenuCharacter.Say += OnSay;
+            }
+            else
+            {
+                bg = new MountainBackground();
+                inner.Insert(0, bg);
+            }
 
             Bind();
             loc = new UILocalizer(root);
@@ -74,6 +91,7 @@ namespace FumblePeak
         void OnDisable()
         {
             loc?.Dispose();
+            MenuCharacter.Say -= OnSay;
             FumblePlayer.RosterChanged -= OnRoster;
             FumblePlayer.PlayerJoined -= OnPlayerJoined;
             FumblePlayer.PlayerLeft -= OnPlayerLeft;
@@ -197,7 +215,7 @@ namespace FumblePeak
             root.RegisterCallback<PointerMoveEvent>(e =>
             {
                 float w = root.resolvedStyle.width;
-                if (w > 1) bg.Parallax = e.position.x / w - 0.5f;
+                if (w > 1 && bg != null) bg.Parallax = e.position.x / w - 0.5f;
             });
 
             FumblePlayer.RosterChanged += OnRoster;
@@ -284,6 +302,16 @@ namespace FumblePeak
         void Update()
         {
             var kb = Keyboard.current;
+            UpdateSpeech();
+
+            // Host "Başlat" dediğinde herkes sinematiği oynatır
+            if (NetworkClient.active && !cineHandler)
+            {
+                NetworkClient.ReplaceHandler<CinematicMessage>(_ => PlayCinematic(null), false);
+                cineHandler = true;
+            }
+            else if (!NetworkClient.active) cineHandler = false;
+            if (cinematic) return;
             if (state == State.Intro)
             {
                 bool any = (kb != null && kb.anyKey.wasPressedThisFrame)
@@ -365,8 +393,45 @@ namespace FumblePeak
 
         // =====================================================================
         // Eylemler
+        /// <summary>Zirvedeki sarhoşun "işerken düşme" sinematiği. Arayüz gizlenir.</summary>
+        bool PlayCinematic(Action onDone)
+        {
+            if (stage == null || cinematic) return false;
+            cinematic = true;
+            HideModal();
+            menu.SetEnabled(false);
+            lobby.SetEnabled(false);
+            inner.AddToClassList("root--cinematic");
+            stage.PlayCinematic(onDone);
+            return true;
+        }
+
+        void OnSay(string key, float duration)
+        {
+            if (speech == null) return;
+            speech.text = L.T(key);
+            speech.EnableInClassList("speech--scream", key == "menu.scream");
+            speech.AddToClassList("speech--show");
+            speechUntil = Time.unscaledTime + duration;
+            UpdateSpeech();
+        }
+
+        void UpdateSpeech()
+        {
+            if (speech == null || stage == null || stage.cam == null) return;
+            if (speech.ClassListContains("speech--show") && Time.unscaledTime > speechUntil) speech.RemoveFromClassList("speech--show");
+            if (root.panel == null) return;
+            var w = stage.character.BubbleAnchor;
+            bool front = Vector3.Dot(w - stage.cam.transform.position, stage.cam.transform.forward) > 0.1f;
+            var p = RuntimePanelUtils.CameraTransformWorldToPanel(root.panel, w, stage.cam);
+            speech.style.left = p.x;
+            speech.style.top = p.y;
+            speech.style.visibility = front ? UnityEngine.UIElements.Visibility.Visible : UnityEngine.UIElements.Visibility.Hidden;
+        }
+
         void OnSingle()
         {
+            if (PlayCinematic(() => SceneFader.Get().FadeOut(0.4f, () => NM.StartSinglePlayer(), L.T("msg.octopus")))) return;
             ShowBusy(L.T("menu.single"), L.T("menu.single_desc"), false);
             SceneFader.Get().FadeOut(0.5f, () => NM.StartSinglePlayer(), L.T("msg.octopus"));
         }
@@ -487,6 +552,7 @@ namespace FumblePeak
         {
             if (!NetworkServer.active || !NM.AllReady()) return;
             btnLobbyStart.SetEnabled(false);
+            if (stage != null) { NM.StartGameWithCinematic(MenuStage.CinematicDuration); return; }
             SceneFader.Get().FadeOut(0.5f, () => NM.StartGame(), L.T("msg.get_ready"));
         }
 

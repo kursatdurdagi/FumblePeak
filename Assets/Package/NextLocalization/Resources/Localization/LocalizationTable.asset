@@ -54,6 +54,16 @@ MonoBehaviour:
       Key: steam_ok
     - Id: 23623382
       Key: steam_off
+    - Id: 24625004
+      Key: hic
+    - Id: 52971839
+      Key: burp
+    - Id: 28732942
+      Key: nature
+    - Id: 42187450
+      Key: ahh
+    - Id: 29175290
+      Key: scream
   - Id: 89308091
     SectionName: howto
     SectionSheet:
@@ -348,6 +358,15 @@ MonoBehaviour:
     SectionSheet:
     - Id: 80642767
       Key: default
+  - Id: 26866803
+    SectionName: tut
+    SectionSheet:
+    - Id: 71927208
+      Key: 1
+    - Id: 77587987
+      Key: 2
+    - Id: 41165983
+      Key: 3
   Languages:
   - {fileID: 11400000, guid: d2fca627cb74a4a2e992073057941bb3, type: 2}
   - {fileID: 11400000, guid: abffa052e1fbdf0409f13f98e5dbf44b, type: 2}

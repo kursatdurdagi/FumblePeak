@@ -49,7 +49,7 @@ MonoBehaviour:
   - SectionId: 76708446
     EntryId: 10478280
     Key: menu.single_desc
-    Value: 'Octopus mode: all four limbs are yours.'
+    Value: 'Octopus mode: all four limbs are yours!'
   - SectionId: 76708446
     EntryId: 76553287
     Key: menu.multi
@@ -89,27 +89,28 @@ MonoBehaviour:
   - SectionId: 89308091
     EntryId: 26149491
     Key: howto.l2
-    Value: "MOUSE \u2014 move your limb"
+    Value: "MOUSE \u2014 move your hand / foot"
   - SectionId: 89308091
     EntryId: 36193593
     Key: howto.l3
-    Value: "LEFT CLICK \u2014 grab / release"
+    Value: "LEFT CLICK \u2014 grab the rock under the cursor"
   - SectionId: 89308091
     EntryId: 95328796
     Key: howto.l4
-    Value: "RIGHT CLICK \u2014 grab + switch limb"
+    Value: 'After grabbing, control passes to the other hand: reach up, click, repeat!'
   - SectionId: 89308091
     EntryId: 73969794
     Key: howto.l5
-    Value: "Q / E / A / D \u2014 select limb"
+    Value: "Q / E / A / D \u2014 select limb  \xB7  RIGHT CLICK \u2014 let go"
   - SectionId: 89308091
     EntryId: 27629657
     Key: howto.l6
-    Value: "While holding, pull the mouse DOWN \u2192 the body goes UP."
+    Value: The holding hand pulls you up by itself. Glowing rock = where you can
+      grab.
   - SectionId: 89308091
     EntryId: 79449286
     Key: howto.l7
-    Value: 'Don''t hang in one spot too long: arms redden, shake and let go!'
+    Value: 'Don''t hang on one arm too long: arms redden, shake and let go!'
   - SectionId: 89308091
     EntryId: 25288826
     Key: howto.players
@@ -518,8 +519,8 @@ MonoBehaviour:
   - SectionId: 42099039
     EntryId: 62715655
     Key: hud.controls
-    Value: "MOUSE move limb  \xB7  LEFT CLICK grab/release  \xB7  RIGHT CLICK grab
-      + switch  \xB7  Q/E/A/D select limb  \xB7  ESC {0}"
+    Value: "MOUSE reach  \xB7  LEFT CLICK grab  \xB7  RIGHT CLICK let go  \xB7  Q/E/A/D
+      select limb  \xB7  H hide  \xB7  ESC {0}"
   - SectionId: 42099039
     EntryId: 79326119
     Key: hud.esc_pause
@@ -620,3 +621,36 @@ MonoBehaviour:
     EntryId: 80642767
     Key: profile.default
     Value: Climber
+  - SectionId: 26866803
+    EntryId: 71927208
+    Key: tut.1
+    Value: 'Move the mouse: the colored dot is your hand. Put it on a glowing rock
+      and LEFT CLICK!'
+  - SectionId: 26866803
+    EntryId: 77587987
+    Key: tut.2
+    Value: Great! Control passed to your other hand. Reach a higher rock and click.
+  - SectionId: 26866803
+    EntryId: 41165983
+    Key: tut.3
+    Value: Awesome! The holding hand pulls you up. Keep going, the summit awaits!
+  - SectionId: 76708446
+    EntryId: 24625004
+    Key: menu.hic
+    Value: Hic!
+  - SectionId: 76708446
+    EntryId: 52971839
+    Key: menu.burp
+    Value: Buuurp!
+  - SectionId: 76708446
+    EntryId: 28732942
+    Key: menu.nature
+    Value: Nature calls...
+  - SectionId: 76708446
+    EntryId: 42187450
+    Key: menu.ahh
+    Value: Ahhh, that's the stuff...
+  - SectionId: 76708446
+    EntryId: 29175290
+    Key: menu.scream
+    Value: WAAAAAH!

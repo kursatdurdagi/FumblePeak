@@ -76,11 +76,18 @@ namespace FumblePeak
             Local = this;
             ulong sid = SteamLobby.Instance != null && SteamLobby.Instance.IsReady ? SteamLobby.Instance.MySteamId : 0;
             CmdSetProfile(PlayerProfile.Name, sid);
+            ClimberBody.OnRespawned += ResetCursors; // kampa dönünce imleçler eline gelsin
             RebuildOwned();
+        }
+
+        void ResetCursors(string _ = null)
+        {
+            for (int i = 0; i < 4; i++) virtInit[i] = false;
         }
 
         public override void OnStopLocalPlayer()
         {
+            ClimberBody.OnRespawned -= ResetCursors;
             if (Local == this) Local = null;
         }
 
@@ -168,7 +175,7 @@ namespace FumblePeak
             int L = localActive;
             bool grabbed = body.IsGrabbing(L);
             Vector2 center = grabbed ? body.RenderEffectorPos(L) : body.RenderAnchor(L);
-            float radius = body.reach[L] * (grabbed ? 1.15f : 1.25f);
+            float radius = body.reach[L] * (grabbed ? 1.0f : 1.3f);
 
             // ----- İmleç hareketi -----
             Vector2 c = virt[L];
@@ -178,9 +185,10 @@ namespace FumblePeak
                 var stick = pad.leftStick.ReadValue();
                 if (stick.sqrMagnitude > 0.04f) { c = center + stick * radius; padUsed = true; }
             }
-            if (!padUsed && mouse != null)
+            if (!padUsed)
             {
-                Vector2 d = mouse.delta.ReadValue();
+                Vector2 d = mouse != null ? mouse.delta.ReadValue() : Vector2.zero;
+                d += Sim.delta; Sim.delta = Vector2.zero; // otomatik test girdisi
                 c += d * WorldPerPixel * Sensitivity;
             }
             // erişim alanına kilitle
@@ -188,13 +196,23 @@ namespace FumblePeak
             if (off.sqrMagnitude > radius * radius) c = center + off.normalized * radius;
             virt[L] = c;
 
+            // ----- Tutunan eli hareket ettirmek onu kayadan kaldırır -----
+            // (en az bir uzuv daha tutunuyorsa; tek dayanakken yanlışlıkla düşme olmasın)
+            if (grabbed && (c - body.RenderEffectorPos(L)).sqrMagnitude > 0.2f * 0.2f && OtherSupports(body, L) > 0)
+            {
+                CmdRelease((byte)L);
+                grabbed = false;
+            }
+
             // ----- Tutun / bırak -----
-            bool grab = (mouse != null && mouse.leftButton.wasPressedThisFrame)
-                        || (kb != null && kb.spaceKey.wasPressedThisFrame)
-                        || (pad != null && (pad.rightTrigger.wasPressedThisFrame || pad.buttonSouth.wasPressedThisFrame));
-            bool grabNext = owned.Count > 1 &&
-                            ((mouse != null && mouse.rightButton.wasPressedThisFrame) ||
-                             (pad != null && pad.buttonWest.wasPressedThisFrame));
+            bool click = (mouse != null && mouse.leftButton.wasPressedThisFrame)
+                         || (kb != null && kb.spaceKey.wasPressedThisFrame)
+                         || (pad != null && (pad.rightTrigger.wasPressedThisFrame || pad.buttonSouth.wasPressedThisFrame))
+                         || Sim.click;
+            bool release = (mouse != null && mouse.rightButton.wasPressedThisFrame)
+                           || (pad != null && pad.buttonEast.wasPressedThisFrame)
+                           || Sim.rightClick;
+            Sim.click = Sim.rightClick = false;
 
             sendTimer += Time.deltaTime;
             if (sendTimer >= 1f / 40f && (c - lastSent).sqrMagnitude > 0.000001f)
@@ -204,14 +222,46 @@ namespace FumblePeak
                 CmdSetTarget((byte)L, c);
             }
 
-            if (grab || grabNext)
+            if (release && (grabbed || body.IsFist(L)))
             {
-                // Bırakırken imleci ele getir: uzuv aşağı savrulmasın
-                if (grabbed) { virt[L] = body.RenderEffectorPos(L); }
-                CmdGrabAt((byte)L, grabbed ? c : virt[L]);
-                if (grabbed) { lastSent = virt[L]; CmdSetTarget((byte)L, virt[L]); }
-                if (grabNext) NextInGroup();
+                CmdRelease((byte)L);
             }
+            else if (click)
+            {
+                // İmleç elin üstündeyse tıklama = bırak; başka yerdeyse = oraya tutun
+                bool onHand = (c - body.RenderEffectorPos(L)).sqrMagnitude < 0.2f * 0.2f;
+                if ((grabbed || body.IsFist(L)) && onHand)
+                {
+                    CmdRelease((byte)L);
+                }
+                else
+                {
+                    CmdGrabAt((byte)L, c);
+                    LastGrabLimb = L;
+                    // Kolay mod: tutunma isteğinden sonra kontrol diğer ele geçer (el-el tırmanış)
+                    if (AutoSwitch) NextInGroup();
+                }
+            }
+        }
+
+        /// <summary>Tutunduktan sonra aynı gruptaki diğer uzva otomatik geç.</summary>
+        public static bool AutoSwitch = true;
+        public static int LastGrabLimb = -1;
+
+        /// <summary>Otomatik test / bot girdisi (gerçek oyunda kullanılmaz).</summary>
+        public static class Sim
+        {
+            public static Vector2 delta;
+            public static bool click, rightClick;
+        }
+
+        static int OtherSupports(ClimberBody body, int except)
+        {
+            int n = 0;
+            for (int i = 0; i < 4; i++) if (i != except && body.IsGrabbing(i)) n++;
+            // yere basan ayaklar (gövde zemine yakın) da sayılır
+            n += body.GroundedFeet;
+            return n;
         }
 
         bool cursorLocked;
@@ -224,7 +274,7 @@ namespace FumblePeak
         }
 
 
-        /// <summary>Sağ tık: kol ↔ kol, bacak ↔ bacak (el-el tırmanış ritmi).</summary>
+        /// <summary>Kol ↔ kol, bacak ↔ bacak (el-el tırmanış ritmi).</summary>
         void NextInGroup()
         {
             bool arm = LimbUtil.IsArm(localActive);
@@ -250,6 +300,13 @@ namespace FumblePeak
 
         void SelectLimb(int limb)
         {
+            var body = ClimberBody.Instance;
+            if (body != null && isLocalPlayer)
+            {
+                // imleci seçilen elin/ayağın üstüne getir (zıplama yok, tutunan uzuv kopmaz)
+                virt[limb] = body.RenderEffectorPos(limb);
+                virtInit[limb] = true;
+            }
             localActive = limb;
             lastSent = new Vector2(float.MaxValue, 0);
             CmdSetActive((byte)limb);
@@ -303,7 +360,14 @@ namespace FumblePeak
         {
             if (!LimbUtil.Has(limbMask, limb) || ClimberBody.Instance == null) return;
             ClimberBody.Instance.ServerSetTarget(limb, p);
-            ClimberBody.Instance.ServerToggleGrab(limb);
+            ClimberBody.Instance.ServerGrab(limb);
+        }
+
+        [Command]
+        void CmdRelease(byte limb)
+        {
+            if (!LimbUtil.Has(limbMask, limb) || ClimberBody.Instance == null) return;
+            ClimberBody.Instance.ServerRelease(limb);
         }
 
         public void RequestRespawn() { if (isLocalPlayer) CmdRespawn(); }

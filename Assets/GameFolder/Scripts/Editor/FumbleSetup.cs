@@ -47,7 +47,7 @@ namespace FumblePeak.EditorTools
             var player = MakePlayerPrefab();
             var climber = MakeClimberPrefab(mats);
             BuildGameScene(panel, mats);
-            BuildMainMenu(panel, player, climber);
+            BuildMainMenu(panel, player, climber, mats);
             SetBuildScenes();
             WriteSteamAppId();
             AssetDatabase.SaveAssets();
@@ -251,7 +251,7 @@ namespace FumblePeak.EditorTools
                 var b = FindBone(model.transform, lo[i]);
                 var c = FindBone(model.transform, en[i]);
                 var anchor = a.position; anchor.z = 0;
-                float reach = ((b.position - a.position).magnitude + (c.position - b.position).magnitude) * (i < 2 ? 1.12f : 1.0f); // kollara oynanış için biraz ekstra erişim
+                float reach = ((b.position - a.position).magnitude + (c.position - b.position).magnitude) * (i < 2 ? 1.4f : 1.0f); // kollara oynanış için ekstra erişim (kolay tırmanış)
                 body.anchorLocal[i] = anchor - hp;
                 body.reach[i] = reach;
 
@@ -289,6 +289,7 @@ namespace FumblePeak.EditorTools
             vis.visualRoot = model.transform;
             vis.markerMaterial = mats.marker;
             vis.steamMaterial = mats.steam;
+            vis.lineMaterial = FumbleLevelBuilder.LineMaterial;
 
             var prefab = PrefabUtility.SaveAsPrefabAsset(root, PrefabDir + "/Climber.prefab");
             Object.DestroyImmediate(root);
@@ -301,16 +302,12 @@ namespace FumblePeak.EditorTools
             foreach (var go in s.GetRootGameObjects()) Object.DestroyImmediate(go);
         }
 
-        static void BuildMainMenu(PanelSettings panel, GameObject player, GameObject climber)
+        static void BuildMainMenu(PanelSettings panel, GameObject player, GameObject climber, Mats mats)
         {
             var scene = EditorSceneManager.OpenScene(MainMenuPath, OpenSceneMode.Single);
             ClearScene(scene);
 
-            var camGo = new GameObject("Main Camera") { tag = "MainCamera" };
-            var cam = camGo.AddComponent<Camera>();
-            cam.clearFlags = CameraClearFlags.SolidColor;
-            cam.backgroundColor = new Color(0.04f, 0.05f, 0.09f);
-            camGo.AddComponent<AudioListener>();
+            BuildMenuStage(mats);
 
             var nmGo = new GameObject("NetworkManager");
             var kcp = nmGo.AddComponent<kcp2k.KcpTransport>();
@@ -338,6 +335,118 @@ namespace FumblePeak.EditorTools
 
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
+        }
+
+        /// <summary>Ana menü 3D sahnesi: zirve, sarhoş dağcı, şişe, kamera ve sinematik.</summary>
+        static void BuildMenuStage(Mats mats)
+        {
+            var stageRoot = new GameObject("MenuStage");
+            var info = FumbleLevelBuilder.BuildMenuStage(stageRoot.transform);
+
+            // --- Kamera ---
+            var camGo = new GameObject("Main Camera") { tag = "MainCamera" };
+            var cam = camGo.AddComponent<Camera>();
+            cam.clearFlags = CameraClearFlags.Skybox;
+            cam.fieldOfView = 42f;
+            cam.nearClipPlane = 0.05f;
+            cam.farClipPlane = 600f;
+            camGo.AddComponent<AudioListener>();
+            var camData = camGo.AddComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
+            camData.renderPostProcessing = true;
+            camData.antialiasing = UnityEngine.Rendering.Universal.AntialiasingMode.SubpixelMorphologicalAntiAliasing;
+
+            var idle = new GameObject("CamIdle").transform;
+            idle.SetParent(stageRoot.transform, false);
+            idle.position = new Vector3(-0.9f, 1.55f, -5.4f);
+            idle.rotation = Quaternion.LookRotation(new Vector3(-0.2f, 1.05f, 0.6f) - idle.position);
+            camGo.transform.SetPositionAndRotation(idle.position, idle.rotation);
+
+            var perp = new Vector3(info.edgeDir.z, 0f, -info.edgeDir.x);
+            var cine = new GameObject("CamCinematic").transform;
+            cine.SetParent(stageRoot.transform, false);
+            cine.position = info.edgePos + info.edgeDir * 0.9f + perp * 3.3f + Vector3.up * 0.7f;
+            cine.rotation = Quaternion.LookRotation(info.edgePos + Vector3.up - cine.position);
+
+            var edge = new GameObject("EdgePoint").transform;
+            edge.SetParent(stageRoot.transform, false);
+            edge.position = info.edgePos;
+            edge.rotation = Quaternion.LookRotation(info.edgeDir);
+
+            // --- Karakter ---
+            var charRoot = new GameObject("DrunkClimber");
+            charRoot.transform.SetParent(stageRoot.transform, false);
+            charRoot.transform.SetPositionAndRotation(info.charPos, Quaternion.Euler(0, info.charYaw, 0));
+            var modelAsset = AssetDatabase.LoadAssetAtPath<GameObject>(ModelPath);
+            var model = (GameObject)PrefabUtility.InstantiatePrefab(modelAsset);
+            PrefabUtility.UnpackPrefabInstance(model, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
+            model.name = "Visual";
+            model.transform.SetParent(charRoot.transform, false);
+            for (int i = model.transform.childCount - 1; i >= 0; i--)
+            {
+                var c = model.transform.GetChild(i);
+                if (c.GetComponent<Camera>() != null || c.GetComponent<Light>() != null) Object.DestroyImmediate(c.gameObject);
+            }
+            foreach (var r in model.GetComponentsInChildren<SkinnedMeshRenderer>(true))
+            {
+                r.updateWhenOffscreen = true;
+                var n = r.name;
+                Material mat = n.Contains("Shirt") ? mats.shirt : n.Contains("Pants") ? mats.pants : n.Contains("Sneakers") ? mats.shoes
+                             : n.Contains("Eyelashes") ? mats.hair : mats.skin;
+                r.sharedMaterials = new[] { mat };
+            }
+            foreach (var a in model.GetComponentsInChildren<Animator>(true)) Object.DestroyImmediate(a);
+
+            var bottle = new GameObject("Bottle");
+            bottle.transform.SetParent(stageRoot.transform, false);
+            bottle.AddComponent<MeshFilter>().sharedMesh = info.bottleMesh;
+            bottle.AddComponent<MeshRenderer>().sharedMaterial = info.worldMat;
+
+            var rockHand = new GameObject("RockHandPoint").transform;
+            rockHand.SetParent(stageRoot.transform, false);
+            rockHand.position = info.rockHand;
+
+            // Çiş: sarı parçacık akışı
+            var peeGo = new GameObject("PeeStream");
+            peeGo.transform.SetParent(stageRoot.transform, false);
+            var ps = peeGo.AddComponent<ParticleSystem>();
+            var main = ps.main;
+            main.startLifetime = 1.6f; main.startSpeed = 2.7f; main.startSize = new ParticleSystem.MinMaxCurve(0.045f, 0.07f);
+            main.startColor = new Color(1f, 0.92f, 0.15f, 1f);
+            main.gravityModifier = 1f;
+            main.simulationSpace = ParticleSystemSimulationSpace.World;
+            main.maxParticles = 600;
+            var em = ps.emission; em.rateOverTime = 220f; em.enabled = false;
+            var shape = ps.shape; shape.shapeType = ParticleSystemShapeType.Cone; shape.angle = 2.5f; shape.radius = 0.005f;
+            var sol = ps.sizeOverLifetime; sol.enabled = true; sol.size = new ParticleSystem.MinMaxCurve(1f, AnimationCurve.Linear(0, 1, 1, 0.5f));
+            peeGo.GetComponent<ParticleSystemRenderer>().sharedMaterial = mats.steam;
+
+            var mc = charRoot.AddComponent<MenuCharacter>();
+            mc.model = model.transform;
+            mc.bottle = bottle.transform;
+            mc.rockHand = rockHand;
+            mc.pee = ps;
+
+            // Hafif kar
+            var snowGo = new GameObject("Snowfall");
+            snowGo.transform.SetParent(stageRoot.transform, false);
+            snowGo.transform.position = new Vector3(0.5f, 6f, 0f);
+            var snow = snowGo.AddComponent<ParticleSystem>();
+            var sm = snow.main;
+            sm.startLifetime = 9f; sm.startSpeed = 0.2f; sm.startSize = new ParticleSystem.MinMaxCurve(0.03f, 0.07f);
+            sm.startColor = new Color(1f, 1f, 1f, 0.85f); sm.gravityModifier = 0.03f; sm.maxParticles = 500;
+            sm.simulationSpace = ParticleSystemSimulationSpace.World; sm.prewarm = true;
+            var se = snow.emission; se.rateOverTime = 40f;
+            var ss = snow.shape; ss.shapeType = ParticleSystemShapeType.Box; ss.scale = new Vector3(16f, 12f, 1f);
+            snowGo.transform.rotation = Quaternion.Euler(90f, 0, 0);
+            var sn = snow.noise; sn.enabled = true; sn.strength = 0.35f; sn.frequency = 0.25f;
+            snowGo.GetComponent<ParticleSystemRenderer>().sharedMaterial = mats.steam;
+
+            var stage = stageRoot.AddComponent<MenuStage>();
+            stage.character = mc;
+            stage.cam = cam;
+            stage.edgePoint = edge;
+            stage.idleCamPose = idle;
+            stage.cinematicCamPose = cine;
         }
 
         // ------------------------------------------------------------
@@ -395,109 +504,24 @@ namespace FumblePeak.EditorTools
             var scene = EditorSceneManager.OpenScene(GamePath, OpenSceneMode.Single);
             ClearScene(scene);
 
-            var sky = new Color(0.55f, 0.74f, 0.88f);
-            RenderSettings.fog = true;
-            RenderSettings.fogMode = FogMode.Linear;
-            RenderSettings.fogColor = sky;
-            RenderSettings.fogStartDistance = 14f;
-            RenderSettings.fogEndDistance = 55f;
-            RenderSettings.ambientMode = AmbientMode.Trilight;
-            RenderSettings.ambientSkyColor = new Color(0.75f, 0.82f, 0.95f);
-            RenderSettings.ambientEquatorColor = new Color(0.55f, 0.55f, 0.6f);
-            RenderSettings.ambientGroundColor = new Color(0.3f, 0.28f, 0.25f);
-
-            var sun = new GameObject("Sun");
-            sun.transform.rotation = Quaternion.Euler(40f, 25f, 0f);
-            var sl = sun.AddComponent<Light>();
-            sl.type = LightType.Directional; sl.intensity = 1.2f; sl.color = new Color(1f, 0.95f, 0.86f);
-            sl.shadows = LightShadows.Soft;
-
             var camGo = new GameObject("Main Camera") { tag = "MainCamera" };
-            camGo.transform.position = new Vector3(0, 1.6f, -7.5f);
+            camGo.transform.position = new Vector3(0, 1.6f, -8f);
             var cam = camGo.AddComponent<Camera>();
-            cam.clearFlags = CameraClearFlags.SolidColor;
-            cam.backgroundColor = sky;
-            cam.fieldOfView = 50f;
+            cam.clearFlags = CameraClearFlags.Skybox;
+            cam.fieldOfView = 52f;
+            cam.farClipPlane = 400f;
             camGo.AddComponent<AudioListener>();
             camGo.AddComponent<ClimberCamera>();
+            var camData = camGo.AddComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
+            camData.renderPostProcessing = true;
+            camData.antialiasing = UnityEngine.Rendering.Universal.AntialiasingMode.SubpixelMorphologicalAntiAliasing;
+            AddAtmosphere(camGo.transform);
 
             new GameObject("DevBootstrap").AddComponent<DevBootstrap>();
 
-            // ---------- Seviye: Başlangıç Vadisi ----------
-            var level = new GameObject("Level_BaslangicVadisi").transform;
-            Prim(PrimitiveType.Cube, "Ground", level, new Vector3(0, -0.5f, 0), new Vector3(40, 1, 8), mats.ground).isStatic = true;
-            Prim(PrimitiveType.Cube, "CliffWall", level, new Vector3(0, 30f, 1.2f), new Vector3(16, 64, 1.5f), mats.cliff, false).isStatic = true;
-            for (int i = 0; i < 6; i++) // arka dağlar
-                Prim(PrimitiveType.Cube, "BackRock", level, new Vector3(-18 + i * 7.5f, 8 + (i % 3) * 5, 14), new Vector3(7, 22 + (i % 2) * 10, 3), mats.cliff, false)
-                    .transform.rotation = Quaternion.Euler(0, 0, (i % 2 == 0 ? 8 : -6));
-
-            var spawn = new GameObject("ClimberSpawn");
-            spawn.transform.SetParent(level, false);
-            spawn.transform.position = new Vector3(0, 1.0f, 0);
-            spawn.AddComponent<ClimberSpawn>();
-
-            // Mantar (esnek zıplama)
-            var mush = new GameObject("Mushroom");
-            mush.transform.SetParent(level, false);
-            Prim(PrimitiveType.Cylinder, "Stem", mush.transform, new Vector3(-4.2f, 0.45f, 0), new Vector3(0.45f, 0.45f, 0.45f), mats.mushroom).isStatic = true;
-            var capGo = Prim(PrimitiveType.Sphere, "Cap", mush.transform, new Vector3(-4.2f, 1.0f, 0), new Vector3(1.8f, 0.55f, 1.4f), mats.mushroomCap);
-            capGo.AddComponent<BouncePad>().upSpeed = 9.5f;
-
-            var holds = new GameObject("Holds").transform;
-            holds.SetParent(level, false);
-            var rnd = new System.Random(1337);
-            float cx = 0f;
-
-            // Bölüm 1: y 1.9 → 14  (sadece kaya)
-            for (float y = 1.65f; y < 14.2f; y += 0.42f + (float)rnd.NextDouble() * 0.12f)
-            {
-                cx = Mathf.Clamp(cx + ((float)rnd.NextDouble() - 0.5f) * 0.5f, -2.5f, 2.5f);
-                Hold(holds, new Vector3(cx - 0.32f - (float)rnd.NextDouble() * 0.12f, y, 0), mats, rnd, false);
-                Hold(holds, new Vector3(cx + 0.32f + (float)rnd.NextDouble() * 0.12f, y + 0.12f, 0), mats, rnd, false);
-                if (rnd.NextDouble() < 0.35) Hold(holds, new Vector3(cx + ((float)rnd.NextDouble() - 0.5f) * 0.4f, y + 0.3f, 0), mats, rnd, false);
-            }
-
-            // Kamp 1
-            var ledgeY = 15f;
-            Ledge(level, "Ledge_Camp1", new Vector3(cx, ledgeY, 0), 4.5f, mats);
-            Campfire(level, new Vector3(cx + 1.2f, ledgeY + 0.2f, 0), mats);
-            var cp = new GameObject("Checkpoint_Camp1");
-            cp.transform.SetParent(level, false);
-            cp.transform.position = new Vector3(cx, ledgeY + 1.2f, 0);
-            var cpBox = cp.AddComponent<BoxCollider>(); cpBox.isTrigger = true; cpBox.size = new Vector3(4.5f, 2f, 2f);
-            var cpComp = cp.AddComponent<Checkpoint>();
-            var rp = new GameObject("RespawnPoint"); rp.transform.SetParent(cp.transform, false);
-            rp.transform.position = new Vector3(cx - 0.8f, ledgeY + 1.25f, 0);
-            cpComp.respawnPoint = rp.transform;
-            // Kamp çıkıntısının kenarlarına tutamak (çıkıntıya tırmanabilmek için)
-            Hold(holds, new Vector3(cx - 2.5f, ledgeY - 0.1f, 0), mats, rnd, false);
-            Hold(holds, new Vector3(cx + 2.5f, ledgeY - 0.1f, 0), mats, rnd, false);
-            Hold(holds, new Vector3(cx - 2.6f, ledgeY - 0.65f, 0), mats, rnd, false);
-            Hold(holds, new Vector3(cx + 2.6f, ledgeY - 0.65f, 0), mats, rnd, false);
-
-            // Bölüm 2: y 16 → 26 (kaygan yosun karışık)
-            for (float y = ledgeY + 1.6f; y < 26.5f; y += 0.48f + (float)rnd.NextDouble() * 0.12f)
-            {
-                cx = Mathf.Clamp(cx + ((float)rnd.NextDouble() - 0.5f) * 1.1f, -3f, 3f);
-                Hold(holds, new Vector3(cx - 0.5f - (float)rnd.NextDouble() * 0.2f, y, 0), mats, rnd, rnd.NextDouble() < 0.35);
-                Hold(holds, new Vector3(cx + 0.5f + (float)rnd.NextDouble() * 0.2f, y + 0.15f, 0), mats, rnd, rnd.NextDouble() < 0.35);
-                if (rnd.NextDouble() < 0.25) Hold(holds, new Vector3(cx, y + 0.32f, 0), mats, rnd, false);
-            }
-
-            // Zirve
-            float topY = 27.5f;
-            Ledge(level, "Ledge_Summit", new Vector3(cx, topY, 0), 5f, mats);
-            Hold(holds, new Vector3(cx - 2.7f, topY - 0.1f, 0), mats, rnd, false);
-            Hold(holds, new Vector3(cx + 2.7f, topY - 0.1f, 0), mats, rnd, false);
-            Hold(holds, new Vector3(cx - 2.8f, topY - 0.6f, 0), mats, rnd, false);
-            Hold(holds, new Vector3(cx + 2.8f, topY - 0.6f, 0), mats, rnd, false);
-            Prim(PrimitiveType.Cylinder, "FlagPole", level, new Vector3(cx + 1.5f, topY + 1.2f, 0.3f), new Vector3(0.06f, 1.0f, 0.06f), mats.wood, false);
-            Prim(PrimitiveType.Cube, "Flag", level, new Vector3(cx + 1.95f, topY + 1.9f, 0.3f), new Vector3(0.8f, 0.5f, 0.04f), mats.flag, false);
-            var summit = new GameObject("Summit");
-            summit.transform.SetParent(level, false);
-            summit.transform.position = new Vector3(cx, topY + 1.2f, 0);
-            var sBox = summit.AddComponent<BoxCollider>(); sBox.isTrigger = true; sBox.size = new Vector3(5f, 2f, 2f);
-            summit.AddComponent<SummitTrigger>();
+            // ---------- Seviye: prosedürel dağ ----------
+            var level = new GameObject("Level_Mountain").transform;
+            FumbleLevelBuilder.Build(level, mats.marker);
 
             // ---------- HUD ----------
             var hudGo = new GameObject("GameHUD");
@@ -508,6 +532,30 @@ namespace FumblePeak.EditorTools
 
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
+        }
+
+        static void AddAtmosphere(Transform cam)
+        {
+            var atmo = cam.gameObject.AddComponent<AltitudeAtmosphere>();
+            var mat = AssetDatabase.LoadAssetAtPath<Material>("Packages/com.unity.render-pipelines.universal/Runtime/Materials/ParticlesUnlit.mat");
+            ParticleSystem Make(string name, Color c, float size, float speed, float grav)
+            {
+                var go = new GameObject(name);
+                go.transform.SetParent(cam, false);
+                go.transform.localPosition = new Vector3(0, 6f, 7f);
+                var ps = go.AddComponent<ParticleSystem>();
+                var main = ps.main;
+                main.startLifetime = 6f; main.startSpeed = speed; main.startSize = size;
+                main.startColor = c; main.gravityModifier = grav; main.maxParticles = 400;
+                main.simulationSpace = ParticleSystemSimulationSpace.World;
+                var shape = ps.shape; shape.shapeType = ParticleSystemShapeType.Box; shape.scale = new Vector3(18f, 1f, 8f);
+                var noise = ps.noise; noise.enabled = true; noise.strength = 0.4f; noise.frequency = 0.3f;
+                var em = ps.emission; em.rateOverTime = 0f;
+                go.GetComponent<ParticleSystemRenderer>().sharedMaterial = mat;
+                return ps;
+            }
+            atmo.snow = Make("Snow", new Color(1f, 1f, 1f, 0.9f), 0.07f, 0.3f, 0.08f);
+            atmo.pollen = Make("Pollen", new Color(1f, 0.95f, 0.7f, 0.6f), 0.04f, 0.1f, -0.01f);
         }
 
         static void SetBuildScenes()

@@ -29,6 +29,13 @@ namespace FumblePeak
         public float maxPullAccel = 45f;
         [Tooltip("Omzun tutunan elin üstüne çıkabileceği en fazla yükseklik")]
         public float shoulderAboveHand = 0.3f;
+        [Header("Kolay oynanış")]
+        [Tooltip("Tutununca gövde kendiliğinden yukarı çekilir (m/sn)")]
+        public float autoPullSpeed = 1.7f;
+        [Tooltip("Otomatik çekmede omzun elin ne kadar altında duracağı")]
+        public float armHang = -0.2f;
+        [Tooltip("Kolları da yöneten oyuncunun bacakları basamakları kendisi bulur")]
+        public bool autoLegs = true;
         [Tooltip("Tek oyuncuda dayanıklılık tüketim çarpanı")]
         public float singlePlayerDrain = 0.45f;
         public float uprightStrength = 140f;
@@ -54,6 +61,7 @@ namespace FumblePeak
         [SyncVar] Vector2 sT0, sT1, sT2, sT3;
         [SyncVar] byte sGrab;
         [SyncVar] byte sFist;
+        [SyncVar] byte sGround;
         [SyncVar] byte sF0, sF1, sF2, sF3;
         [SyncVar] public float bestHeight;
 
@@ -73,6 +81,9 @@ namespace FumblePeak
         Vector2 bodyTarget;
         readonly Vector2[] lastTarget = new Vector2[4];
         readonly Grip[] lastGrip = new Grip[4];
+        readonly float[] manualTime = new float[4];
+        readonly float[] fistSince = new float[4];
+        float autoLegTimer;
         Vector3 placeAt;
         bool hasPlace;
 
@@ -83,6 +94,8 @@ namespace FumblePeak
         public Vector2 Target(int i) => isServer ? targets[i] : i switch { 0 => sT0, 1 => sT1, 2 => sT2, _ => sT3 };
         public bool IsGrabbing(int i) => LimbUtil.Has(sGrab, i);
         public bool IsFist(int i) => LimbUtil.Has(sFist, i);
+        /// <summary>Zemine basan ayak sayısı (tüm istemciler).</summary>
+        public int GroundedFeet => isServer ? lastGroundedFeet : sGround;
         public float Fatigue01(int i) => (i switch { 0 => sF0, 1 => sF1, 2 => sF2, _ => sF3 }) / 255f;
         public Vector2 RenderTorsoPos => isServer ? (Vector2)torso.transform.position : sTorso;
         public float RenderTorsoRot => isServer ? torso.transform.eulerAngles.z : sTorsoRot;
@@ -174,6 +187,7 @@ namespace FumblePeak
         {
             if (limb < 0 || limb > 3) return;
             if (!float.IsFinite(p.x) || !float.IsFinite(p.y)) return;
+            if ((targets[limb] - p).sqrMagnitude > 0.0001f) manualTime[limb] = Time.time;
             targets[limb] = p;
         }
 
@@ -189,7 +203,29 @@ namespace FumblePeak
             else if (cooldown[limb] <= 0f)
             {
                 wantGrab[limb] = true; // yumruk; hedefe varınca / durunca en yakın kayaya kenetlenir
+                fistSince[limb] = Time.time;
+                manualTime[limb] = Time.time;
             }
+        }
+
+        [Server]
+        public void ServerRelease(int limb)
+        {
+            if (limb < 0 || limb > 3) return;
+            wantGrab[limb] = false;
+            ReleaseInternal(limb);
+            manualTime[limb] = Time.time;
+        }
+
+        /// <summary>Tutunma isteği: zaten tutuyorsa dokunma (toggle değil).</summary>
+        [Server]
+        public void ServerGrab(int limb)
+        {
+            if (limb < 0 || limb > 3 || cooldown[limb] > 0f) return;
+            if (joints[limb] != null) ReleaseInternal(limb); // başka yere tutunmak için önce bırak
+            wantGrab[limb] = true;
+            fistSince[limb] = Time.time;
+            manualTime[limb] = Time.time;
         }
 
         [Server]
@@ -236,7 +272,8 @@ namespace FumblePeak
             int groundedFeet = 0;
             Vector3 footSum = Vector3.zero;
             int supports = grabbedCount + lastGroundedFeet; // zemine basan ayaklar da ağırlık taşır
-            float load = supports >= 3 ? 1f : supports == 2 ? 1.25f : 2f; // GDD: az destek = hızlı yorulma
+            // 3+ destek = dinlenme (tükenmez), 2 = normal, 1 = 2 kat hızlı (GDD 2.2)
+            float load = supports >= 3 ? 0f : supports == 2 ? 1f : 2f;
             if (FumbleNetworkManager.IsSinglePlayer) load *= singlePlayerDrain;
 
             for (int i = 0; i < 4; i++)
@@ -256,12 +293,9 @@ namespace FumblePeak
                         if (!StillOnGrip(grabPoint[i], g)) { ReleaseInternal(i); continue; }
                     }
 
-                    // Sürükleme: tutunan uzvun imleci aşağı inerse gövde hedefi yukarı çıkar
-                    Vector2 delta = targets[i] - lastTarget[i];
-                    bodyTarget -= delta;
-
                     // Dayanıklılık
-                    stamina[i] -= dt * load;
+                    if (load > 0f) stamina[i] -= dt * load;
+                    else stamina[i] = Mathf.Min(maxStamina, stamina[i] + 0.5f * dt);
                     if (stamina[i] <= 0f)
                     {
                         stamina[i] = 0f;
@@ -293,6 +327,7 @@ namespace FumblePeak
                         bool arrived = ((Vector2)eff.position - targets[i]).sqrMagnitude < 0.25f * 0.25f;
                         bool settled = rel.sqrMagnitude < 0.5f * 0.5f;
                         if (arrived || settled) TryGrab(i);
+                        if (joints[i] == null && Time.time - fistSince[i] > 2.5f && !arrived) wantGrab[i] = false; // boşluğa yumruk
                     }
                     stamina[i] = Mathf.Min(maxStamina, stamina[i] + regenPerSecond * dt);
                 }
@@ -305,6 +340,7 @@ namespace FumblePeak
             for (int i = 0; i < 4; i++) if (joints[i] != null) { nowGrabbed++; lastTarget[i] = targets[i]; }
             if (nowGrabbed > 0)
             {
+                AutoPull(dt);
                 ClampBodyTarget();
                 Vector2 err = bodyTarget - (Vector2)torso.position;
                 Vector2 v = torso.linearVelocity;
@@ -329,6 +365,8 @@ namespace FumblePeak
             float ang = Mathf.DeltaAngle(0, torso.rotation.eulerAngles.z);
             torso.AddTorque(Vector3.forward * (-ang * Mathf.Deg2Rad * uprightStrength - torso.angularVelocity.z * uprightDamping), ForceMode.Acceleration);
 
+            if (autoLegs) AutoLegs(dt);
+
             // Düşüş → checkpoint
             if (torso.position.y < checkpoint.y - fallRespawnDistance)
                 ServerRespawn("fall");
@@ -336,14 +374,101 @@ namespace FumblePeak
             WriteSync();
         }
 
+        /// <summary>
+        /// Kolay tırmanış: tutunan kollar gövdeyi kendiliğinden yukarı çeker (omuz elin biraz altına),
+        /// sadece bacak tutunuyorsa gövde ayağın üstünde dikilir.
+        /// </summary>
+        void AutoPull(float dt)
+        {
+            float bestArmY = float.NegativeInfinity, bestLegY = float.NegativeInfinity;
+            float sumX = 0f; int n = 0;
+            for (int i = 0; i < 4; i++)
+            {
+                if (joints[i] == null) continue;
+                Vector2 g = grabPoint[i];
+                if (LimbUtil.IsArm(i)) bestArmY = Mathf.Max(bestArmY, g.y - armHang - anchorLocal[i].y);
+                else bestLegY = Mathf.Max(bestLegY, g.y + reach[i] * 0.8f - anchorLocal[i].y);
+                sumX += g.x - anchorLocal[i].x * 0.6f;
+                n++;
+            }
+            float ty = bestArmY > float.NegativeInfinity ? Mathf.Max(bestArmY, bestLegY) : bestLegY;
+            var goal = new Vector2(sumX / n, ty);
+            bodyTarget = Vector2.MoveTowards(bodyTarget, goal, autoPullSpeed * dt);
+        }
+
+        /// <summary>
+        /// Kolları da yöneten oyuncu (tek oyuncu / çapraz mod) için bacaklar basamakları kendisi bulur.
+        /// Oyuncu bacağı elle oynatırsa 3 sn otomatik devre dışı kalır.
+        /// </summary>
+        void AutoLegs(float dt)
+        {
+            autoLegTimer -= dt;
+            if (autoLegTimer > 0f) return;
+            autoLegTimer = 0.25f;
+
+            bool anyArm = joints[0] != null || joints[1] != null;
+            for (int i = 2; i < 4; i++)
+            {
+                Vector2 hip = AnchorWorld(i);
+                // Kollar gövdeyi çekerken fazla gerilen ayak (kim yönetirse yönetsin) kayadan kayar
+                if (joints[i] != null && anyArm && (hip - (Vector2)grabPoint[i]).magnitude > reach[i] * 0.9f)
+                {
+                    wantGrab[i] = false;
+                    ReleaseInternal(i);
+                    continue;
+                }
+
+                var owner = FumblePlayer.OwnerOf(i);
+                bool ownerHasArm = owner != null && (LimbUtil.Has(owner.limbMask, 0) || LimbUtil.Has(owner.limbMask, 1));
+                if (!ownerHasArm || Time.time - manualTime[i] < 3f) continue;
+
+                if (joints[i] != null)
+                {
+                    // Gövde ayağı geçtiyse ya da bacak fazla gerildiyse ayağı bırak → yeni basamak arar
+                    float drop0 = hip.y - grabPoint[i].y;
+                    float stretch = (hip - (Vector2)grabPoint[i]).magnitude;
+                    if (drop0 < reach[i] * 0.3f || (anyArm && stretch > reach[i] * 0.78f))
+                    {
+                        wantGrab[i] = false;
+                        ReleaseInternal(i);
+                    }
+                    continue;
+                }
+                if (!anyArm || wantGrab[i]) continue;
+
+                float side = i == 2 ? -1f : 1f;
+                int n = Physics.OverlapSphereNonAlloc(hip, reach[i] * 0.95f, overlap, gripMask, QueryTriggerInteraction.Collide);
+                Grip best = null; float bestScore = float.MaxValue; Vector2 bestP = Vector2.zero;
+                for (int k = 0; k < n; k++)
+                {
+                    var g = overlap[k].GetComponentInParent<Grip>();
+                    if (g == null || g.type == GripType.Slippery) continue;
+                    Vector2 gp = overlap[k].bounds.center;
+                    float drop = hip.y - gp.y;
+                    if (drop < reach[i] * 0.35f || (gp - hip).magnitude > reach[i] * 0.68f) continue;
+                    bool usedByOther = false;
+                    for (int o = 0; o < 4; o++) if (o != i && grips[o] == g) usedByOther = true;
+                    if (usedByOther) continue;
+                    float score = Mathf.Abs(gp.x - (hip.x + side * 0.15f)) + drop * 0.5f;
+                    if (score < bestScore) { bestScore = score; best = g; bestP = gp; }
+                }
+                if (best == null) continue;
+                targets[i] = bestP;
+                wantGrab[i] = true;
+                fistSince[i] = Time.time;
+            }
+        }
+
         /// <summary>Gövde hedefini her tutunan uzvun erişimi içinde tut.</summary>
         void ClampBodyTarget()
         {
             for (int it = 0; it < 3; it++)
             {
+                bool armHold = joints[0] != null || joints[1] != null;
                 for (int i = 0; i < 4; i++)
                 {
                     if (joints[i] == null) continue;
+                    if (armHold && !LimbUtil.IsArm(i)) continue; // kollar tutarken bacak hedefi kısıtlamaz (gerilirse bırakır)
                     Vector2 a = bodyTarget + (Vector2)anchorLocal[i];
                     Vector2 g = grabPoint[i];
                     Vector2 d = a - g;
@@ -427,6 +552,7 @@ namespace FumblePeak
                 else if (wantGrab[i]) f |= (byte)(1 << i);
             }
             sGrab = g; sFist = f;
+            sGround = (byte)lastGroundedFeet;
             sF0 = Fat(0); sF1 = Fat(1); sF2 = Fat(2); sF3 = Fat(3);
             if (torso.position.y > bestHeight) bestHeight = torso.position.y;
         }
