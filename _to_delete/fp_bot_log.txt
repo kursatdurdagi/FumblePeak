@@ -1,79 +1,32 @@
 t=2 connected=False scene=MainMenu
-join localhost
-t=4 connected=False scene=MainMenu
-t=6 connected=False scene=MainMenu
+join 192.168.1.238
 t=8 connected=False scene=MainMenu
-t=10 connected=False scene=MainMenu
-t=12 connected=True scene=MainMenu
-t=14 connected=True scene=MainMenu
 ready
-t=16 connected=True scene=MainMenu slot=2 mask=12 ready=True active=2 players=3
-t=18 connected=True scene=MainMenu slot=2 mask=12 ready=True active=2 players=3
-t=20 connected=True scene=MainMenu slot=2 mask=12 ready=True active=2 players=3
-t=22 connected=True scene=MainMenu slot=2 mask=12 ready=True active=2 players=3
-t=24 connected=True scene=MainMenu slot=2 mask=12 ready=True active=2 players=3
-t=26 connected=True scene=MainMenu slot=2 mask=12 ready=True active=2 players=3
-t=28 connected=True scene=MainMenu slot=2 mask=12 ready=True active=2 players=3
-t=30 connected=False scene=MainMenu
-t=32 connected=False scene=MainMenu
-join localhost
-t=34 connected=False scene=MainMenu
-ready
-t=36 connected=True scene=MainMenu slot=2 mask=12 ready=True active=2 players=3
-t=38 connected=True scene=MainMenu slot=2 mask=12 ready=True active=2 players=3
-t=40 connected=True scene=MainMenu slot=2 mask=12 ready=True active=2 players=3
-t=42 connected=True scene=MainMenu slot=2 mask=12 ready=True active=2 players=3
-t=44 connected=True scene=MainMenu slot=2 mask=12 ready=True active=2 players=3
-t=46 connected=True scene=MainMenu slot=2 mask=12 ready=True active=2 players=3
-t=48 connected=True scene=MainMenu slot=2 mask=12 ready=True active=2 players=3
-t=50 connected=True scene=MainMenu slot=2 mask=12 ready=True active=2 players=3
-t=52 connected=True scene=MainMenu slot=2 mask=12 ready=True active=2 players=3
-t=54 connected=True scene=MainMenu slot=2 mask=12 ready=True active=2 players=3
-t=57 connected=False scene=MainMenu
-t=59 connected=False scene=MainMenu
-t=61 connected=False scene=MainMenu
-t=63 connected=False scene=MainMenu
-join localhost
-t=65 connected=False scene=MainMenu
-t=67 connected=False scene=MainMenu
-t=69 connected=False scene=MainMenu
-t=71 connected=True scene=GameScene
-t=73 connected=True scene=GameScene slot=2 mask=12 ready=False active=2 players=3 torso=1.56 grabs=0100
-t=75 connected=True scene=GameScene slot=2 mask=12 ready=False active=2 players=3 torso=1.72 grabs=0100
-t=77 connected=True scene=GameScene slot=2 mask=12 ready=False active=2 players=3 torso=1.72 grabs=0100
-t=79 connected=True scene=GameScene slot=2 mask=12 ready=False active=2 players=3 torso=0.93 grabs=0000
-t=81 connected=True scene=GameScene slot=2 mask=12 ready=False active=2 players=3 torso=1.64 grabs=0100
-t=83 connected=True scene=GameScene slot=2 mask=12 ready=False active=2 players=3 torso=1.71 grabs=0100
-t=85 connected=True scene=GameScene slot=2 mask=12 ready=False active=2 players=3 torso=1.71 grabs=0100
-t=87 connected=True scene=GameScene slot=2 mask=12 ready=False active=2 players=3 torso=1.71 grabs=0100
-t=89 connected=True scene=GameScene slot=2 mask=12 ready=False active=2 players=3 torso=1.71 grabs=0100
-t=91 connected=True scene=GameScene slot=2 mask=12 ready=False active=2 players=3 torso=1.71 grabs=0100
-t=93 connected=False scene=MainMenu
-t=95 connected=False scene=MainMenu
-join localhost
-t=97 connected=True scene=GameScene slot=2 mask=12 ready=False active=2 players=3 torso=2.92 grabs=1000
-t=99 connected=True scene=GameScene slot=2 mask=12 ready=False active=2 players=3 torso=3.27 grabs=1111
-t=101 connected=True scene=GameScene slot=2 mask=12 ready=False active=2 players=3 torso=3.27 grabs=1111
-t=103 connected=True scene=GameScene slot=2 mask=12 ready=False active=2 players=3 torso=3.30 grabs=0111
-t=105 connected=True scene=GameScene slot=2 mask=12 ready=False active=2 players=3 torso=3.30 grabs=1011
-t=107 connected=True scene=GameScene slot=2 mask=12 ready=False active=2 players=3 torso=3.30 grabs=1011
-t=109 connected=True scene=GameScene slot=2 mask=12 ready=False active=2 players=3 torso=3.29 grabs=0011
-t=111 connected=True scene=GameScene slot=2 mask=12 ready=False active=2 players=3 torso=3.27 grabs=1111
-t=113 connected=True scene=GameScene slot=2 mask=12 ready=False active=2 players=3 torso=3.27 grabs=1111
-t=115 connected=True scene=GameScene slot=2 mask=12 ready=False active=2 players=3 torso=3.31 grabs=0111
-t=117 connected=True scene=GameScene slot=2 mask=12 ready=False active=2 players=3 torso=3.30 grabs=1011
-t=119 connected=True scene=GameScene slot=2 mask=12 ready=False active=2 players=3 torso=3.28 grabs=0111
-t=121 connected=True scene=GameScene slot=2 mask=12 ready=False active=2 players=3 torso=3.28 grabs=0111
-t=123 connected=True scene=GameScene slot=2 mask=12 ready=False active=2 players=3 torso=3.28 grabs=0111
-t=125 connected=True scene=GameScene slot=2 mask=12 ready=False active=2 players=3 torso=3.28 grabs=0111
-t=127 connected=True scene=GameScene slot=2 mask=12 ready=False active=2 players=3 torso=3.28 grabs=0111
-join localhost
-t=129 connected=False scene=MainMenu
-t=131 connected=False scene=MainMenu
-t=133 connected=False scene=MainMenu
-t=135 connected=False scene=MainMenu
-t=137 connected=False scene=MainMenu
-t=139 connected=False scene=MainMenu
-t=141 connected=False scene=MainMenu
-t=143 connected=False scene=MainMenu
-t=145 connected=False scene=MainMenu
+t=10 connected=True scene=MainMenu slot=1 mask=6 ready=True active=1 players=2
+t=12 connected=True scene=MainMenu slot=1 mask=6 ready=True active=1 players=2
+t=14 connected=True scene=MainMenu slot=1 mask=6 ready=True active=1 players=2
+t=16 connected=True scene=MainMenu slot=1 mask=6 ready=True active=1 players=2
+t=18 connected=True scene=MainMenu slot=1 mask=6 ready=True active=1 players=2
+t=20 connected=True scene=MainMenu slot=1 mask=6 ready=True active=1 players=2
+t=22 connected=True scene=MainMenu slot=1 mask=6 ready=True active=1 players=2
+t=24 connected=True scene=MainMenu slot=1 mask=6 ready=True active=1 players=2
+t=26 connected=True scene=MainMenu slot=1 mask=6 ready=True active=1 players=2
+t=28 connected=True scene=MainMenu slot=1 mask=6 ready=True active=1 players=2
+t=30 connected=True scene=MainMenu slot=1 mask=6 ready=True active=1 players=2
+t=32 connected=True scene=MainMenu slot=1 mask=6 ready=True active=1 players=2
+t=34 connected=True scene=GameScene slot=1 mask=6 ready=True active=1 players=2 torso=1.20 grabs=1111
+t=36 connected=True scene=GameScene slot=1 mask=6 ready=True active=1 players=2 torso=1.18 grabs=1111
+t=38 connected=True scene=GameScene slot=1 mask=6 ready=True active=1 players=2 torso=1.12 grabs=1011
+t=40 connected=True scene=GameScene slot=1 mask=6 ready=True active=1 players=2 torso=1.12 grabs=1011
+t=42 connected=True scene=GameScene slot=1 mask=6 ready=True active=2 players=2 torso=1.12 grabs=1011
+t=44 connected=True scene=GameScene slot=1 mask=6 ready=True active=2 players=2 torso=1.12 grabs=1011
+t=46 connected=True scene=GameScene slot=1 mask=6 ready=True active=1 players=2 torso=1.21 grabs=1111
+t=48 connected=True scene=GameScene slot=1 mask=6 ready=True active=1 players=2 torso=1.18 grabs=1111
+t=50 connected=True scene=GameScene slot=1 mask=6 ready=True active=1 players=2 torso=1.10 grabs=1011
+t=52 connected=True scene=GameScene slot=1 mask=6 ready=True active=1 players=2 torso=1.21 grabs=0111
+t=54 connected=True scene=GameScene slot=1 mask=6 ready=True active=2 players=2 torso=1.05 grabs=0110
+t=56 connected=True scene=GameScene slot=1 mask=6 ready=True active=2 players=2 torso=1.09 grabs=0100
+t=58 connected=True scene=GameScene slot=1 mask=6 ready=True active=2 players=2 torso=1.04 grabs=0100
+t=60 connected=True scene=GameScene slot=1 mask=6 ready=True active=1 players=2 torso=1.18 grabs=0010
+t=62 connected=True scene=GameScene slot=1 mask=6 ready=True active=1 players=2 torso=1.18 grabs=0010
+t=64 connected=True scene=GameScene slot=1 mask=6 ready=True active=2 players=2 torso=1.18 grabs=0010

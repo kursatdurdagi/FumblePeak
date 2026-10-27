@@ -662,3 +662,19 @@ MonoBehaviour:
     EntryId: 27427525
     Key: hud.slipped
     Value: '{0} rutscht ab!'
+  - SectionId: 47142713
+    EntryId: 70243543
+    Key: msg.version_mismatch
+    Value: "Spielversionen unterscheiden sich, Beitritt nicht m\xF6glich.\nHost:
+      {0}\nDu: {1}\nBeide denselben (neuesten) Projektstand holen und neu bauen."
+  - SectionId: 47142713
+    EntryId: 79926828
+    Key: msg.lobby_full
+    Value: Die Lobby ist voll (max. 4 Spieler).
+  - SectionId: 47142713
+    EntryId: 62867486
+    Key: msg.join_tips
+    Value: "Pr\xFCfe:\n\u2022 Seid ihr im selben WLAN? (Gastnetze trennen Ger\xE4te)\n\u2022
+      Hat der Host 'Per IP hosten' gedr\xFCckt, ist die Lobby offen?\n\u2022 Ist
+      die IP ({0}) die 'lokale IP' im Men\xFC des Hosts?\n\u2022 Erlaubt die Firewall
+      des Hosts eingehende Verbindungen f\xFCr Fumble Peak / Unity? (UDP {1})"

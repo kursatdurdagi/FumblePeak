@@ -177,6 +177,9 @@ namespace FumblePeak
             conn?.Disconnect();
         }
 
+        /// <summary>Host bağlantıyı reddetti (sürüm farkı / lobi dolu); sebep PendingMenuMessage'da.</summary>
+        public void MarkRejected() => intentionalLeave = true;
+
         public void MarkKicked()
         {
             intentionalLeave = true;

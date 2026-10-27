@@ -42,8 +42,11 @@ namespace FumblePeak
             if (!NetworkClient.active && !joinRequested && Time.realtimeSinceStartup > 4f)
             {
                 joinRequested = true;
-                Log("join localhost");
-                nm.JoinLocal("127.0.0.1");
+                // fp_bot.txt içine IP yazılırsa oraya bağlanır (LAN testi), boşsa localhost
+                var ip = File.ReadAllText(Path.Combine(dir, "fp_bot.txt")).Trim();
+                if (string.IsNullOrEmpty(ip)) ip = "127.0.0.1";
+                Log("join " + ip);
+                nm.JoinLocal(ip);
             }
             if (!NetworkClient.active && joinRequested && Time.realtimeSinceStartup > 20f && Time.frameCount % 600 == 0)
                 joinRequested = false; // tekrar dene

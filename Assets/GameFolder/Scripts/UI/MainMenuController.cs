@@ -349,12 +349,22 @@ namespace FumblePeak
                 }
             }
 
-            // IP bağlantısı başarısız
+            // IP bağlantısı başarısız (host reddetti ya da ulaşılamadı)
             if (state == State.Busy && waitingConnection && Time.unscaledTime - busySince > 1f && !NetworkClient.active && !NetworkServer.active)
             {
                 waitingConnection = false;
                 SceneFader.Get().FadeIn(0.3f);
-                ShowMessage(L.T("msg.failed"), FumbleNetworkManager.PendingMenuMessage ?? L.T("msg.unreachable"));
+                var why = FumbleNetworkManager.PendingMenuMessage;
+                ShowMessage(L.T("msg.failed"), string.IsNullOrEmpty(why) ? L.T("msg.unreachable") + "\n\n" + L.T("msg.join_tips", PlayerProfile.LastIp, NM.LocalPort) : why);
+                FumbleNetworkManager.PendingMenuMessage = null;
+            }
+            // 8 sn içinde bağlanamadıysa beklemeyi bırak, nedenini yaz
+            if (state == State.Busy && waitingConnection && Time.unscaledTime - busySince > 8f && !NetworkClient.isConnected && !NetworkServer.active)
+            {
+                waitingConnection = false;
+                NM.Leave();
+                SceneFader.Get().FadeIn(0.3f);
+                ShowMessage(L.T("msg.failed"), L.T("msg.unreachable") + "\n\n" + L.T("msg.join_tips", PlayerProfile.LastIp, NM.LocalPort));
                 FumbleNetworkManager.PendingMenuMessage = null;
             }
 

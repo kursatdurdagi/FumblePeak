@@ -649,3 +649,22 @@ MonoBehaviour:
     EntryId: 27427525
     Key: hud.slipped
     Value: '{0} koptu!'
+  - SectionId: 47142713
+    EntryId: 70243543
+    Key: msg.version_mismatch
+    Value: "Oyun s\xFCr\xFCmleri farkl\u0131, bu lobiye girilemez.\nHost: {0}\nSen:
+      {1}\n\u0130kiniz de projenin ayn\u0131 (en g\xFCncel) halini \xE7ekip yeniden
+      derleyin."
+  - SectionId: 47142713
+    EntryId: 79926828
+    Key: msg.lobby_full
+    Value: "Lobi dolu (en fazla 4 ki\u015Fi)."
+  - SectionId: 47142713
+    EntryId: 62867486
+    Key: msg.join_tips
+    Value: "Kontrol et:\n\u2022 Ayn\u0131 Wi-Fi'da m\u0131s\u0131n\u0131z? (misafir
+      a\u011F\u0131 cihazlar\u0131 birbirinden ay\u0131rabilir)\n\u2022 Host 'IP
+      \u0130LE LOB\u0130 KUR' dedi mi, lobi a\xE7\u0131k m\u0131?\n\u2022 Yazd\u0131\u011F\u0131n
+      IP ({0}) host'un men\xFCde g\xF6rd\xFC\u011F\xFC 'yerel IP' ile ayn\u0131 m\u0131?\n\u2022
+      Host'un bilgisayar\u0131nda g\xFCvenlik duvar\u0131 Fumble Peak / Unity'ye
+      gelen ba\u011Flant\u0131ya izin veriyor mu? (UDP {1})"

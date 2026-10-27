@@ -313,6 +313,7 @@ namespace FumblePeak.EditorTools
             var kcp = nmGo.AddComponent<kcp2k.KcpTransport>();
             var nm = nmGo.AddComponent<FumbleNetworkManager>();
             nmGo.AddComponent<SteamLobby>();
+            nm.authenticator = nmGo.AddComponent<FumbleAuthenticator>(); // sürüm / lobi dolu kontrolü
             nm.transport = kcp;
             nm.localTransport = kcp;
             nm.playerPrefab = player;

@@ -295,6 +295,12 @@ MonoBehaviour:
       Key: get_ready
     - Id: 81335112
       Key: octopus
+    - Id: 70243543
+      Key: version_mismatch
+    - Id: 79926828
+      Key: lobby_full
+    - Id: 62867486
+      Key: join_tips
   - Id: 42099039
     SectionName: hud
     SectionSheet:

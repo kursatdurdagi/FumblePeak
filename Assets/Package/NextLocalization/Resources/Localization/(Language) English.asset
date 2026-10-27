@@ -659,3 +659,26 @@ MonoBehaviour:
     EntryId: 27427525
     Key: hud.slipped
     Value: '{0} slipped!'
+  - SectionId: 47142713
+    EntryId: 70243543
+    Key: msg.version_mismatch
+    Value: 'Game versions differ, you can''t join this lobby.
+
+      Host: {0}
+
+      You:
+      {1}
+
+      Both pull the same (latest) project and rebuild.'
+  - SectionId: 47142713
+    EntryId: 79926828
+    Key: msg.lobby_full
+    Value: The lobby is full (max 4 players).
+  - SectionId: 47142713
+    EntryId: 62867486
+    Key: msg.join_tips
+    Value: "Check:\n\u2022 Are you on the same Wi-Fi? (guest networks may isolate
+      devices)\n\u2022 Did the host press 'Host via IP' and is the lobby open?\n\u2022
+      Is the IP you typed ({0}) the 'local IP' shown on the host's menu?\n\u2022
+      Does the host's firewall allow incoming connections for Fumble Peak / Unity?
+      (UDP {1})"
