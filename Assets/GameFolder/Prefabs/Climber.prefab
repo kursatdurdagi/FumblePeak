@@ -2094,14 +2094,19 @@ MonoBehaviour:
   pullDampingRatio: 13
   gravityCompensation: 0.9
   maxPullAccel: 45
-  shoulderAboveHand: 0.3
-  autoPullSpeed: 1.7
-  armHang: -0.2
-  autoLegs: 1
-  singlePlayerDrain: 0.45
+  shoulderAboveHand: 0.55
+  bodyMoveSpeed: 1.3
+  armHangRatio: 0.3
+  legStandRatio: 0.85
+  armPullShare: 0.6
+  maxDragPull: 0.12
+  strainLimit: 1.08
+  strainTime: 0.3
+  singlePlayerDrain: 1.15
   uprightStrength: 140
   uprightDamping: 14
   gripRadius: 0.3
+  grabTolerance: 0.09
   gripMask:
     serializedVersion: 2
     m_Bits: 256
@@ -2109,8 +2114,10 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294966527
   standHeight: 0.85
-  maxStamina: 10
-  regenPerSecond: 3
+  minHoldTime: 10
+  maxHoldTime: 15
+  recoverPerSecond: 2
+  feetOnlyTime: 0.4
   forcedCooldown: 1
   fallRespawnDistance: 8
   bestHeight: 0

@@ -6,11 +6,10 @@ using UnityEngine.InputSystem;
 namespace FumblePeak
 {
     /// <summary>
-    /// Bağlanan her oyuncu için ağ nesnesi. Kendi uzuv(lar)ını yönlendirir.
-    /// Kontroller (GDD 2): Fare = uzvun konumu, Sol Tık = tutun / bırak (aç-kapa).
-    /// Birden çok uzvun varsa: Q/E/A/D veya 1-4 doğrudan seçer, Tab / tekerlek sırayla gezer,
-    /// Sağ Tık = tutun/bırak + sıradaki uzva geç.
-    /// Gamepad: Sol analog = uzuv, RT / A = tutun, LB-RB = uzuv değiştir.
+    /// Bağlanan her oyuncu için ağ nesnesi. Kendi uzuv(lar)ını fareyle sürükler:
+    /// imleç uzvun üstüne gelince gösterge çıkar, sol tuşa basılı tutup sürükle,
+    /// bırakınca altında kaya varsa tutunur, yoksa uzuv serbest kalır.
+    /// Co-op'ta herkes sadece kendi uzuvlarını tutabilir.
     /// </summary>
     public class FumblePlayer : NetworkBehaviour
     {
@@ -62,7 +61,7 @@ namespace FumblePeak
 
         public override void OnStopClient()
         {
-            if (isLocalPlayer) UpdateCursorLock(false);
+            if (isLocalPlayer) { UnityEngine.Cursor.lockState = CursorLockMode.None; UnityEngine.Cursor.visible = true; }
             else if (NetworkClient.isConnected && profileAnnounced) PlayerLeft?.Invoke(playerName);
         }
 
@@ -76,18 +75,11 @@ namespace FumblePeak
             Local = this;
             ulong sid = SteamLobby.Instance != null && SteamLobby.Instance.IsReady ? SteamLobby.Instance.MySteamId : 0;
             CmdSetProfile(PlayerProfile.Name, sid);
-            ClimberBody.OnRespawned += ResetCursors; // kampa dönünce imleçler eline gelsin
             RebuildOwned();
-        }
-
-        void ResetCursors(string _ = null)
-        {
-            for (int i = 0; i < 4; i++) virtInit[i] = false;
         }
 
         public override void OnStopLocalPlayer()
         {
-            ClimberBody.OnRespawned -= ResetCursors;
             if (Local == this) Local = null;
         }
 
@@ -118,199 +110,107 @@ namespace FumblePeak
         {
             owned.Clear();
             for (int i = 0; i < 4; i++) if (LimbUtil.Has(limbMask, i)) owned.Add(i);
-            if (isLocalPlayer && owned.Count > 0 && !owned.Contains(localActive)) SelectLimb(owned[0]);
+            if (isLocalPlayer && owned.Count > 0 && !owned.Contains(localActive)) localActive = owned[0];
         }
 
-        // ---------------- Girdi ----------------
-        // Sanal imleç: her uzvun kendi imleci var, fare HAREKETİ (delta) aktif uzvun imlecini kaydırır.
-        // İmleç uzvun erişim alanına kilitli → asla kaybolmaz, uzuv değiştirince zıplama olmaz.
-        readonly Vector2[] virt = new Vector2[4];
-        readonly bool[] virtInit = new bool[4];
-        ClimberBody lastBody;
-        public static float Sensitivity = 1f;
-        const float WorldPerPixel = 0.0045f;
+        // ---------------- Girdi: sürükle-bırak ----------------
+        // Fare imleci serbest. İmleç kendi uzvunun (el/ayak) üstüne gelince gösterge çıkar.
+        // Sol tuşa bas → uzvu tut ve sürükle (en fazla kol/bacak boyu kadar uzanır).
+        // Bırak → altında kaya varsa tutunur, yoksa uzuv serbest kalır (fizik).
+        public static float Sensitivity = 1f; // (eski ayar; artık kullanılmıyor)
+        public const float HoverRadius = 0.26f;
 
-        public Vector2 CursorOf(int limb) => virtInit[limb] ? virt[limb] : (ClimberBody.Instance != null ? ClimberBody.Instance.Target(limb) : Vector2.zero);
-        public Vector2 LocalCursor => CursorOf(localActive);
+        /// <summary>İmlecin üstünde durduğu kendi uzvun (-1 = yok).</summary>
+        public int HoverLimb { get; private set; } = -1;
+        /// <summary>Şu an sürüklenen uzuv (-1 = yok).</summary>
+        public int DragLimb { get; private set; } = -1;
+        /// <summary>Farenin oyun düzlemindeki (z=0) konumu.</summary>
+        public Vector2 Pointer { get; private set; }
+        public bool PointerValid { get; private set; }
+
+        public Vector2 CursorOf(int limb) => isLocalPlayer && DragLimb == limb ? Pointer
+            : (ClimberBody.Instance != null ? ClimberBody.Instance.Target(limb) : Vector2.zero);
 
         void Update()
         {
             if (!isLocalPlayer) return;
             var body = ClimberBody.Instance;
             bool blocked = body == null || owned.Count == 0 || InputBlocked;
-            UpdateCursorLock(!blocked);
-            if (blocked) return;
+            UnityEngine.Cursor.lockState = CursorLockMode.None;
+            UnityEngine.Cursor.visible = true;
+            if (blocked)
+            {
+                if (DragLimb >= 0 && body != null) EndDrag(body);
+                HoverLimb = -1;
+                return;
+            }
 
-            var kb = Keyboard.current;
             var mouse = Mouse.current;
-            var pad = Gamepad.current;
-
-            if (body != lastBody) { lastBody = body; for (int i = 0; i < 4; i++) virtInit[i] = false; }
-            for (int i = 0; i < 4; i++)
-                if (!virtInit[i]) { virt[i] = body.Target(i); virtInit[i] = true; }
-
-            // ----- Uzuv seçimi -----
-            if (owned.Count > 1)
+            var cam = Camera.main;
+            PointerValid = false;
+            if (Sim.active) { Pointer = Sim.pointer; PointerValid = true; }
+            else if (mouse != null && cam != null)
             {
-                int step = 0;
-                if (kb != null && kb.tabKey.wasPressedThisFrame) step = 1;
-                if (mouse != null)
+                var ray = cam.ScreenPointToRay(mouse.position.ReadValue());
+                if (Mathf.Abs(ray.direction.z) > 1e-4f)
                 {
-                    float sc = mouse.scroll.ReadValue().y;
-                    if (sc > 0.1f) step = -1; else if (sc < -0.1f) step = 1;
-                }
-                if (pad != null && pad.rightShoulder.wasPressedThisFrame) step = 1;
-                if (pad != null && pad.leftShoulder.wasPressedThisFrame) step = -1;
-                if (step != 0) CycleLimb(step);
-                if (kb != null)
-                {
-                    // Q = Sol Kol, E = Sağ Kol, A = Sol Bacak, D = Sağ Bacak (ya da 1-4)
-                    if (kb.qKey.wasPressedThisFrame || kb.digit1Key.wasPressedThisFrame) TrySelect(0);
-                    if (kb.eKey.wasPressedThisFrame || kb.digit2Key.wasPressedThisFrame) TrySelect(1);
-                    if (kb.aKey.wasPressedThisFrame || kb.digit3Key.wasPressedThisFrame) TrySelect(2);
-                    if (kb.dKey.wasPressedThisFrame || kb.digit4Key.wasPressedThisFrame) TrySelect(3);
+                    float t = -ray.origin.z / ray.direction.z;
+                    if (t > 0f) { Pointer = ray.origin + ray.direction * t; PointerValid = true; }
                 }
             }
+            if (!PointerValid) return;
 
-            int L = localActive;
-            bool grabbed = body.IsGrabbing(L);
-            Vector2 center = grabbed ? body.RenderEffectorPos(L) : body.RenderAnchor(L);
-            float radius = body.reach[L] * (grabbed ? 1.0f : 1.3f);
+            bool down = Sim.active ? Sim.down : mouse != null && mouse.leftButton.wasPressedThisFrame;
+            bool up = Sim.active ? Sim.up : mouse != null && mouse.leftButton.wasReleasedThisFrame;
+            Sim.down = Sim.up = false;
 
-            // ----- İmleç hareketi -----
-            Vector2 c = virt[L];
-            bool padUsed = false;
-            if (pad != null)
+            if (DragLimb < 0)
             {
-                var stick = pad.leftStick.ReadValue();
-                if (stick.sqrMagnitude > 0.04f) { c = center + stick * radius; padUsed = true; }
-            }
-            if (!padUsed)
-            {
-                Vector2 d = mouse != null ? mouse.delta.ReadValue() : Vector2.zero;
-                d += Sim.delta; Sim.delta = Vector2.zero; // otomatik test girdisi
-                c += d * WorldPerPixel * Sensitivity;
-            }
-            // erişim alanına kilitle
-            Vector2 off = c - center;
-            if (off.sqrMagnitude > radius * radius) c = center + off.normalized * radius;
-            virt[L] = c;
-
-            // ----- Tutunan eli hareket ettirmek onu kayadan kaldırır -----
-            // (en az bir uzuv daha tutunuyorsa; tek dayanakken yanlışlıkla düşme olmasın)
-            if (grabbed && (c - body.RenderEffectorPos(L)).sqrMagnitude > 0.2f * 0.2f && OtherSupports(body, L) > 0)
-            {
-                CmdRelease((byte)L);
-                grabbed = false;
-            }
-
-            // ----- Tutun / bırak -----
-            bool click = (mouse != null && mouse.leftButton.wasPressedThisFrame)
-                         || (kb != null && kb.spaceKey.wasPressedThisFrame)
-                         || (pad != null && (pad.rightTrigger.wasPressedThisFrame || pad.buttonSouth.wasPressedThisFrame))
-                         || Sim.click;
-            bool release = (mouse != null && mouse.rightButton.wasPressedThisFrame)
-                           || (pad != null && pad.buttonEast.wasPressedThisFrame)
-                           || Sim.rightClick;
-            Sim.click = Sim.rightClick = false;
-
-            sendTimer += Time.deltaTime;
-            if (sendTimer >= 1f / 40f && (c - lastSent).sqrMagnitude > 0.000001f)
-            {
-                sendTimer = 0f;
-                lastSent = c;
-                CmdSetTarget((byte)L, c);
-            }
-
-            if (release && (grabbed || body.IsFist(L)))
-            {
-                CmdRelease((byte)L);
-            }
-            else if (click)
-            {
-                // İmleç elin üstündeyse tıklama = bırak; başka yerdeyse = oraya tutun
-                bool onHand = (c - body.RenderEffectorPos(L)).sqrMagnitude < 0.2f * 0.2f;
-                if ((grabbed || body.IsFist(L)) && onHand)
+                // Hangi uzvumun üstündeyim?
+                HoverLimb = -1;
+                float best = HoverRadius * HoverRadius;
+                foreach (int i in owned)
                 {
-                    CmdRelease((byte)L);
+                    float d = (body.RenderEffectorPos(i) - Pointer).sqrMagnitude;
+                    if (d < best) { best = d; HoverLimb = i; }
                 }
-                else
+                if (down && HoverLimb >= 0)
                 {
-                    CmdGrabAt((byte)L, c);
-                    LastGrabLimb = L;
-                    // Kolay mod: tutunma isteğinden sonra kontrol diğer ele geçer (el-el tırmanış)
-                    if (AutoSwitch) NextInGroup();
+                    DragLimb = HoverLimb;
+                    localActive = DragLimb;
+                    lastSent = new Vector2(float.MaxValue, 0);
+                    CmdBeginDrag((byte)DragLimb);
+                    RosterChanged?.Invoke();
                 }
+            }
+            else
+            {
+                HoverLimb = DragLimb;
+                sendTimer += Time.deltaTime;
+                if (sendTimer >= 1f / 40f && (Pointer - lastSent).sqrMagnitude > 0.000001f)
+                {
+                    sendTimer = 0f;
+                    lastSent = Pointer;
+                    CmdSetTarget((byte)DragLimb, Pointer);
+                }
+                bool held = Sim.active ? !up : mouse == null || mouse.leftButton.isPressed;
+                if (up || !held) EndDrag(body);
             }
         }
 
-        /// <summary>Tutunduktan sonra aynı gruptaki diğer uzva otomatik geç.</summary>
-        public static bool AutoSwitch = true;
-        public static int LastGrabLimb = -1;
+        void EndDrag(ClimberBody body)
+        {
+            CmdEndDrag((byte)DragLimb, Pointer);
+            DragLimb = -1;
+            RosterChanged?.Invoke();
+        }
 
         /// <summary>Otomatik test / bot girdisi (gerçek oyunda kullanılmaz).</summary>
         public static class Sim
         {
-            public static Vector2 delta;
-            public static bool click, rightClick;
-        }
-
-        static int OtherSupports(ClimberBody body, int except)
-        {
-            int n = 0;
-            for (int i = 0; i < 4; i++) if (i != except && body.IsGrabbing(i)) n++;
-            // yere basan ayaklar (gövde zemine yakın) da sayılır
-            n += body.GroundedFeet;
-            return n;
-        }
-
-        bool cursorLocked;
-        void UpdateCursorLock(bool want)
-        {
-            if (want == cursorLocked) return;
-            cursorLocked = want;
-            UnityEngine.Cursor.lockState = want ? CursorLockMode.Locked : CursorLockMode.None;
-            UnityEngine.Cursor.visible = !want;
-        }
-
-
-        /// <summary>Kol ↔ kol, bacak ↔ bacak (el-el tırmanış ritmi).</summary>
-        void NextInGroup()
-        {
-            bool arm = LimbUtil.IsArm(localActive);
-            for (int k = 1; k <= 4; k++)
-            {
-                int cand = (localActive + k) % 4;
-                if (owned.Contains(cand) && LimbUtil.IsArm(cand) == arm && cand != localActive) { SelectLimb(cand); return; }
-            }
-            CycleLimb(1);
-        }
-
-        void TrySelect(int limb)
-        {
-            if (owned.Contains(limb)) SelectLimb(limb);
-        }
-
-        void CycleLimb(int step)
-        {
-            int idx = owned.IndexOf(localActive);
-            if (idx < 0) idx = 0;
-            SelectLimb(owned[(idx + step + owned.Count) % owned.Count]);
-        }
-
-        void SelectLimb(int limb)
-        {
-            var body = ClimberBody.Instance;
-            if (body != null && isLocalPlayer)
-            {
-                // imleci seçilen elin/ayağın üstüne getir (zıplama yok, tutunan uzuv kopmaz)
-                virt[limb] = body.RenderEffectorPos(limb);
-                virtInit[limb] = true;
-            }
-            localActive = limb;
-            lastSent = new Vector2(float.MaxValue, 0);
-            CmdSetActive((byte)limb);
-            RosterChanged?.Invoke();
+            public static bool active;
+            public static Vector2 pointer;
+            public static bool down, up;
         }
 
         // ---------------- Komutlar ----------------
@@ -343,9 +243,18 @@ namespace FumblePeak
         }
 
         [Command]
-        void CmdSetActive(byte limb)
+        void CmdBeginDrag(byte limb)
         {
-            if (LimbUtil.Has(limbMask, limb)) activeLimb = limb;
+            if (!LimbUtil.Has(limbMask, limb) || ClimberBody.Instance == null) return;
+            activeLimb = limb;
+            ClimberBody.Instance.ServerBeginDrag(limb);
+        }
+
+        [Command]
+        void CmdEndDrag(byte limb, Vector2 p)
+        {
+            if (!LimbUtil.Has(limbMask, limb) || ClimberBody.Instance == null) return;
+            ClimberBody.Instance.ServerEndDrag(limb, p);
         }
 
         [Command(channel = Channels.Unreliable)]

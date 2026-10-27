@@ -177,34 +177,43 @@ namespace FumblePeak
         void UpdateMarker(int i)
         {
             var owner = FumblePlayer.OwnerOf(i);
-            bool isActive = owner != null && owner.ActiveLimb == i;
-            // Sadece aktif uzuvların imleci görünür (kalabalık olmasın); yerel oyuncunun imleci büyük
-            bool show = owner != null && (isActive || body.IsFist(i));
-            markers[i].gameObject.SetActive(show);
-            lines[i].enabled = show && isActive && !body.IsGrabbing(i);
-            if (!show) return;
-
+            if (owner == null) { markers[i].gameObject.SetActive(false); lines[i].enabled = false; return; }
             bool local = owner.isLocalPlayer;
-            Vector2 t = local ? owner.CursorOf(i) : body.Target(i);
-            markers[i].position = new Vector3(t.x, t.y, -0.25f);
-            float pulse = 1f + Mathf.Sin(Time.time * 7f) * 0.1f;
-            float size = (local ? 0.22f : 0.16f) * pulse;
-            if (body.IsFist(i)) size *= 0.75f;
-            markers[i].localScale = Vector3.one * size;
+            bool dragged = local ? owner.DragLimb == i : body.IsDragged(i);
+            bool hovered = local && owner.HoverLimb == i && !dragged;
 
-            var c = owner.Color;
-            c.a = local ? 0.9f : 0.7f;
+            Vector2 eff = body.RenderEffectorPos(i);
+            markers[i].gameObject.SetActive(true);
+            markers[i].position = new Vector3(eff.x, eff.y, -0.25f);
+            float pulse = 1f + Mathf.Sin(Time.time * 8f) * 0.12f;
+            float size; float alpha;
+            if (dragged) { size = 0.2f; alpha = 0.9f; }
+            else if (hovered) { size = 0.32f * pulse; alpha = 0.8f; }       // "bunu tutabilirsin" göstergesi
+            else { size = local ? 0.1f : 0.08f; alpha = local ? 0.6f : 0.45f; } // kimin uzvu olduğu belli olsun
+            // Yorgunluk: tutunma süresi doldukça nokta büyür, kızarır ve hızla yanıp söner
+            float fat = body.IsGrabbing(i) ? body.Fatigue01(i) : 0f;
+            if (fat > 0.35f && !dragged && !hovered)
+            {
+                float k = Mathf.InverseLerp(0.35f, 1f, fat);
+                size = Mathf.Lerp(size, 0.22f, k) * (1f + Mathf.Sin(Time.time * Mathf.Lerp(6f, 20f, k)) * 0.15f * k);
+                alpha = Mathf.Lerp(alpha, 0.9f, k);
+            }
+            markers[i].localScale = Vector3.one * size;
+            var c = Color.Lerp(owner.Color, new Color(1f, 0.12f, 0.08f), Mathf.InverseLerp(0.35f, 0.95f, fat)); c.a = alpha;
             markerR[i].GetPropertyBlock(mpb);
             mpb.SetColor(BaseColor, c);
             markerR[i].SetPropertyBlock(mpb);
 
-            if (lines[i].enabled)
+            lines[i].enabled = dragged;
+            if (dragged)
             {
-                Vector2 hand = body.RenderEffectorPos(i);
-                lines[i].SetPosition(0, new Vector3(hand.x, hand.y, -0.2f));
+                Vector2 t = local ? owner.Pointer : body.Target(i);
+                Vector2 anchor = body.RenderAnchor(i);
+                bool over = (t - anchor).magnitude > body.reach[i]; // erişimin dışı → gövdeyi zorluyor
+                lines[i].SetPosition(0, new Vector3(eff.x, eff.y, -0.2f));
                 lines[i].SetPosition(1, new Vector3(t.x, t.y, -0.2f));
-                var lc = owner.Color; lc.a = 0.45f;
-                lines[i].startColor = lc; lc.a = 0.1f; lines[i].endColor = lc;
+                var lc = over ? new Color(1f, 0.3f, 0.25f) : owner.Color;
+                lc.a = 0.7f; lines[i].startColor = lc; lc.a = 0.15f; lines[i].endColor = lc;
             }
         }
 
@@ -220,20 +229,13 @@ namespace FumblePeak
             Renderer best = null;
             if (me != null)
             {
-                int L = me.ActiveLimb;
-                if (!body.IsGrabbing(L))
+                int L = me.DragLimb;
+                if (L >= 0)
                 {
-                    Vector2 c = me.CursorOf(L);
-                    int n = Physics.OverlapSphereNonAlloc(new Vector3(c.x, c.y, 0f), 0.4f, hoverBuf, body.gripMask, QueryTriggerInteraction.Collide);
-                    float bd = float.MaxValue;
-                    for (int k = 0; k < n; k++)
-                    {
-                        if (hoverBuf[k].GetComponentInParent<Grip>() == null) continue;
-                        var r = hoverBuf[k].GetComponentInParent<Renderer>();
-                        if (r == null) continue;
-                        float d = ((Vector2)hoverBuf[k].bounds.center - c).sqrMagnitude;
-                        if (d < bd) { bd = d; best = r; }
-                    }
+                    // bırakınca tutunacağı taş: el/ayak taşın üstündeyse (sunucuyla aynı kural)
+                    Vector2 c = body.RenderEffectorPos(L);
+                    if (body.FindGrip(new Vector3(c.x, c.y, 0f), out var col, out _))
+                        best = col.GetComponentInChildren<Renderer>();
                 }
             }
             if (best != hovered)

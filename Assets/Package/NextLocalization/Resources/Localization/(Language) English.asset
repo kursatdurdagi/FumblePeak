@@ -519,8 +519,9 @@ MonoBehaviour:
   - SectionId: 42099039
     EntryId: 62715655
     Key: hud.controls
-    Value: "MOUSE reach  \xB7  LEFT CLICK grab  \xB7  RIGHT CLICK let go  \xB7  Q/E/A/D
-      select limb  \xB7  H hide  \xB7  ESC {0}"
+    Value: "Hover a hand/foot  \xB7  HOLD LEFT MOUSE and drag  \xB7  release on a
+      rock to grab  \xB7  pull too hard and the others slip!  \xB7  H hide  \xB7 
+      ESC {0}"
   - SectionId: 42099039
     EntryId: 79326119
     Key: hud.esc_pause
@@ -654,3 +655,7 @@ MonoBehaviour:
     EntryId: 29175290
     Key: menu.scream
     Value: WAAAAAH!
+  - SectionId: 42099039
+    EntryId: 27427525
+    Key: hud.slipped
+    Value: '{0} slipped!'

@@ -162,7 +162,8 @@ namespace FumblePeak.EditorTools
 
             // ---------- Oyun içi ----------
             new[] { "hud.biome1", "BAŞLANGIÇ VADİSİ", "STARTER VALLEY", "STARTTAL" },
-            new[] { "hud.controls", "FARE uzan  ·  SOL TIK tutun  ·  SAĞ TIK bırak  ·  Q/E/A/D uzuv seç  ·  H gizle  ·  ESC {0}", "MOUSE reach  ·  LEFT CLICK grab  ·  RIGHT CLICK let go  ·  Q/E/A/D select limb  ·  H hide  ·  ESC {0}", "MAUS greifen  ·  LINKSKLICK festhalten  ·  RECHTSKLICK loslassen  ·  Q/E/A/D wählen  ·  H ausblenden  ·  ESC {0}" },
+            new[] { "hud.controls", "Elinin/ayağının üstüne gel  ·  SOL TUŞU basılı tut ve sürükle  ·  bırak: kaya varsa tutunur  ·  çok çekersen diğerleri kopar!  ·  H gizle  ·  ESC {0}", "Hover a hand/foot  ·  HOLD LEFT MOUSE and drag  ·  release on a rock to grab  ·  pull too hard and the others slip!  ·  H hide  ·  ESC {0}", "Hand/Fuß anfahren  ·  LINKE MAUSTASTE halten und ziehen  ·  auf einem Stein loslassen zum Greifen  ·  zu fest ziehen und die anderen rutschen ab!  ·  H ausblenden  ·  ESC {0}" },
+            new[] { "hud.slipped", "{0} koptu!", "{0} slipped!", "{0} rutscht ab!" },
             new[] { "hud.esc_pause", "duraklat", "pause", "Pause" },
             new[] { "hud.esc_menu", "menü", "menu", "Menü" },
             new[] { "hud.paused", "DURAKLATILDI", "PAUSED", "PAUSIERT" },

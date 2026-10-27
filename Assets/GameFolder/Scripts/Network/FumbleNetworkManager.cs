@@ -79,7 +79,10 @@ namespace FumblePeak
 
         IEnumerator StartGameNextFrame()
         {
-            yield return null;
+            // Yerel oyuncu oluşmadan sahne değişirse istemci ikinci kez AddPlayer gönderir
+            // ("There is already a player for this connection") → önce oyuncuyu bekle.
+            float until = Time.unscaledTime + 3f;
+            while (NetworkClient.localPlayer == null && Time.unscaledTime < until) yield return null;
             StartGame();
         }
 
@@ -255,10 +258,26 @@ namespace FumblePeak
         }
 
         // ---------------- İstemci ----------------
+        bool playerRequested;
+
         public override void OnClientConnect()
         {
+            // onlineScene boş → taban sınıf burada AddPlayer gönderir
+            playerRequested = autoCreatePlayer && !clientLoadedScene;
             base.OnClientConnect();
             wasConnected = true;
+        }
+
+        /// <summary>Sahne değişince oyuncuyu yalnızca daha önce istenmediyse iste (çift AddPlayer hatası).</summary>
+        public override void OnClientSceneChanged()
+        {
+            if (NetworkClient.connection != null && NetworkClient.connection.isAuthenticated && !NetworkClient.ready)
+                NetworkClient.Ready();
+            if (autoCreatePlayer && NetworkClient.localPlayer == null && !playerRequested && NetworkClient.connection != null && NetworkClient.connection.isAuthenticated)
+            {
+                playerRequested = true;
+                NetworkClient.AddPlayer();
+            }
         }
 
         public override void OnClientDisconnect()
@@ -283,6 +302,7 @@ namespace FumblePeak
 
         public override void OnStopClient()
         {
+            playerRequested = false;
             base.OnStopClient();
             SteamLobby.Instance?.LeaveLobby();
         }

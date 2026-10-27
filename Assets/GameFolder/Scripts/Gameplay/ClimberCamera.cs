@@ -5,9 +5,9 @@ namespace FumblePeak
     /// <summary>Gövdeyi yumuşak takip eden yan kamera + düşüşte sarsıntı.</summary>
     public class ClimberCamera : MonoBehaviour
     {
-        public Vector3 offset = new Vector3(0f, 0.6f, -7.5f);
+        public Vector3 offset = new Vector3(0f, 0.35f, -4.6f);
         public float followSpeed = 4f;
-        public float lookAhead = 0.35f;
+        public float lookAhead = 0.25f;
 
         Vector3 vel;
         float shake;

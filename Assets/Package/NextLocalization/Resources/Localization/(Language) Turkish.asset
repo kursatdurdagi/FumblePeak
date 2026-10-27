@@ -506,8 +506,9 @@ MonoBehaviour:
   - SectionId: 42099039
     EntryId: 62715655
     Key: hud.controls
-    Value: "FARE uzan  \xB7  SOL TIK tutun  \xB7  SA\u011E TIK b\u0131rak  \xB7 
-      Q/E/A/D uzuv se\xE7  \xB7  H gizle  \xB7  ESC {0}"
+    Value: "Elinin/aya\u011F\u0131n\u0131n \xFCst\xFCne gel  \xB7  SOL TU\u015EU
+      bas\u0131l\u0131 tut ve s\xFCr\xFCkle  \xB7  b\u0131rak: kaya varsa tutunur 
+      \xB7  \xE7ok \xE7ekersen di\u011Ferleri kopar!  \xB7  H gizle  \xB7  ESC {0}"
   - SectionId: 42099039
     EntryId: 79326119
     Key: hud.esc_pause
@@ -644,3 +645,7 @@ MonoBehaviour:
     EntryId: 29175290
     Key: menu.scream
     Value: AAAAAAA!
+  - SectionId: 42099039
+    EntryId: 27427525
+    Key: hud.slipped
+    Value: '{0} koptu!'

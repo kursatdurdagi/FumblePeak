@@ -8,7 +8,7 @@ namespace FumblePeak
     /// <summary>
     /// Co-op test botu (sadece BUILD'de ve oyun klasörünün yanında "fp_bot.txt" varsa çalışır).
     ///  • Ana menüde localhost'a bağlanır, lobide "Hazır" olur.
-    ///  • Oyunda kendi uzuvlarıyla en yüksek erişilebilir tutamağa uzanıp tutunur (gerçek girdi yolu: FumblePlayer.Sim).
+    ///  • Oyunda kendi uzuvlarını sürükleyip en yüksek erişilebilir tutamağa bırakır (gerçek girdi yolu: FumblePlayer.Sim).
     ///  • Durumunu "fp_bot_log.txt" dosyasına yazar.
     /// Editörde ve normal oyuncu kurulumlarında hiçbir şey yapmaz.
     /// </summary>
@@ -74,10 +74,14 @@ namespace FumblePeak
             }
         }
 
+        int nextLimb;
+
         void ClimbStep(FumblePlayer me, ClimberBody body)
         {
-            int L = me.ActiveLimb;
-            if (!LimbUtil.Has(me.limbMask, L)) return;
+            int L = -1;
+            for (int k = 0; k < 4; k++) { int c = (nextLimb + k) % 4; if (LimbUtil.Has(me.limbMask, c)) { L = c; break; } }
+            if (L < 0) return;
+            nextLimb = L + 1;
             Vector2 anchor = body.RenderAnchor(L);
             Vector2 best = Vector2.zero; float by = float.NegativeInfinity;
             foreach (var g in FindObjectsByType<Grip>(FindObjectsSortMode.None))
@@ -90,12 +94,24 @@ namespace FumblePeak
                 if ((gp - anchor).magnitude < lim && gp.y > by && (LimbUtil.IsArm(L) || gp.y < anchor.y - 0.3f)) { by = gp.y; best = gp; }
             }
             if (float.IsNegativeInfinity(by)) return;
-            Vector2 need = best - me.CursorOf(L);
-            FumblePlayer.Sim.delta += need / (0.0045f * FumblePlayer.Sensitivity);
-            Invoke(nameof(Click), 0.25f);
+            StartCoroutine(Drag(body.RenderEffectorPos(L), best));
         }
 
-        void Click() => FumblePlayer.Sim.click = true;
+        /// <summary>Gerçek girdi yolu: uzvun üstüne gel, bas, sürükle, bırak.</summary>
+        System.Collections.IEnumerator Drag(Vector2 from, Vector2 to)
+        {
+            FumblePlayer.Sim.active = true;
+            FumblePlayer.Sim.pointer = from;
+            yield return null;
+            FumblePlayer.Sim.down = true;
+            yield return null;
+            for (float t = 0; t < 0.5f; t += Time.deltaTime)
+            {
+                FumblePlayer.Sim.pointer = Vector2.Lerp(from, to, t / 0.3f);
+                yield return null;
+            }
+            FumblePlayer.Sim.up = true;
+        }
 
         void Log(string s)
         {

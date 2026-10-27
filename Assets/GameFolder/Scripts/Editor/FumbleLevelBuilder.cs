@@ -74,6 +74,7 @@ namespace FumblePeak.EditorTools
             BuildTrees(deco, m);
             BuildScatterRocks(deco, m);
             BuildMushrooms(deco, m);
+            BuildWallFlora(Group(root, "Flora"), m);
             BuildClouds(Group(root, "Clouds"), m);
         }
 
@@ -95,13 +96,13 @@ namespace FumblePeak.EditorTools
             SetupEnvironment();
             RenderSettings.fogStartDistance = 35f;
             RenderSettings.fogEndDistance = 220f;
-            RenderSettings.fogColor = new Color(0.8f, 0.88f, 0.96f);
+            RenderSettings.fogColor = new Color(0.95f, 0.86f, 0.8f);
             // zirvedeyiz: ufkun altı bulut denizi gibi açık mavi-beyaz olsun (yeşil değil)
             var menuSkyPath = $"{LevelDir}/Menu_Sky.mat";
             var menuSky = AssetDatabase.LoadAssetAtPath<Material>(menuSkyPath);
             if (menuSky == null) { menuSky = new Material(RenderSettings.skybox); AssetDatabase.CreateAsset(menuSky, menuSkyPath); }
             menuSky.CopyPropertiesFromMaterial(RenderSettings.skybox);
-            menuSky.SetColor("_GroundColor", new Color(0.86f, 0.91f, 0.97f));
+            menuSky.SetColor("_GroundColor", new Color(0.94f, 0.86f, 0.82f)); // ufkun altı: şeftali bulut denizi
             EditorUtility.SetDirty(menuSky);
             RenderSettings.skybox = menuSky;
             MakeRockSets();
@@ -337,39 +338,57 @@ namespace FumblePeak.EditorTools
         // Ortam: gökyüzü, sis, güneş, post-processing
         static void SetupEnvironment()
         {
+            // ---- Sıcak "altın saat" gökyüzü ----
             var skyPath = $"{LevelDir}/Sky.mat";
             var sky = AssetDatabase.LoadAssetAtPath<Material>(skyPath);
             if (sky == null) { sky = new Material(Shader.Find("Skybox/Procedural")); AssetDatabase.CreateAsset(sky, skyPath); }
-            sky.SetFloat("_SunSize", 0.05f);
-            sky.SetFloat("_SunSizeConvergence", 4f);
-            sky.SetFloat("_AtmosphereThickness", 0.75f);
-            sky.SetColor("_SkyTint", new Color(0.42f, 0.62f, 0.95f));
-            sky.SetColor("_GroundColor", new Color(0.62f, 0.75f, 0.6f));
-            sky.SetFloat("_Exposure", 1.1f);
+            sky.SetFloat("_SunSize", 0.06f);
+            sky.SetFloat("_SunSizeConvergence", 3f);
+            sky.SetFloat("_AtmosphereThickness", 0.85f);           // ufukta turuncu-pembe saçılma
+            sky.SetColor("_SkyTint", new Color(0.62f, 0.55f, 0.82f)); // morumsu: ufukta sarı+mavi karışıp yeşile dönmesin
+            sky.SetColor("_GroundColor", new Color(0.8f, 0.7f, 0.62f));
+            sky.SetFloat("_Exposure", 1.0f);
             EditorUtility.SetDirty(sky);
             RenderSettings.skybox = sky;
 
+            // Sıcak, pastel sis: uzak dağlar şeftali rengi pusta kaybolur
             RenderSettings.fog = true;
             RenderSettings.fogMode = FogMode.Linear;
-            RenderSettings.fogColor = new Color(0.74f, 0.85f, 0.93f);
-            RenderSettings.fogStartDistance = 28f;
-            RenderSettings.fogEndDistance = 150f;
-            RenderSettings.ambientMode = AmbientMode.Trilight;
-            RenderSettings.ambientSkyColor = new Color(0.72f, 0.8f, 0.95f);
-            RenderSettings.ambientEquatorColor = new Color(0.68f, 0.7f, 0.72f);
-            RenderSettings.ambientGroundColor = new Color(0.42f, 0.4f, 0.36f);
+            RenderSettings.fogColor = new Color(0.94f, 0.84f, 0.77f);
+            RenderSettings.fogStartDistance = 30f;
+            RenderSettings.fogEndDistance = 160f;
 
+            // Üç renkli ortam ışığı: soğuk gökyüzü + sıcak ufuk + kahverengi zemin
+            // (low-poly yüzlerde gölgeler mor-mavi, aydınlık yüzler turuncu-sarı → canlı kontrast)
+            RenderSettings.ambientMode = AmbientMode.Trilight;
+            RenderSettings.ambientSkyColor = new Color(0.6f, 0.68f, 0.92f);
+            RenderSettings.ambientEquatorColor = new Color(0.86f, 0.74f, 0.66f);
+            RenderSettings.ambientGroundColor = new Color(0.42f, 0.34f, 0.34f);
+            RenderSettings.ambientIntensity = 1f;
+
+            // Alçak açılı, sıcak güneş: uzun gölgeler, yüzler net ayrışır
             var sun = new GameObject("Sun");
-            sun.transform.rotation = Quaternion.Euler(38f, 22f, 0f);
+            sun.transform.rotation = Quaternion.Euler(28f, -35f, 0f);
             var l = sun.AddComponent<Light>();
             l.type = LightType.Directional;
-            l.intensity = 1.2f;
-            l.color = new Color(1f, 0.93f, 0.82f);
+            l.intensity = 1.4f;
+            l.color = new Color(1f, 0.87f, 0.7f);
             l.shadows = LightShadows.Soft;
-            l.shadowStrength = 0.75f;
+            l.shadowStrength = 0.7f;
+            l.shadowBias = 0.03f;
+            l.shadowNormalBias = 0.3f;
             RenderSettings.sun = l;
 
-            // Post-processing
+            // Karşıdan gelen hafif soğuk dolgu ışığı (gölge yok): gölgeli yüzler simsiyah olmasın
+            var fill = new GameObject("FillLight");
+            fill.transform.rotation = Quaternion.Euler(20f, 160f, 0f);
+            var fl = fill.AddComponent<Light>();
+            fl.type = LightType.Directional;
+            fl.intensity = 0.28f;
+            fl.color = new Color(0.55f, 0.62f, 1f);
+            fl.shadows = LightShadows.None;
+
+            // ---- Post-processing: sıcak, yumuşak, hafif rüya gibi ----
             var profPath = $"{LevelDir}/MountainVolume.asset";
             var prof = AssetDatabase.LoadAssetAtPath<VolumeProfile>(profPath);
             if (prof == null) { prof = ScriptableObject.CreateInstance<VolumeProfile>(); AssetDatabase.CreateAsset(prof, profPath); }
@@ -379,10 +398,29 @@ namespace FumblePeak.EditorTools
                 c.active = true;
                 return c;
             }
-            var bloom = Get<Bloom>(); bloom.intensity.Override(0.35f); bloom.threshold.Override(1.05f); bloom.scatter.Override(0.6f);
             var tone = Get<Tonemapping>(); tone.mode.Override(TonemappingMode.Neutral);
-            var ca = Get<ColorAdjustments>(); ca.saturation.Override(10f); ca.postExposure.Override(-0.1f); ca.contrast.Override(10f);
-            var vig = Get<Vignette>(); vig.intensity.Override(0.2f); vig.smoothness.Override(0.5f);
+            var bloom = Get<Bloom>();
+            bloom.intensity.Override(0.4f); bloom.threshold.Override(1.0f); bloom.scatter.Override(0.72f);
+            bloom.tint.Override(new Color(1f, 0.88f, 0.74f));
+            var wb = Get<WhiteBalance>(); wb.temperature.Override(9f); wb.tint.Override(3f);
+            var ca = Get<ColorAdjustments>();
+            ca.postExposure.Override(0.05f);
+            ca.contrast.Override(14f);
+            ca.saturation.Override(8f);
+            ca.colorFilter.Override(new Color(1f, 0.98f, 0.95f));
+            // Gölgeler hafif mor-mavi, parlak yerler şeftali → klasik sıcak low-poly görünüm
+            var smh = Get<ShadowsMidtonesHighlights>();
+            smh.shadows.Override(new Vector4(0.92f, 0.94f, 1.08f, 0f));
+            smh.midtones.Override(new Vector4(1.03f, 1.0f, 0.96f, 0f));
+            smh.highlights.Override(new Vector4(1.06f, 1.0f, 0.9f, 0f));
+            var split = Get<SplitToning>();
+            split.shadows.Override(new Color(0.42f, 0.4f, 0.62f));
+            split.highlights.Override(new Color(1f, 0.86f, 0.7f));
+            split.balance.Override(-15f);
+            var lgg = Get<LiftGammaGain>();
+            lgg.lift.Override(new Vector4(1.02f, 0.99f, 1.04f, 0.02f)); // siyahlar yumuşak, hafif mor
+            var vig = Get<Vignette>();
+            vig.intensity.Override(0.26f); vig.smoothness.Override(0.55f); vig.color.Override(new Color(0.35f, 0.15f, 0.12f));
             EditorUtility.SetDirty(prof);
             var vol = new GameObject("PostProcess").AddComponent<Volume>();
             vol.isGlobal = true;
@@ -692,11 +730,116 @@ namespace FumblePeak.EditorTools
 
         static void MakeRockSets()
         {
-            holdMeshes = new Mesh[4]; holdMoss = new Mesh[3]; holdIce = new Mesh[3]; decoRocks = new Mesh[4];
-            for (int i = 0; i < 4; i++) holdMeshes[i] = RockMesh("Hold_" + i, HoldSand, HoldChalk, 300 + i, 0.8f);
-            for (int i = 0; i < 3; i++) holdMoss[i] = RockMesh("HoldMoss_" + i, HoldMoss, new Color(0.62f, 0.92f, 0.62f), 400 + i, 0.75f);
-            for (int i = 0; i < 3; i++) holdIce[i] = RockMesh("HoldIce_" + i, HoldIce, Snow, 500 + i, 0.75f);
+            // Taş tutamak çeşitleri: şekil (kulp, ince kenar, eğimli, sıkıştırma, yumru) × taş türü
+            var shapes = new[] { HoldShape.Jug, HoldShape.Crimp, HoldShape.Sloper, HoldShape.Pinch, HoldShape.Knob };
+            var stones = new[]
+            {
+                (main: new Color(0.68f, 0.66f, 0.63f), top: new Color(0.9f, 0.88f, 0.84f)),  // granit
+                (main: new Color(0.82f, 0.67f, 0.5f), top: new Color(0.95f, 0.88f, 0.76f)),  // kumtaşı
+                (main: new Color(0.57f, 0.6f, 0.67f), top: new Color(0.85f, 0.86f, 0.88f)),  // arduvaz
+                (main: new Color(0.86f, 0.8f, 0.7f), top: new Color(0.97f, 0.95f, 0.9f)),    // kireçtaşı
+            };
+            holdMeshes = new Mesh[shapes.Length * stones.Length];
+            int k = 0;
+            for (int si = 0; si < stones.Length; si++)
+                for (int hi = 0; hi < shapes.Length; hi++, k++)
+                    holdMeshes[k] = StoneMesh($"Hold_{si}_{hi}", shapes[hi], stones[si].main, stones[si].top, null, 300 + k);
+            holdMoss = new Mesh[shapes.Length];
+            for (int hi = 0; hi < shapes.Length; hi++)
+                holdMoss[hi] = StoneMesh($"HoldMoss_{hi}", shapes[hi], new Color(0.6f, 0.62f, 0.56f), new Color(0.48f, 0.74f, 0.4f), new Color(0.38f, 0.62f, 0.34f), 400 + hi);
+            holdIce = new Mesh[shapes.Length];
+            for (int hi = 0; hi < shapes.Length; hi++)
+                holdIce[hi] = StoneMesh($"HoldIce_{hi}", shapes[hi], new Color(0.7f, 0.86f, 0.98f), new Color(0.96f, 0.99f, 1f), null, 500 + hi, 0.4f);
+            decoRocks = new Mesh[4];
             for (int i = 0; i < 4; i++) decoRocks[i] = RockMesh("Rock_" + i, RockWarm, RockCool, 600 + i, 0.7f);
+        }
+
+        enum HoldShape { Jug, Crimp, Sloper, Pinch, Knob }
+
+        static float Hash3(Vector3 p, int seed)
+        {
+            // yumuşak 3B gürültü: kaydırılmış sinüslerin toplamı (organik taş yüzeyi)
+            float s0 = seed * 0.37f;
+            return (Mathf.Sin(p.x * 3.1f + s0) * Mathf.Sin(p.y * 2.7f + s0 * 1.3f) * Mathf.Sin(p.z * 3.3f + s0 * 0.7f)
+                  + 0.5f * Mathf.Sin(p.x * 6.3f + p.z * 4.1f + s0 * 2.1f) * Mathf.Sin(p.y * 5.7f + s0)) / 1.5f;
+        }
+
+        /// <summary>
+        /// Gerçek taş gibi tutamak: 2 kez bölünmüş ikosahedron + yumuşak gürültü, şekle göre ölçek,
+        /// üstte tebeşir/açık ton, altta koyu gölge, ara ara liken lekeleri.
+        /// </summary>
+        static Mesh StoneMesh(string name, HoldShape shape, Color main, Color top, Color? topOverride, int seed, float noiseAmt = 1f)
+        {
+            var old = rnd; rnd = new System.Random(seed);
+            float t = (1f + Mathf.Sqrt(5f)) / 2f;
+            var verts = new List<Vector3>
+            {
+                new Vector3(-1, t, 0), new Vector3(1, t, 0), new Vector3(-1, -t, 0), new Vector3(1, -t, 0),
+                new Vector3(0, -1, t), new Vector3(0, 1, t), new Vector3(0, -1, -t), new Vector3(0, 1, -t),
+                new Vector3(t, 0, -1), new Vector3(t, 0, 1), new Vector3(-t, 0, -1), new Vector3(-t, 0, 1),
+            };
+            var faces = new List<int>
+            {
+                0,11,5, 0,5,1, 0,1,7, 0,7,10, 0,10,11, 1,5,9, 5,11,4, 11,10,2, 10,7,6, 7,1,8,
+                3,9,4, 3,4,2, 3,2,6, 3,6,8, 3,8,9, 4,9,5, 2,4,11, 6,2,10, 8,6,7, 9,8,1,
+            };
+            for (int level = 0; level < 2; level++)
+            {
+                var mid = new Dictionary<long, int>();
+                int Mid(int a2, int b2)
+                {
+                    long key = a2 < b2 ? ((long)a2 << 32) | (uint)b2 : ((long)b2 << 32) | (uint)a2;
+                    if (mid.TryGetValue(key, out int i2)) return i2;
+                    verts.Add((verts[a2] + verts[b2]) * 0.5f);
+                    mid[key] = verts.Count - 1;
+                    return verts.Count - 1;
+                }
+                var nf = new List<int>();
+                for (int i = 0; i < faces.Count; i += 3)
+                {
+                    int a2 = faces[i], b2 = faces[i + 1], c2 = faces[i + 2];
+                    int ab = Mid(a2, b2), bc = Mid(b2, c2), ca = Mid(c2, a2);
+                    nf.AddRange(new[] { a2, ab, ca, b2, bc, ab, c2, ca, bc, ab, bc, ca });
+                }
+                faces = nf;
+            }
+            Vector3 scale = shape switch
+            {
+                HoldShape.Jug => new Vector3(1.25f, 0.85f, 1f),
+                HoldShape.Crimp => new Vector3(1.55f, 0.42f, 0.9f),
+                HoldShape.Sloper => new Vector3(1.4f, 0.7f, 1f),
+                HoldShape.Pinch => new Vector3(0.62f, 1.35f, 0.9f),
+                _ => new Vector3(1f, 1f, 1f),
+            };
+            float rough = (shape == HoldShape.Sloper ? 0.08f : 0.18f) * noiseAmt;
+            for (int i = 0; i < verts.Count; i++)
+            {
+                var n = verts[i].normalized;
+                float r = 1f + Hash3(n * 1.4f, seed) * rough + (R() - 0.5f) * 0.05f * noiseAmt;
+                var p = Vector3.Scale(n * r, scale);
+                // kulp: üst tarafta hafif tutma oyuğu (öne doğru dudak)
+                if (shape == HoldShape.Jug && n.y > 0.35f && n.z < 0.2f) p.y -= 0.12f * (n.y - 0.35f);
+                verts[i] = p * 0.5f;
+            }
+            var mb = new MB();
+            var lichen = new[] { new Color(0.86f, 0.78f, 0.35f), new Color(0.9f, 0.6f, 0.32f), new Color(0.62f, 0.72f, 0.45f) };
+            for (int i = 0; i < faces.Count; i += 3)
+            {
+                Vector3 a = verts[faces[i]], b = verts[faces[i + 1]], c = verts[faces[i + 2]];
+                if (Vector3.Dot(Vector3.Cross(b - a, c - a), a + b + c) < 0f) { var tmp = b; b = c; c = tmp; }
+                mb.Tri(a, b, c, (p, n) =>
+                {
+                    Color col;
+                    if (n.y > 0.5f) col = topOverride ?? Color.Lerp(main, top, Mathf.InverseLerp(0.5f, 0.9f, n.y));
+                    else if (n.y < -0.35f) col = main * 0.72f;
+                    else col = Color.Lerp(main * 0.88f, main, n.y + 0.5f);
+                    col.a = 1f;
+                    if (topOverride == null && R() < 0.025f) col = Color.Lerp(col, lichen[rnd.Next(lichen.Length)], 0.45f);
+                    return Jitter(col, 0.012f);
+                });
+            }
+            rnd = old;
+            return mb.Save(name);
         }
 
         enum HoldKind { Rock, Moss, Ice }
@@ -705,22 +848,26 @@ namespace FumblePeak.EditorTools
         {
             var set = kind == HoldKind.Rock ? holdMeshes : kind == HoldKind.Moss ? holdMoss : holdIce;
             var mesh = set[rnd.Next(set.Length)];
-            float s = R(0.27f, 0.34f);
+            float s = R(0.25f, 0.34f);
             float zFace = FaceZ(p.x, p.y);
-            var go = MeshObj(kind == HoldKind.Rock ? "Hold" : kind == HoldKind.Moss ? "Hold_Moss" : "Hold_Ice", parent, mesh, m.hold,
-                new Vector3(p.x, p.y, zFace * 0.5f), true);
-            go.isStatic = false; // vurgu için MaterialPropertyBlock kullanılır
-            go.transform.localScale = new Vector3(s * 1.2f, s, Mathf.Max(0.5f, zFace + 0.2f));
-            go.transform.rotation = Quaternion.Euler(0, 0, R(-25f, 25f));
-            go.layer = GripLayer;
-            var col = go.AddComponent<SphereCollider>();
+
+            // Kök: oyun düzleminde (z=0), tekdüze ölçek → tutunma alanı tam taşın boyunda (boşluğu tutmaz)
+            var root = new GameObject(kind == HoldKind.Rock ? "Hold" : kind == HoldKind.Moss ? "Hold_Moss" : "Hold_Ice");
+            root.transform.SetParent(parent, false);
+            root.transform.position = new Vector3(p.x, p.y, 0f);
+            root.layer = GripLayer;
+            var col = root.AddComponent<SphereCollider>();
             col.isTrigger = true;
-            col.radius = 0.5f;
-            // çarpışma merkezi oyun düzlemine (z=0) yakın olsun
-            col.center = new Vector3(0, 0, -go.transform.position.z / go.transform.localScale.z);
-            var grip = go.AddComponent<Grip>();
+            col.radius = s * 0.5f;
+            var grip = root.AddComponent<Grip>();
             grip.type = kind == HoldKind.Rock ? GripType.Rock : GripType.Slippery;
             grip.slideSpeed = kind == HoldKind.Ice ? 0.3f : 0.18f;
+
+            // Görsel: duvardan çıkan taş (derinlik duvara kadar uzar)
+            var go = MeshObj("Stone", root.transform, mesh, m.hold, new Vector3(p.x, p.y, zFace * 0.5f), true);
+            go.isStatic = false; // vurgu için MaterialPropertyBlock kullanılır
+            go.transform.localScale = new Vector3(s, s, Mathf.Max(0.5f, zFace + 0.2f));
+            go.transform.rotation = Quaternion.Euler(0, 0, R(-30f, 30f));
         }
 
         // ---------------------------------------------------------------
@@ -736,7 +883,7 @@ namespace FumblePeak.EditorTools
 
             float[] camps = { Camp1Y, Camp2Y, Camp3Y };
             int campIndex = 0;
-            float y = 1.5f;
+            float y = 0.45f; // yerden başlar: ayaklar da ilk basamaklara basabilsin
             float side = -1f;
             while (y < SummitY + 0.2f)
             {
@@ -784,56 +931,116 @@ namespace FumblePeak.EditorTools
         {
             float side = index % 2 == 0 ? 1f : -1f;
             const float width = 3.0f;
-            float ledgeX = cx + side * (width * 0.5f + 0.6f); // rota çıkıntının yanından geçer, altına sıkışmaz
+            // Çıkıntı rotaya bitişik: rotadan yana adım atıp üstüne basılabilir
+            float ledgeX = cx + side * (width * 0.5f + 0.38f);
             var top = cy < 14f ? Grass : Snow;
+            float topY = cy + 0.05f;
 
             var camp = new GameObject($"Camp_{index + 1}").transform;
             camp.SetParent(route, false);
 
-            // Çıkıntı: görsel kaya plakası + katı kutu çarpışması
+            // ---- Çıkıntı: düz üst + duvara gömülü kayalık alt gövde (havada asılı durmasın) ----
             var ledge = MeshObj("Ledge", camp, LedgeMesh(top), m.vc, new Vector3(ledgeX, cy - 0.12f, 0.3f));
             ledge.transform.localScale = new Vector3(width + 0.4f, 0.9f, 2.4f);
+            for (int k = 0; k < 4; k++)
+            {
+                float t = (k + 0.5f) / 4f;
+                var under = MeshObj("LedgeRock", camp, decoRocks[k % decoRocks.Length], m.vc,
+                    new Vector3(ledgeX + (t - 0.5f) * width * 0.85f, cy - 0.55f - R(0f, 0.25f), 0.55f));
+                under.transform.localScale = new Vector3(R(0.9f, 1.3f), R(0.7f, 1.1f), 1.2f) * (1f - Mathf.Abs(t - 0.5f) * 0.6f);
+                under.transform.rotation = Quaternion.Euler(R(-15, 15), R(0, 360), R(-15, 15));
+            }
             var lc = new GameObject("LedgeCollider");
             lc.transform.SetParent(camp, false);
             lc.transform.position = new Vector3(ledgeX, cy - 0.15f, 0f);
-            var box = lc.AddComponent<BoxCollider>();
-            box.size = new Vector3(width, 0.4f, 2f);
+            lc.AddComponent<BoxCollider>().size = new Vector3(width, 0.4f, 2f);
 
-            // Çıkıntının kenarında tutamaklar (üstüne çıkmak için)
-            float edge = ledgeX - side * (width * 0.5f + 0.15f);
-            Hold(holds, new Vector2(edge, cy - 0.35f), HoldKind.Rock, m);
-            Hold(holds, new Vector2(edge - side * 0.45f, cy - 0.15f), HoldKind.Rock, m);
-            Hold(holds, new Vector2(edge, cy + 0.35f), HoldKind.Rock, m);
-            Hold(holds, new Vector2(edge - side * 0.5f, cy + 0.5f), HoldKind.Rock, m);
-            // çıkıntının üstünde devam (duvardaki tutamaklar)
-            Hold(holds, new Vector2(ledgeX - side * 0.6f, cy + 1.05f), HoldKind.Rock, m);
-            Hold(holds, new Vector2(ledgeX + side * 0.2f, cy + 1.35f), HoldKind.Rock, m);
+            // ---- Çıkıntıya biniş: rotanın yanındaki kenarda basamaklar ----
+            float edge = ledgeX - side * (width * 0.5f + 0.12f);
+            Hold(holds, new Vector2(edge, cy - 0.4f), HoldKind.Rock, m);
+            Hold(holds, new Vector2(edge + side * 0.15f, cy + 0.55f), HoldKind.Rock, m);
 
-            // Kamp ateşi
-            var firePos = new Vector3(ledgeX + side * 0.6f, cy + 0.05f, 0.35f);
+            // ---- Kamptan çıkış duvarı: çıkıntının üstünden başlayıp rotaya kıvrılan merdiven ----
+            // Ayakta dururken eller (+1.6..2.0) ve ayaklar (+0.45..0.8) hemen tutunabilir.
+            int steps = 22;
+            for (int k = 0; k < steps; k++)
+            {
+                float y = topY + 0.45f + k * 0.3f;
+                // önce dümdüz yukarı, sonra yavaşça rotaya kıvrılır (her basamakta en fazla ~0.2 m yana)
+                float t = Mathf.Clamp01((k - 4) / (float)(steps - 6)); // doğrusal: her basamakta eşit, küçük yan kayma
+                float x = Mathf.Lerp(ledgeX - side * 0.15f, RouteCenterX(y), t) + (k % 2 == 0 ? -0.15f : 0.15f);
+                Hold(holds, new Vector2(x, y), HoldKind.Rock, m);
+                if (k < 3) Hold(holds, new Vector2(x + (k % 2 == 0 ? 0.55f : -0.55f), y + 0.12f), HoldKind.Rock, m); // geniş başlangıç
+            }
+
+            // ---- Kamp ateşi, oturma kütükleri, çadır, fener, sırt çantası ----
+            var firePos = new Vector3(ledgeX + side * 0.45f, topY, 0.45f);
             BuildCampfire(camp, firePos, m);
+            if (logMesh == null) logMesh = RockMesh("Log", new Color(0.5f, 0.32f, 0.2f), new Color(0.6f, 0.4f, 0.25f), 801, 0.4f);
+            for (int k = 0; k < 2; k++)
+            {
+                var seat = MeshObj("SeatLog", camp, logMesh, m.vc, firePos + new Vector3((k == 0 ? -0.55f : 0.55f), 0.08f, 0.25f));
+                seat.transform.localScale = new Vector3(0.5f, 0.16f, 0.16f);
+                seat.transform.rotation = Quaternion.Euler(0, k == 0 ? 70f : -70f, 0);
+            }
 
-            // Çadır
-            var tent = MeshObj("Tent", camp, TentMesh(), m.tent, new Vector3(ledgeX + side * 0.9f, cy + 0.05f, 0.8f));
+            var tent = MeshObj("Tent", camp, TentMesh(), m.tent, new Vector3(ledgeX + side * 1.05f, topY, 0.85f));
             tent.transform.rotation = Quaternion.Euler(0, side > 0 ? -20f : 20f, 0);
             tent.transform.localScale = Vector3.one * 0.9f;
 
-            // Kontrol noktası: rota + çıkıntı geniş alan
+            // fener: direk + sıcak ışık
+            var lanternPos = new Vector3(ledgeX - side * 0.55f, topY, 0.5f);
+            var pole = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            Object.DestroyImmediate(pole.GetComponent<Collider>());
+            pole.name = "LanternPole"; pole.transform.SetParent(camp, false);
+            pole.transform.position = lanternPos + Vector3.up * 0.45f;
+            pole.transform.localScale = new Vector3(0.035f, 0.45f, 0.035f);
+            pole.GetComponent<Renderer>().sharedMaterial = m.tent;
+            var lamp = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            Object.DestroyImmediate(lamp.GetComponent<Collider>());
+            lamp.name = "Lantern"; lamp.transform.SetParent(camp, false);
+            lamp.transform.position = lanternPos + Vector3.up * 0.95f;
+            lamp.transform.localScale = Vector3.one * 0.12f;
+            lamp.GetComponent<Renderer>().sharedMaterial = m.fire;
+            lamp.GetComponent<Renderer>().shadowCastingMode = ShadowCastingMode.Off;
+            var ll = new GameObject("LanternLight").AddComponent<Light>();
+            ll.transform.SetParent(camp, false);
+            ll.transform.position = lanternPos + new Vector3(0, 0.95f, -0.3f);
+            ll.type = LightType.Point; ll.color = new Color(1f, 0.75f, 0.4f); ll.range = 3f; ll.intensity = 1.6f; ll.shadows = LightShadows.None;
+
+            var bag = MeshObj("Backpack", camp, RockMesh("Backpack", new Color(0.85f, 0.35f, 0.3f), new Color(0.95f, 0.5f, 0.35f), 950, 1.2f), m.vc,
+                new Vector3(ledgeX + side * 1.45f, topY + 0.18f, 0.35f));
+            bag.transform.localScale = new Vector3(0.22f, 0.3f, 0.18f);
+
+            // çimen/karda küçük çiçekler (ya da kar topakları)
+            var flowerCols = cy < 14f
+                ? new[] { new Color(1f, 0.85f, 0.3f), new Color(1f, 0.5f, 0.6f), new Color(0.75f, 0.6f, 1f), Color.white }
+                : new[] { Color.white, new Color(0.85f, 0.92f, 1f) };
+            for (int k = 0; k < 9; k++)
+            {
+                var fp = new Vector3(ledgeX + R(-width * 0.45f, width * 0.45f), topY + 0.02f, R(0.05f, 1.2f));
+                if (Mathf.Abs(fp.x - firePos.x) < 0.5f) continue;
+                var f = MeshObj("Flower", camp, RockMesh("Flower_" + (k % flowerCols.Length), flowerCols[k % flowerCols.Length], flowerCols[k % flowerCols.Length], 960 + k % flowerCols.Length, 0.6f), m.vc, fp, false);
+                f.transform.localScale = Vector3.one * R(0.05f, 0.08f);
+            }
+
+            // ---- Kontrol noktası + dinlenme alanı (kamp ateşi ısıtır: tüm uzuvlar toparlanır) ----
             var cp = new GameObject("Checkpoint");
             cp.transform.SetParent(camp, false);
             cp.transform.position = new Vector3((ledgeX + cx) * 0.5f, cy + 0.9f, 0);
-            var t = cp.AddComponent<BoxCollider>();
-            t.isTrigger = true;
-            t.size = new Vector3(Mathf.Abs(ledgeX - cx) + width + 1.2f, 1.6f, 2f);
+            var t2 = cp.AddComponent<BoxCollider>();
+            t2.isTrigger = true;
+            t2.size = new Vector3(Mathf.Abs(ledgeX - cx) + width + 1.2f, 1.6f, 2f);
             var check = cp.AddComponent<Checkpoint>();
+            check.restZone = true;
             var rp = new GameObject("RespawnPoint");
             rp.transform.SetParent(cp.transform, false);
-            rp.transform.position = new Vector3(ledgeX - side * 0.3f, cy + 1.0f, 0);
+            rp.transform.position = new Vector3(ledgeX - side * 0.15f, topY + 0.95f, 0);
             check.respawnPoint = rp.transform;
 
             // Çıkıntıda küçük çam
-            var tree = MeshObj("Pine", camp, PineMesh(), m.vc, new Vector3(ledgeX - side * 1.1f, cy + 0.05f, 0.75f));
-            tree.transform.localScale = Vector3.one * 0.55f;
+            var tree = MeshObj("Pine", camp, PineMesh(), m.vc, new Vector3(ledgeX + side * 1.35f, topY, 1.0f));
+            tree.transform.localScale = Vector3.one * 0.5f;
         }
 
         static void BuildCampfire(Transform parent, Vector3 pos, Mats m)
@@ -1021,6 +1228,414 @@ namespace FumblePeak.EditorTools
                 var go = MeshObj("Outcrop", parent, decoRocks[rnd.Next(decoRocks.Length)], m.vc, new Vector3(x, y, zf + s * 0.35f));
                 go.transform.localScale = new Vector3(s * R(1f, 2f), s * R(0.5f, 1f), s);
                 go.transform.rotation = Quaternion.Euler(R(-20, 20), R(0, 360), R(-20, 20));
+            }
+        }
+
+        // ---------------------------------------------------------------
+        // Duvar florası: rotadan uzakta (tırmanılamaz, çarpışmasız) çiçek kümeleri, çimen, çalı
+        static void BuildWallFlora(Transform parent, Mats m)
+        {
+            const float band = 8f;
+            int bands = Mathf.CeilToInt((PeakY - 4f) / band);
+            for (int bi = 0; bi < bands; bi++)
+            {
+                var mb = new MB();
+                float y0 = 0.6f + bi * band, y1 = Mathf.Min(PeakY - 4f, y0 + band);
+                int clusters = Mathf.RoundToInt(55 * (1f - bi / (float)bands * 0.5f));
+                for (int c = 0; c < clusters; c++)
+                {
+                    float y = R(y0, y1);
+                    float cx = RouteCenterX(y);
+                    float hw = HalfWidth(y);
+                    float sideSign = R() < 0.5f ? -1f : 1f;
+                    float x = cx + sideSign * R(1.5f, Mathf.Max(1.8f, hw * 0.75f));
+                    // kampların çıkıntı bölgesini boş bırak
+                    if (Mathf.Abs(y - Camp1Y) < 1.6f || Mathf.Abs(y - Camp2Y) < 1.6f || Mathf.Abs(y - Camp3Y) < 1.6f)
+                        if (Mathf.Abs(x - cx) < 4.5f) continue;
+                    if (y > SummitY - 2f && Mathf.Abs(x - cx) < 4f) continue;
+                    float z = FaceZ(x, y) + 0.06f; // raf duvara gömülü başlar (havada durmasın)
+                    FloraCluster(mb, new Vector3(x, y, z), y);
+                }
+                if (mb.v.Count == 0) continue;
+                var go = MeshObj("Flora_" + bi, parent, mb.Save("Flora_" + bi), m.vc, Vector3.zero, false);
+            }
+        }
+
+        static void FloraCluster(MB target, Vector3 at, float y)
+        {
+            // Küme yerelde kurulur, sonra büyütülüp yerine konur (uzaktan da okunabilsin)
+            var mb = new MB();
+            FloraClusterLocal(mb, Vector3.zero, y);
+            float sz = R(1.3f, 1.8f);
+            int baseIdx = target.v.Count;
+            for (int i = 0; i < mb.v.Count; i++) { target.v.Add(at + mb.v[i] * sz); target.c.Add(mb.c[i]); }
+            for (int i = 0; i < mb.t.Count; i++) target.t.Add(baseIdx + mb.t[i]);
+        }
+
+        // ---- Flora yapı taşları (hepsi yerel uzayda, kümenin tabanı = (0,0,0), kamera -Z yönünde) ----
+        enum FlowerKind { Daisy, Poppy, Lavender, Bluebell, Gentian, Edelweiss }
+
+        static void FloraClusterLocal(MB mb, Vector3 o, float y)
+        {
+            bool snowy = y >= Camp3Y;
+            Color moss, soil, grassLo, grassHi;
+            FlowerKind[] kinds;
+            Color[] daisyCols;
+            if (y < Camp1Y)
+            {
+                moss = new Color(0.34f, 0.64f, 0.3f); soil = new Color(0.5f, 0.38f, 0.3f);
+                grassLo = new Color(0.2f, 0.52f, 0.26f); grassHi = new Color(0.5f, 0.86f, 0.32f);
+                kinds = new[] { FlowerKind.Daisy, FlowerKind.Poppy, FlowerKind.Lavender, FlowerKind.Bluebell };
+                daisyCols = new[] { new Color(1f, 0.98f, 0.95f), new Color(1f, 0.85f, 0.35f) };
+            }
+            else if (y < Camp2Y)
+            {
+                moss = new Color(0.46f, 0.62f, 0.38f); soil = new Color(0.48f, 0.4f, 0.36f);
+                grassLo = new Color(0.24f, 0.52f, 0.3f); grassHi = new Color(0.52f, 0.82f, 0.4f);
+                kinds = new[] { FlowerKind.Gentian, FlowerKind.Daisy, FlowerKind.Poppy, FlowerKind.Lavender };
+                daisyCols = new[] { new Color(1f, 0.88f, 0.4f), new Color(1f, 0.7f, 0.82f) };
+            }
+            else if (y < Camp3Y)
+            {
+                moss = new Color(0.58f, 0.64f, 0.48f); soil = new Color(0.5f, 0.46f, 0.44f);
+                grassLo = new Color(0.5f, 0.56f, 0.38f); grassHi = new Color(0.8f, 0.82f, 0.6f);
+                kinds = new[] { FlowerKind.Edelweiss, FlowerKind.Edelweiss, FlowerKind.Gentian };
+                daisyCols = new[] { Color.white };
+            }
+            else
+            {
+                moss = Snow; soil = SnowShade; grassLo = new Color(0.6f, 0.68f, 0.62f); grassHi = new Color(0.86f, 0.9f, 0.86f);
+                kinds = new[] { FlowerKind.Edelweiss };
+                daisyCols = new[] { Color.white };
+            }
+
+            // 1) Duvardan çıkan yarım ay şeklinde topraklı/yosunlu raf (bitkiler bunun ÜSTÜNDE durur)
+            float w = R(0.26f, 0.36f), d = R(0.14f, 0.2f);
+            Pocket(mb, o, w, d, moss, soil, snowy ? SnowShade : Color.Lerp(RockWarm, RockCool, R()));
+
+            // 2) Arkada çalı
+            if (!snowy && R() < 0.55f)
+            {
+                var bushCol = Color.Lerp(grassLo, new Color(0.16f, 0.46f, 0.3f), R(0.2f, 0.6f));
+                int n = Mathf.RoundToInt(R(3, 5));
+                for (int k = 0; k < n; k++)
+                {
+                    var c = o + new Vector3(R(-w * 0.55f, w * 0.55f), R(0.06f, 0.14f), R(0.0f, 0.06f));
+                    Ico(mb, c, R(0.07f, 0.11f), R(0.8f, 1f), Color.Lerp(bushCol, grassHi, 0.35f), bushCol * 0.8f);
+                }
+            }
+
+            // 3) Çimen öbekleri
+            int tufts = snowy ? 1 : Mathf.RoundToInt(R(2, 4));
+            for (int k = 0; k < tufts; k++)
+                GrassTuft(mb, o + new Vector3(R(-w * 0.7f, w * 0.7f), 0.005f, -R(0.02f, d * 0.6f)), R(0.1f, 0.18f), grassLo, grassHi);
+
+            // 4) Çiçekler (1-2 tür, kümelenmiş)
+            var kindA = kinds[rnd.Next(kinds.Length)];
+            var kindB = kinds[rnd.Next(kinds.Length)];
+            var dcol = daisyCols[rnd.Next(daisyCols.Length)];
+            int flowers = snowy ? Mathf.RoundToInt(R(1, 2)) : Mathf.RoundToInt(R(3, 6));
+            for (int k = 0; k < flowers; k++)
+            {
+                var fp = o + new Vector3(R(-w * 0.65f, w * 0.65f), 0.005f, -R(0.02f, d * 0.7f));
+                FlowerOf(mb, k % 3 == 2 ? kindB : kindA, fp, dcol, grassLo);
+            }
+
+            // 5) Raf kenarından sarkan sarmaşık
+            if (!snowy && R() < 0.45f) Vine(mb, o + new Vector3(R(-w * 0.5f, w * 0.5f), -0.02f, -d * 0.85f), R(0.25f, 0.5f), grassLo, grassHi);
+        }
+
+        static void TriN(MB mb, Vector3 a, Vector3 b, Vector3 c, Vector3 outward, Color col)
+        {
+            // normal 'outward' yönüne bakacak şekilde sar
+            if (Vector3.Dot(Vector3.Cross(b - a, c - a), outward) < 0f) mb.Tri(a, c, b, col);
+            else mb.Tri(a, b, c, col);
+        }
+
+        static void DoubleTri(MB mb, Vector3 a, Vector3 b, Vector3 c, Color col)
+        {
+            mb.Tri(a, b, c, col);
+            mb.Tri(a, c, b, col);
+        }
+
+        /// <summary>Duvara yaslı yarım ay raf: üst yüz yosun/toprak, ön yüz kaya, alta doğru duvara incelir.</summary>
+        static void Pocket(MB mb, Vector3 o, float w, float d, Color top, Color soil, Color rock)
+        {
+            const int n = 9;
+            var rim = new Vector3[n];
+            var low = new Vector3[n];
+            for (int i = 0; i < n; i++)
+            {
+                float a = i / (float)(n - 1) * Mathf.PI;
+                float j = R(0.88f, 1.1f);
+                rim[i] = o + new Vector3(Mathf.Cos(a) * w * j, R(-0.008f, 0.012f), -Mathf.Sin(a) * d * j + 0.04f);
+                low[i] = o + new Vector3(Mathf.Cos(a) * w * 0.55f, -R(0.1f, 0.15f), -Mathf.Sin(a) * d * 0.3f + 0.06f);
+            }
+            var center = o + new Vector3(0f, 0.012f, -d * 0.35f);
+            var backR = o + new Vector3(w * 0.95f, 0f, 0.32f);
+            var backL = o + new Vector3(-w * 0.95f, 0f, 0.32f);
+            // üst yüz (yelpaze)
+            for (int i = 0; i < n - 1; i++)
+            {
+                var col = Color.Lerp(top, soil, (i % 3 == 0) ? 0.35f : R(0f, 0.15f));
+                TriN(mb, center, rim[i], rim[i + 1], Vector3.up, Jitter(col, 0.03f));
+            }
+            TriN(mb, center, rim[n - 1], backL, Vector3.up, Jitter(top, 0.03f));
+            TriN(mb, center, backL, backR, Vector3.up, Jitter(top, 0.03f));
+            TriN(mb, center, backR, rim[0], Vector3.up, Jitter(top, 0.03f));
+            // ön/alt yüz: üstte ince toprak şeridi, altında kaya
+            var mid = o + new Vector3(0f, -0.06f, 0f);
+            for (int i = 0; i < n - 1; i++)
+            {
+                var outw = ((rim[i] + rim[i + 1] + low[i] + low[i + 1]) * 0.25f) - mid;
+                TriN(mb, rim[i], rim[i + 1], low[i], outw, Jitter(i % 2 == 0 ? soil : rock, 0.03f));
+                TriN(mb, rim[i + 1], low[i + 1], low[i], outw, Jitter(rock * 0.9f, 0.03f));
+            }
+            var tipLow = o + new Vector3(0f, -0.22f, 0.22f);
+            for (int i = 0; i < n - 1; i++)
+                TriN(mb, low[i], low[i + 1], tipLow, (low[i] + low[i + 1]) * 0.5f - (tipLow + Vector3.up * 0.1f), Jitter(rock * 0.75f, 0.03f));
+        }
+
+        /// <summary>Kıvrık, uca doğru incelen ve açıklaşan çimen yaprakları.</summary>
+        static void GrassTuft(MB mb, Vector3 p, float h, Color lo, Color hi)
+        {
+            int blades = Mathf.RoundToInt(R(5, 9));
+            for (int k = 0; k < blades; k++)
+            {
+                float t = (k + R(-0.3f, 0.3f)) / blades;
+                float ang = Mathf.Lerp(-0.7f, 0.7f, t);
+                var dir = new Vector3(Mathf.Sin(ang) * 0.55f, 1f, -0.25f + R(-0.1f, 0.1f)).normalized;
+                var bend = new Vector3(Mathf.Sin(ang) * 0.6f, -0.15f, -0.2f) * h * 0.35f;
+                float hh = h * R(0.7f, 1.2f);
+                var side = Vector3.Cross(dir, Vector3.back).normalized;
+                float bw = R(0.012f, 0.018f);
+                var b0 = p + side * bw; var b1 = p - side * bw;
+                var mc = p + dir * hh * 0.55f + bend * 0.4f;
+                var m0 = mc + side * bw * 0.7f; var m1 = mc - side * bw * 0.7f;
+                var tip = p + dir * hh + bend;
+                var cMid = Color.Lerp(lo, hi, 0.5f);
+                DoubleTri(mb, b0, m0, b1, Jitter(lo, 0.03f));
+                DoubleTri(mb, b1, m0, m1, Jitter(lo, 0.03f));
+                DoubleTri(mb, m0, tip, m1, Jitter(Color.Lerp(cMid, hi, R(0.3f, 0.8f)), 0.03f));
+            }
+        }
+
+        static void Stem(MB mb, Vector3 p, Vector3 top, Vector3 bend, Color col, bool leaves)
+        {
+            var mid = (p + top) * 0.5f + bend;
+            float w = 0.006f;
+            var s = Vector3.right * w;
+            DoubleTri(mb, p - s, mid, p + s, col);
+            DoubleTri(mb, mid - s, top, mid + s, col);
+            if (!leaves) return;
+            for (int k = 0; k < 2; k++)
+            {
+                var lp = Vector3.Lerp(p, mid, 0.5f + k * 0.4f);
+                float sgn = k == 0 ? -1f : 1f;
+                var tip = lp + new Vector3(sgn * 0.06f, 0.035f, -0.01f);
+                var mid2 = (lp + tip) * 0.5f;
+                var off = new Vector3(0f, 0.012f, -0.004f);
+                DoubleTri(mb, lp, mid2 + off, tip, Jitter(col * 1.1f, 0.04f));
+                DoubleTri(mb, lp, tip, mid2 - off, Jitter(col * 0.9f, 0.04f));
+            }
+        }
+
+        static void FlowerOf(MB mb, FlowerKind kind, Vector3 p, Color daisy, Color stemCol)
+        {
+            float h = R(0.12f, 0.22f);
+            var bend = new Vector3(R(-0.025f, 0.025f), 0f, -0.02f);
+            var top = p + new Vector3(R(-0.03f, 0.03f), h, -R(0.02f, 0.05f));
+            var face = new Vector3(0f, 0.55f, -1f).normalized;   // çiçek kameraya + biraz yukarı bakar
+            var right = Vector3.right;
+            var up = Vector3.Cross(face, right).normalized;
+            if (up.y < 0) up = -up;
+            switch (kind)
+            {
+                case FlowerKind.Daisy:
+                {
+                    Stem(mb, p, top, bend, stemCol, true);
+                    int pn = 9; float r = R(0.035f, 0.05f);
+                    for (int k = 0; k < pn; k++)
+                    {
+                        float a = k / (float)pn * Mathf.PI * 2f;
+                        var dir = right * Mathf.Cos(a) + up * Mathf.Sin(a);
+                        var perp = right * -Mathf.Sin(a) + up * Mathf.Cos(a);
+                        var root = top + dir * r * 0.25f;
+                        var tipP = top + dir * r - face * 0.006f;
+                        var midP = top + dir * r * 0.6f;
+                        var raised = midP - face * 0.008f;
+                        DoubleTri(mb, root, raised + perp * r * 0.16f, tipP, Jitter(daisy, 0.03f));
+                        DoubleTri(mb, root, tipP, raised - perp * r * 0.16f, Jitter(daisy * 0.93f, 0.03f));
+                    }
+                    Dome(mb, top - face * 0.006f, r * 0.32f, face, right, up, new Color(1f, 0.78f, 0.2f));
+                    break;
+                }
+                case FlowerKind.Poppy:
+                {
+                    Stem(mb, p, top, bend, stemCol, false);
+                    var red = Jitter(Color.Lerp(new Color(0.95f, 0.25f, 0.2f), new Color(1f, 0.45f, 0.35f), R()), 0.03f);
+                    if (daisy.b > 0.75f && daisy.r > 0.9f && daisy.g < 0.8f) red = new Color(1f, 0.55f, 0.7f); // pembe varyant
+                    float r = R(0.045f, 0.06f);
+                    for (int k = 0; k < 4; k++)
+                    {
+                        float a0 = (k - 0.45f) / 4f * Mathf.PI * 2f, a1 = (k + 0.45f) / 4f * Mathf.PI * 2f;
+                        Vector3 P(float a, float rr, float cup) => top + (right * Mathf.Cos(a) + up * Mathf.Sin(a)) * rr - face * cup;
+                        float am = (a0 + a1) * 0.5f;
+                        DoubleTri(mb, top, P(a0, r * 0.8f, 0.015f), P(am, r, 0.02f), red);
+                        DoubleTri(mb, top, P(am, r, 0.02f), P(a1, r * 0.8f, 0.015f), red * 0.9f);
+                    }
+                    Dome(mb, top - face * 0.008f, r * 0.25f, face, right, up, new Color(0.18f, 0.14f, 0.2f));
+                    break;
+                }
+                case FlowerKind.Lavender:
+                {
+                    Stem(mb, p, top, bend, stemCol, false);
+                    var purple = Color.Lerp(new Color(0.62f, 0.48f, 0.95f), new Color(0.78f, 0.62f, 1f), R());
+                    for (int k = 0; k < 6; k++)
+                    {
+                        var bp = Vector3.Lerp(p + (top - p) * 0.65f, top + Vector3.up * 0.03f, k / 5f) + bend * 0.3f;
+                        Ico(mb, bp, R(0.012f, 0.018f) * (1.2f - k * 0.08f), 1.4f, purple, purple * 0.8f);
+                    }
+                    break;
+                }
+                case FlowerKind.Bluebell:
+                {
+                    var hook = top + new Vector3(0.04f, 0.01f, -0.02f);
+                    Stem(mb, p, hook, bend, stemCol, true);
+                    var blue = new Color(0.45f, 0.55f, 1f);
+                    for (int k = 0; k < 3; k++)
+                    {
+                        var at = Vector3.Lerp(top - new Vector3(0, 0.04f, 0), hook, k / 2f) + Vector3.down * 0.02f;
+                        Bell(mb, at, R(0.018f, 0.024f), Vector3.down, Jitter(blue, 0.04f));
+                    }
+                    break;
+                }
+                case FlowerKind.Gentian:
+                {
+                    Stem(mb, p, top, bend, stemCol, true);
+                    Bell(mb, top, R(0.024f, 0.032f), (Vector3.up * 0.8f + face * 0.5f).normalized, Jitter(new Color(0.25f, 0.4f, 1f), 0.04f));
+                    break;
+                }
+                default: // Edelweiss: keçe gibi beyaz, sivri yıldız
+                {
+                    Stem(mb, p, top, bend, new Color(0.7f, 0.74f, 0.66f), true);
+                    int pn = 7; float r = R(0.04f, 0.055f);
+                    var felt = new Color(0.97f, 0.97f, 0.93f);
+                    for (int k = 0; k < pn; k++)
+                    {
+                        float a = k / (float)pn * Mathf.PI * 2f;
+                        var dir = right * Mathf.Cos(a) + up * Mathf.Sin(a);
+                        var perp = right * -Mathf.Sin(a) + up * Mathf.Cos(a);
+                        var tipP = top + dir * r;
+                        DoubleTri(mb, top + perp * r * 0.22f, tipP, top - perp * r * 0.22f, Jitter(felt, 0.03f));
+                    }
+                    Dome(mb, top - face * 0.006f, r * 0.3f, face, right, up, new Color(0.92f, 0.88f, 0.6f));
+                    break;
+                }
+            }
+        }
+
+        /// <summary>Yüze bakan küçük kubbe (çiçek göbeği).</summary>
+        static void Dome(MB mb, Vector3 c, float r, Vector3 face, Vector3 right, Vector3 up, Color col)
+        {
+            var tip = c - face * r * 0.8f;
+            const int n = 6;
+            for (int k = 0; k < n; k++)
+            {
+                float a0 = k / (float)n * Mathf.PI * 2f, a1 = (k + 1f) / n * Mathf.PI * 2f;
+                var p0 = c + (right * Mathf.Cos(a0) + up * Mathf.Sin(a0)) * r;
+                var p1 = c + (right * Mathf.Cos(a1) + up * Mathf.Sin(a1)) * r;
+                TriN(mb, p0, p1, tip, -face, Jitter(k % 2 == 0 ? col : col * 0.9f, 0.02f));
+            }
+        }
+
+        /// <summary>Çan / huni çiçek (açık ağız 'dir' yönüne bakar).</summary>
+        static void Bell(MB mb, Vector3 baseP, float r, Vector3 dir, Color col)
+        {
+            var axisR = Vector3.Cross(dir, Vector3.forward); if (axisR.sqrMagnitude < 1e-4f) axisR = Vector3.right; axisR.Normalize();
+            var axisU = Vector3.Cross(axisR, dir).normalized;
+            const int n = 6;
+            var mouth = baseP + dir * r * 1.6f;
+            for (int k = 0; k < n; k++)
+            {
+                float a0 = k / (float)n * Mathf.PI * 2f, a1 = (k + 1f) / n * Mathf.PI * 2f;
+                var p0 = mouth + (axisR * Mathf.Cos(a0) + axisU * Mathf.Sin(a0)) * r;
+                var p1 = mouth + (axisR * Mathf.Cos(a1) + axisU * Mathf.Sin(a1)) * r;
+                var lip = mouth + (axisR * Mathf.Cos((a0 + a1) * 0.5f) + axisU * Mathf.Sin((a0 + a1) * 0.5f)) * r * 1.35f + dir * r * 0.3f;
+                DoubleTri(mb, baseP, p0, p1, k % 2 == 0 ? col : col * 0.88f);
+                DoubleTri(mb, p0, lip, p1, col * 1.08f); // kıvrık taç yaprağı
+            }
+        }
+
+        static Vector3[] icoV; static int[] icoF;
+
+        /// <summary>Yumuşak low-poly yumru (1 kez bölünmüş ikosahedron): çalı, lavanta tomurcuğu.</summary>
+        static void Ico(MB mb, Vector3 c, float r, float squashY, Color top, Color side)
+        {
+            if (icoV == null)
+            {
+                float t = (1f + Mathf.Sqrt(5f)) / 2f;
+                var v = new List<Vector3>
+                {
+                    new Vector3(-1, t, 0), new Vector3(1, t, 0), new Vector3(-1, -t, 0), new Vector3(1, -t, 0),
+                    new Vector3(0, -1, t), new Vector3(0, 1, t), new Vector3(0, -1, -t), new Vector3(0, 1, -t),
+                    new Vector3(t, 0, -1), new Vector3(t, 0, 1), new Vector3(-t, 0, -1), new Vector3(-t, 0, 1),
+                };
+                int[] f0 =
+                {
+                    0,11,5, 0,5,1, 0,1,7, 0,7,10, 0,10,11, 1,5,9, 5,11,4, 11,10,2, 10,7,6, 7,1,8,
+                    3,9,4, 3,4,2, 3,2,6, 3,6,8, 3,8,9, 4,9,5, 2,4,11, 6,2,10, 8,6,7, 9,8,1,
+                };
+                var mid = new Dictionary<long, int>();
+                int Mid(int a, int b)
+                {
+                    long key = a < b ? ((long)a << 32) | (uint)b : ((long)b << 32) | (uint)a;
+                    if (mid.TryGetValue(key, out int i)) return i;
+                    v.Add((v[a] + v[b]) * 0.5f); mid[key] = v.Count - 1; return v.Count - 1;
+                }
+                var nf = new List<int>();
+                for (int i = 0; i < f0.Length; i += 3)
+                {
+                    int a = f0[i], b = f0[i + 1], cc = f0[i + 2];
+                    int ab = Mid(a, b), bc = Mid(b, cc), ca = Mid(cc, a);
+                    nf.AddRange(new[] { a, ab, ca, b, bc, ab, cc, ca, bc, ab, bc, ca });
+                }
+                for (int i = 0; i < v.Count; i++) v[i] = v[i].normalized;
+                icoV = v.ToArray(); icoF = nf.ToArray();
+            }
+            var pts = new Vector3[icoV.Length];
+            for (int i = 0; i < pts.Length; i++)
+            {
+                var n = icoV[i] * R(0.88f, 1.08f);
+                pts[i] = c + new Vector3(n.x * r, n.y * r * squashY, n.z * r);
+            }
+            for (int i = 0; i < icoF.Length; i += 3)
+            {
+                Vector3 a = pts[icoF[i]], b = pts[icoF[i + 1]], e = pts[icoF[i + 2]];
+                var ctr = (a + b + e) / 3f;
+                var nrm = (ctr - c).normalized;
+                var col = Color.Lerp(side, top, Mathf.Clamp01(nrm.y * 0.8f + 0.4f));
+                TriN(mb, a, b, e, ctr - c, Jitter(col, 0.03f));
+            }
+        }
+
+        /// <summary>Rafın ön kenarından duvar boyunca sarkan yapraklı sarmaşık.</summary>
+        static void Vine(MB mb, Vector3 p, float len, Color lo, Color hi)
+        {
+            int segs = Mathf.RoundToInt(len / 0.06f);
+            var prev = p;
+            for (int k = 1; k <= segs; k++)
+            {
+                float t = k / (float)segs;
+                var cur = p + new Vector3(Mathf.Sin(t * 5f + p.x * 3f) * 0.03f, -len * t, 0.03f * t);
+                DoubleTri(mb, prev + Vector3.right * 0.004f, cur, prev - Vector3.right * 0.004f, lo * 0.9f);
+                float sgn = k % 2 == 0 ? 1f : -1f;
+                var leafTip = cur + new Vector3(sgn * 0.045f, -0.01f, -0.01f);
+                var leafMid = (cur + leafTip) * 0.5f;
+                var col = Color.Lerp(lo, hi, R(0.2f, 0.7f));
+                DoubleTri(mb, cur, leafMid + new Vector3(0, 0.014f, -0.004f), leafTip, Jitter(col, 0.03f));
+                DoubleTri(mb, cur, leafTip, leafMid + new Vector3(0, -0.014f, -0.004f), Jitter(col * 0.88f, 0.03f));
+                prev = cur;
             }
         }
 

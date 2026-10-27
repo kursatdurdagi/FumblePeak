@@ -13,24 +13,12 @@ namespace FumblePeak
     [RequireComponent(typeof(UIDocument))]
     public class GameHUD : MonoBehaviour
     {
-        VisualElement root, roster, toast, summit, pause, limbPanel, lobbyRow;
+        VisualElement root, roster, toast, summit, pause, lobbyRow;
         Label toastText, controls, lobbyCode, lobbyLabel, pauseHint;
         Button btnInvite, btnLobby;
         IVisualElementScheduledItem toastHide;
         UILocalizer loc;
         bool paused, single;
-        int lastPanelHash = -2;
-        readonly VisualElement[] limbCards = new VisualElement[4];
-        readonly Label[] limbNames = new Label[4];
-        readonly Label[] limbStates = new Label[4];
-        static readonly string[] LimbKeys = { "Q", "E", "A", "D" };
-
-        // ---- Kısa eğitim (ilk oyunda) ----
-        VisualElement tutorial;
-        Label tutorialText;
-        int tutStep = -1;
-        float tutStartY, tutTimer;
-        const string TutKey = "fp_tutorial_done";
 
         void OnEnable()
         {
@@ -50,7 +38,9 @@ namespace FumblePeak
             pauseHint = root.Q<Label>("pause-hint");
             btnInvite = root.Q<Button>("btn-invite");
             btnLobby = root.Q<Button>("btn-lobby");
-            limbPanel = root.Q("limb-panel");
+            // Eski uzuv paneli ve eğitim sekmesi artık yok (sürükle-bırak kontroller)
+            root.Q("limb-panel")?.RemoveFromHierarchy();
+            root.Q("tutorial")?.RemoveFromHierarchy();
             single = FumbleNetworkManager.IsSinglePlayer;
 
             loc = new UILocalizer(root);
@@ -63,16 +53,10 @@ namespace FumblePeak
             btnLobby.clicked += ReturnToLobby;
             root.Q<Button>("btn-leave").clicked += Leave;
 
-            foreach (var l in new[] { roster, toast, summit, controls, limbPanel }) l.pickingMode = PickingMode.Ignore;
+            foreach (var l in new[] { roster, toast, summit, controls }) l.pickingMode = PickingMode.Ignore;
             toast.Query<VisualElement>().ForEach(e => e.pickingMode = PickingMode.Ignore);
             summit.Query<VisualElement>().ForEach(e => e.pickingMode = PickingMode.Ignore);
 
-            BuildLimbPanel();
-            tutorial = root.Q("tutorial");
-            tutorialText = root.Q<Label>("tutorial-text");
-            tutorial.pickingMode = PickingMode.Ignore;
-            tutorialText.pickingMode = PickingMode.Ignore;
-            if (PlayerPrefs.GetInt(TutKey, 0) == 0) root.schedule.Execute(() => SetTutorial(0)).StartingIn(2500);
             RefreshTexts();
 
             FumblePlayer.RosterChanged += RebuildRoster;
@@ -82,6 +66,7 @@ namespace FumblePeak
             ClimberBody.OnCheckpointReached += OnCheckpoint;
             ClimberBody.OnSummitReached += OnSummit;
             ClimberBody.OnLimbGaveUp += OnGaveUp;
+            ClimberBody.OnLimbSlipped += OnSlipped;
 
             root.schedule.Execute(() => controls.AddToClassList("controls--faded")).StartingIn(14000);
             root.schedule.Execute(RebuildRoster).StartingIn(300);
@@ -98,6 +83,7 @@ namespace FumblePeak
             ClimberBody.OnCheckpointReached -= OnCheckpoint;
             ClimberBody.OnSummitReached -= OnSummit;
             ClimberBody.OnLimbGaveUp -= OnGaveUp;
+            ClimberBody.OnLimbSlipped -= OnSlipped;
             FumblePlayer.InputBlocked = false;
             Time.timeScale = 1f;
         }
@@ -106,9 +92,6 @@ namespace FumblePeak
         {
             controls.text = L.T("hud.controls", single ? L.T("hud.esc_pause") : L.T("hud.esc_menu"));
             pauseHint.text = single ? L.T("hud.paused_single") : L.T("hud.paused_coop");
-            if (tutStep >= 0 && tutStep <= 2) tutorialText.text = L.T("tut." + (tutStep + 1));
-            for (int i = 0; i < 4; i++) limbNames[i].text = LimbUtil.Name(i);
-            lastPanelHash = -2;
             RebuildRoster();
         }
 
@@ -119,37 +102,6 @@ namespace FumblePeak
             if ((kb != null && kb.escapeKey.wasPressedThisFrame) || (pad != null && pad.startButton.wasPressedThisFrame))
                 SetPaused(!paused);
             if (kb != null && kb.hKey.wasPressedThisFrame) controls.ToggleInClassList("controls--faded");
-            UpdateLimbPanel();
-            UpdateTutorial();
-        }
-
-        void SetTutorial(int step)
-        {
-            tutStep = step;
-            tutTimer = 0f;
-            if (step < 0 || step > 2) { tutorial.RemoveFromClassList("tutorial--show"); return; }
-            tutorialText.text = L.T("tut." + (step + 1));
-            tutorial.AddToClassList("tutorial--show");
-            if (step == 0 && ClimberBody.Instance != null) tutStartY = ClimberBody.Instance.TorsoPos.y;
-        }
-
-        void UpdateTutorial()
-        {
-            if (tutStep < 0) return;
-            var body = ClimberBody.Instance;
-            var me = FumblePlayer.Local;
-            if (body == null || me == null) return;
-            tutTimer += Time.unscaledDeltaTime;
-            bool anyMineGrabbed = false;
-            for (int i = 0; i < 4; i++) if (LimbUtil.Has(me.limbMask, i) && body.IsGrabbing(i)) anyMineGrabbed = true;
-            if (tutStep == 0 && anyMineGrabbed) SetTutorial(1);
-            else if (tutStep == 1 && body.TorsoPos.y > tutStartY + 1.2f) SetTutorial(2);
-            else if (tutStep == 2 && tutTimer > 5f)
-            {
-                SetTutorial(-1);
-                PlayerPrefs.SetInt(TutKey, 1);
-                PlayerPrefs.Save();
-            }
         }
 
         // ---------------- Duraklat ----------------
@@ -216,67 +168,10 @@ namespace FumblePeak
                     if (!LimbUtil.Has(p.limbMask, i)) continue;
                     var chip = new Label(LimbUtil.Name(i)) { pickingMode = PickingMode.Ignore };
                     chip.AddToClassList("limb-chip");
-                    if (p.ActiveLimb == i && CountBits(p.limbMask) > 1) chip.AddToClassList("limb-chip--active");
+                    if (p.ActiveLimb == i && ClimberBody.Instance != null && ClimberBody.Instance.IsDragged(i)) chip.AddToClassList("limb-chip--active");
                     item.Add(chip);
                 }
                 roster.Add(item);
-            }
-        }
-
-        // ---------------- Uzuv paneli ----------------
-        void BuildLimbPanel()
-        {
-            limbPanel.Clear();
-            for (int i = 0; i < 4; i++)
-            {
-                var card = new VisualElement { pickingMode = PickingMode.Ignore };
-                card.AddToClassList("limb-card");
-                var key = new Label(LimbKeys[i]) { pickingMode = PickingMode.Ignore };
-                key.AddToClassList("limb-card__key");
-                var col = new VisualElement { pickingMode = PickingMode.Ignore };
-                var name = new Label(LimbUtil.Name(i)) { pickingMode = PickingMode.Ignore };
-                name.AddToClassList("limb-card__name");
-                var state = new Label("") { pickingMode = PickingMode.Ignore };
-                state.AddToClassList("limb-card__state");
-                col.Add(name); col.Add(state);
-                card.Add(key); card.Add(col);
-                limbPanel.Add(card);
-                limbCards[i] = card;
-                limbNames[i] = name;
-                limbStates[i] = state;
-            }
-        }
-
-        void UpdateLimbPanel()
-        {
-            var me = FumblePlayer.Local;
-            var body = ClimberBody.Instance;
-            bool show = me != null && body != null && CountBits(me.limbMask) > 1;
-            int hash = -1;
-            if (show)
-            {
-                hash = me.limbMask | (me.ActiveLimb << 4);
-                for (int i = 0; i < 4; i++)
-                {
-                    if (body.IsGrabbing(i)) hash |= 1 << (8 + i);
-                    if (body.IsFist(i)) hash |= 1 << (12 + i);
-                }
-            }
-            if (hash == lastPanelHash) return; // değişmediyse UI'a dokunma
-            lastPanelHash = hash;
-
-            limbPanel.style.display = show ? DisplayStyle.Flex : DisplayStyle.None;
-            if (!show) return;
-            for (int i = 0; i < 4; i++)
-            {
-                bool mine = LimbUtil.Has(me.limbMask, i);
-                limbCards[i].style.display = mine ? DisplayStyle.Flex : DisplayStyle.None;
-                if (!mine) continue;
-                limbCards[i].EnableInClassList("limb-card--active", me.ActiveLimb == i);
-                bool grab = body.IsGrabbing(i), fist = body.IsFist(i);
-                limbStates[i].text = grab ? L.T("hud.state_grab") : fist ? L.T("hud.state_fist") : L.T("hud.state_free");
-                limbStates[i].EnableInClassList("limb-card__state--grab", grab);
-                limbStates[i].EnableInClassList("limb-card__state--fist", fist);
             }
         }
 
@@ -308,6 +203,14 @@ namespace FumblePeak
             var text = L.T("hud.gave_up", LimbUtil.Name(limb));
             if (owner != null && !single) text += $" ({owner.playerName})";
             ShowToast(text, 1.8f);
+        }
+
+        void OnSlipped(int limb)
+        {
+            var owner = FumblePlayer.OwnerOf(limb);
+            var text = L.T("hud.slipped", LimbUtil.Name(limb));
+            if (owner != null && !single) text += $" ({owner.playerName})";
+            ShowToast(text, 1.6f);
         }
 
         void OnSummit()

@@ -521,8 +521,9 @@ MonoBehaviour:
   - SectionId: 42099039
     EntryId: 62715655
     Key: hud.controls
-    Value: "MAUS greifen  \xB7  LINKSKLICK festhalten  \xB7  RECHTSKLICK loslassen 
-      \xB7  Q/E/A/D w\xE4hlen  \xB7  H ausblenden  \xB7  ESC {0}"
+    Value: "Hand/Fu\xDF anfahren  \xB7  LINKE MAUSTASTE halten und ziehen  \xB7 
+      auf einem Stein loslassen zum Greifen  \xB7  zu fest ziehen und die anderen
+      rutschen ab!  \xB7  H ausblenden  \xB7  ESC {0}"
   - SectionId: 42099039
     EntryId: 79326119
     Key: hud.esc_pause
@@ -657,3 +658,7 @@ MonoBehaviour:
     EntryId: 29175290
     Key: menu.scream
     Value: AAAAAAH!
+  - SectionId: 42099039
+    EntryId: 27427525
+    Key: hud.slipped
+    Value: '{0} rutscht ab!'
