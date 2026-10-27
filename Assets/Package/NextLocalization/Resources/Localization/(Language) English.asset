@@ -682,3 +682,40 @@ MonoBehaviour:
       Is the IP you typed ({0}) the 'local IP' shown on the host's menu?\n\u2022
       Does the host's firewall allow incoming connections for Fumble Peak / Unity?
       (UDP {1})"
+  - SectionId: 47142713
+    EntryId: 92538405
+    Key: msg.local_network
+    Value: "This computer can't reach devices on the local network.\nmacOS: System
+      Settings \u2192 Privacy & Security \u2192 Local Network \u2192 turn Unity ON,
+      then restart Unity.\nWindows: allow Unity Editor on 'Private networks' in the
+      firewall."
+  - SectionId: 47142713
+    EntryId: 78364574
+    Key: msg.reject_old
+    Value: didn't respond (may be an old project version)
+  - SectionId: 47142713
+    EntryId: 20820983
+    Key: msg.reject_version
+    Value: different version ({0})
+  - SectionId: 63891677
+    EntryId: 63586406
+    Key: lobby.attempt
+    Value: '{0} is connecting...'
+  - SectionId: 63891677
+    EntryId: 63627059
+    Key: lobby.rejected
+    Value: '{0} couldn''t join: {1}'
+  - SectionId: 98072823
+    EntryId: 75511719
+    Key: mp.lan_lobby
+    Value: Lobby on your network
+  - SectionId: 98072823
+    EntryId: 29113741
+    Key: mp.lan_searching
+    Value: 'Searching for open lobbies on your Wi-Fi...
+
+      If none shows up,
+      type the host''s IP and press ''CONNECT VIA IP''.
+
+      (With Steam running,
+      friends and invites appear here too.)'

@@ -1,0 +1,9 @@
+t=2 connected=False scene=MainMenu
+discover...
+t=19 connected=False scene=MainMenu
+found 192.168.1.238 kcp://192.168.1.238:7777/
+ready
+t=21 connected=True scene=MainMenu slot=1 mask=6 ready=True active=1 players=2
+t=23 connected=True scene=MainMenu slot=1 mask=6 ready=True active=1 players=2
+t=25 connected=True scene=MainMenu slot=1 mask=6 ready=True active=1 players=2
+t=27 connected=True scene=MainMenu slot=1 mask=6 ready=True active=1 players=2

@@ -678,3 +678,36 @@ MonoBehaviour:
       Hat der Host 'Per IP hosten' gedr\xFCckt, ist die Lobby offen?\n\u2022 Ist
       die IP ({0}) die 'lokale IP' im Men\xFC des Hosts?\n\u2022 Erlaubt die Firewall
       des Hosts eingehende Verbindungen f\xFCr Fumble Peak / Unity? (UDP {1})"
+  - SectionId: 47142713
+    EntryId: 92538405
+    Key: msg.local_network
+    Value: "Dieser Computer erreicht keine Ger\xE4te im lokalen Netz.\nmacOS: Systemeinstellungen
+      \u2192 Datenschutz & Sicherheit \u2192 Lokales Netzwerk \u2192 Unity EIN, dann
+      Unity neu starten.\nWindows: Unity Editor in der Firewall f\xFCr 'Private Netzwerke'
+      erlauben."
+  - SectionId: 47142713
+    EntryId: 78364574
+    Key: msg.reject_old
+    Value: keine Antwort (evtl. alte Projektversion)
+  - SectionId: 47142713
+    EntryId: 20820983
+    Key: msg.reject_version
+    Value: andere Version ({0})
+  - SectionId: 63891677
+    EntryId: 63586406
+    Key: lobby.attempt
+    Value: '{0} verbindet...'
+  - SectionId: 63891677
+    EntryId: 63627059
+    Key: lobby.rejected
+    Value: '{0} konnte nicht beitreten: {1}'
+  - SectionId: 98072823
+    EntryId: 75511719
+    Key: mp.lan_lobby
+    Value: Lobby in deinem Netz
+  - SectionId: 98072823
+    EntryId: 29113741
+    Key: mp.lan_searching
+    Value: "Suche offene Lobbys im WLAN...\nWenn keine erscheint, Host-IP eingeben
+      und '\xDCBER IP VERBINDEN' dr\xFCcken.\n(Mit Steam erscheinen hier auch Freunde
+      und Einladungen.)"

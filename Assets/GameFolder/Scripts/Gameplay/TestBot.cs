@@ -44,6 +44,20 @@ namespace FumblePeak
                 joinRequested = true;
                 // fp_bot.txt içine IP yazılırsa oraya bağlanır (LAN testi), boşsa localhost
                 var ip = File.ReadAllText(Path.Combine(dir, "fp_bot.txt")).Trim();
+                if (ip == "discover" && nm.discovery != null)
+                {
+                    // LAN keşfi testi: yayınla, bulunan ilk lobiye bağlan
+                    Log("discover...");
+                    nm.discovery.OnServerFound.AddListener(r =>
+                    {
+                        if (NetworkClient.active) return;
+                        Log("found " + r.EndPoint.Address + " " + r.uri);
+                        nm.discovery.StopSearch();
+                        nm.JoinLocal(r.EndPoint.Address.ToString());
+                    });
+                    nm.discovery.Search();
+                    return;
+                }
                 if (string.IsNullOrEmpty(ip)) ip = "127.0.0.1";
                 Log("join " + ip);
                 nm.JoinLocal(ip);

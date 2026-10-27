@@ -667,4 +667,39 @@ MonoBehaviour:
       \u0130LE LOB\u0130 KUR' dedi mi, lobi a\xE7\u0131k m\u0131?\n\u2022 Yazd\u0131\u011F\u0131n
       IP ({0}) host'un men\xFCde g\xF6rd\xFC\u011F\xFC 'yerel IP' ile ayn\u0131 m\u0131?\n\u2022
       Host'un bilgisayar\u0131nda g\xFCvenlik duvar\u0131 Fumble Peak / Unity'ye
-      gelen ba\u011Flant\u0131ya izin veriyor mu? (UDP {1})"
+      gelen ba\u011Flant\u0131ya izin veriyor mu? (UDP {1})\n\u2022 macOS: Sistem
+      Ayarlar\u0131 \u2192 Gizlilik ve G\xFCvenlik \u2192 Yerel A\u011F \u2192 Unity
+      a\xE7\u0131k m\u0131? (iki bilgisayarda da)"
+  - SectionId: 47142713
+    EntryId: 92538405
+    Key: msg.local_network
+    Value: "Bu bilgisayar yerel a\u011Fdaki cihazlara eri\u015Femiyor.\nmacOS: Sistem
+      Ayarlar\u0131 \u2192 Gizlilik ve G\xFCvenlik \u2192 Yerel A\u011F \u2192 Unity'yi
+      A\xC7, sonra Unity'yi yeniden ba\u015Flat.\nWindows: g\xFCvenlik duvar\u0131nda
+      Unity Editor'a '\xD6zel a\u011F' izni ver."
+  - SectionId: 47142713
+    EntryId: 78364574
+    Key: msg.reject_old
+    Value: "yan\u0131t vermedi (projenin eski hali olabilir)"
+  - SectionId: 47142713
+    EntryId: 20820983
+    Key: msg.reject_version
+    Value: "s\xFCr\xFCm\xFC farkl\u0131 ({0})"
+  - SectionId: 63891677
+    EntryId: 63586406
+    Key: lobby.attempt
+    Value: "{0} ba\u011Flan\u0131yor..."
+  - SectionId: 63891677
+    EntryId: 63627059
+    Key: lobby.rejected
+    Value: '{0} giremedi: {1}'
+  - SectionId: 98072823
+    EntryId: 75511719
+    Key: mp.lan_lobby
+    Value: "Ayn\u0131 a\u011Fdaki lobi"
+  - SectionId: 98072823
+    EntryId: 29113741
+    Key: mp.lan_searching
+    Value: "Ayn\u0131 Wi-Fi'da a\xE7\u0131k lobi aran\u0131yor...\nG\xF6r\xFCnm\xFCyorsa
+      host'un IP'sini yaz\u0131p 'IP \u0130LE BA\u011ELAN'a bas.\n(Steam a\xE7\u0131ksa
+      arkada\u015F listesi ve davetler de burada g\xF6r\xFCn\xFCr.)"

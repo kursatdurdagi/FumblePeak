@@ -53,6 +53,9 @@ namespace FumblePeak
         Resolution[] resolutions;
 
         FumbleNetworkManager NM => FumbleNetworkManager.Instance;
+        // Aynı ağda bulunan lobiler (serverId → adres, son görülme)
+        readonly Dictionary<long, (string host, float seen)> lanLobbies = new Dictionary<long, (string, float)>();
+        bool discovering;
         SteamLobby Steam => SteamLobby.Instance;
         bool SteamOk => Steam != null && Steam.IsReady;
 
@@ -92,6 +95,9 @@ namespace FumblePeak
         {
             loc?.Dispose();
             MenuCharacter.Say -= OnSay;
+            FumbleAuthenticator.ServerAttempt -= OnServerAttempt;
+            FumbleAuthenticator.ServerRejected -= OnServerRejected;
+            SetLanDiscovery(false);
             FumblePlayer.RosterChanged -= OnRoster;
             FumblePlayer.PlayerJoined -= OnPlayerJoined;
             FumblePlayer.PlayerLeft -= OnPlayerLeft;
@@ -218,6 +224,8 @@ namespace FumblePeak
                 if (w > 1 && bg != null) bg.Parallax = e.position.x / w - 0.5f;
             });
 
+            FumbleAuthenticator.ServerAttempt += OnServerAttempt;
+            FumbleAuthenticator.ServerRejected += OnServerRejected;
             FumblePlayer.RosterChanged += OnRoster;
             FumblePlayer.PlayerJoined += OnPlayerJoined;
             FumblePlayer.PlayerLeft += OnPlayerLeft;
@@ -399,6 +407,7 @@ namespace FumblePeak
             panelBrowser.EnableInClassList("panel--hidden", !multi);
             panelHowto.EnableInClassList("panel--hidden", multi);
             if (multi) RefreshBrowser(true);
+            SetLanDiscovery(multi);
         }
 
         // =====================================================================
@@ -480,6 +489,7 @@ namespace FumblePeak
 
         void OnJoinIp()
         {
+            SetLanDiscovery(false);
             var ip = string.IsNullOrWhiteSpace(fieldIp.value) ? "localhost" : fieldIp.value.Trim();
             PlayerProfile.LastIp = ip;
             ShowBusy(L.T("msg.connecting"), L.T("msg.connecting_to", ip), true);
@@ -527,6 +537,7 @@ namespace FumblePeak
         // Lobi
         void ShowLobby()
         {
+            SetLanDiscovery(false);
             HideModal();
             waitingConnection = false;
             state = State.Lobby;
@@ -576,6 +587,9 @@ namespace FumblePeak
             if (state == State.Lobby) RebuildLobby();
             else if (current == pageMulti) RefreshBrowser(false);
         }
+
+        void OnServerAttempt(string addr) { if (state == State.Lobby) Toast(L.T("lobby.attempt", addr)); }
+        void OnServerRejected(string addr, string why) { if (state == State.Lobby) Toast(L.T("lobby.rejected", addr, why)); }
 
         void OnPlayerJoined(string name) { if (state == State.Lobby) Toast(L.T("lobby.joined", name)); }
         void OnPlayerLeft(string name) { if (state == State.Lobby) Toast(L.T("lobby.left", name)); }
@@ -715,17 +729,62 @@ namespace FumblePeak
 
         // =====================================================================
         // Steam arkadaşları / açık lobiler
+        // ---------------- Aynı ağdaki lobiler (LAN keşfi) ----------------
+        void SetLanDiscovery(bool on)
+        {
+            var d = NM != null ? NM.discovery : null;
+            if (d == null || on == discovering) return;
+            discovering = on;
+            if (on)
+            {
+                lanLobbies.Clear();
+                d.OnServerFound.RemoveListener(OnLanFound);
+                d.OnServerFound.AddListener(OnLanFound);
+                d.Search();
+            }
+            else if (!NetworkServer.active) d.StopSearch(); // host'un ilanını kesme
+        }
+
+        void OnLanFound(Mirror.Discovery.ServerResponse r)
+        {
+            bool isNew = !lanLobbies.ContainsKey(r.serverId);
+            lanLobbies[r.serverId] = (r.EndPoint.Address.ToString(), Time.unscaledTime);
+            if (isNew && current == pageMulti) RefreshBrowser(false);
+        }
+
+        void AddLanEntries()
+        {
+            foreach (var kv in lanLobbies)
+            {
+                if (Time.unscaledTime - kv.Value.seen > 10f) continue;
+                string host = kv.Value.host;
+                browserList.Add(Entry(null, L.T("mp.lan_lobby"), host, true, () =>
+                {
+                    fieldIp.value = host;
+                    OnJoinIp();
+                }));
+            }
+        }
+
+        int LanCount()
+        {
+            int n = 0;
+            foreach (var kv in lanLobbies) if (Time.unscaledTime - kv.Value.seen <= 10f) n++;
+            return n;
+        }
+
         void RefreshBrowser(bool force)
         {
-            nextBrowserRefresh = Time.unscaledTime + 6f;
+            nextBrowserRefresh = Time.unscaledTime + (SteamOk ? 6f : 2f);
             tabFriends.EnableInClassList("tab--active", !browserShowsPublic);
             tabPublic.EnableInClassList("tab--active", browserShowsPublic);
 
             if (!SteamOk)
             {
                 browserList.Clear();
-                browserEmpty.text = L.T("mp.nosteam");
-                browserEmpty.style.display = DisplayStyle.Flex;
+                AddLanEntries();
+                browserEmpty.text = L.T("mp.lan_searching");
+                browserEmpty.style.display = LanCount() == 0 ? DisplayStyle.Flex : DisplayStyle.None;
                 return;
             }
 
@@ -733,6 +792,7 @@ namespace FumblePeak
             {
                 var friends = Steam.GetPlayingFriends();
                 browserList.Clear();
+                AddLanEntries();
                 foreach (var f in friends)
                 {
                     ulong lobbyId = f.lobby;

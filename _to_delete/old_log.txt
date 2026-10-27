@@ -1,0 +1,35 @@
+t=2 connected=False scene=MainMenu
+discover...
+t=9 connected=False scene=MainMenu
+t=11 connected=False scene=MainMenu
+t=13 connected=False scene=MainMenu
+t=15 connected=False scene=MainMenu
+t=17 connected=False scene=MainMenu
+t=19 connected=False scene=MainMenu
+t=21 connected=False scene=MainMenu
+t=23 connected=False scene=MainMenu
+t=25 connected=False scene=MainMenu
+t=27 connected=False scene=MainMenu
+discover...
+t=29 connected=False scene=MainMenu
+t=31 connected=False scene=MainMenu
+t=33 connected=False scene=MainMenu
+t=35 connected=False scene=MainMenu
+t=37 connected=False scene=MainMenu
+discover...
+t=39 connected=False scene=MainMenu
+t=41 connected=False scene=MainMenu
+t=43 connected=False scene=MainMenu
+t=45 connected=False scene=MainMenu
+t=47 connected=False scene=MainMenu
+discover...
+t=49 connected=False scene=MainMenu
+t=51 connected=False scene=MainMenu
+t=53 connected=False scene=MainMenu
+t=55 connected=False scene=MainMenu
+t=57 connected=False scene=MainMenu
+discover...
+t=59 connected=False scene=MainMenu
+t=61 connected=False scene=MainMenu
+t=63 connected=False scene=MainMenu
+t=65 connected=False scene=MainMenu

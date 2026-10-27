@@ -314,6 +314,11 @@ namespace FumblePeak.EditorTools
             var nm = nmGo.AddComponent<FumbleNetworkManager>();
             nmGo.AddComponent<SteamLobby>();
             nm.authenticator = nmGo.AddComponent<FumbleAuthenticator>(); // sürüm / lobi dolu kontrolü
+            var disc = nmGo.AddComponent<FumbleDiscovery>();  // aynı Wi-Fi'daki lobileri bulma
+            disc.transport = kcp;
+            disc.secretHandshake = 0x46756D626C65L; // "Fumble": tüm kopyalarda aynı olmalı
+            disc.enableActiveDiscovery = true;
+            nm.discovery = disc;
             nm.transport = kcp;
             nm.localTransport = kcp;
             nm.playerPrefab = player;

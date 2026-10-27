@@ -24,6 +24,8 @@ namespace FumblePeak
         public Transport localTransport;   // KCP
         [Scene] public string gameScene;
         [HideInInspector] public Transport steamTransport; // SteamLobby tarafından eklenir
+        [Tooltip("Aynı ağdaki lobileri otomatik bulma (UDP yayın)")]
+        public FumbleDiscovery discovery;
 
         /// <summary>Ana menüde gösterilecek bekleyen mesaj (lokalize).</summary>
         public static string PendingMenuMessage;
@@ -93,6 +95,8 @@ namespace FumblePeak
             NetworkServer.listen = true;
             UseTransport(localTransport);
             StartHost();
+            // aynı Wi-Fi'daki oyuncular lobiyi listede görsün
+            if (discovery != null) { discovery.StopSearch(); discovery.AdvertiseServer(); }
         }
 
         public void JoinLocal(string address)
@@ -256,6 +260,7 @@ namespace FumblePeak
 
         public override void OnStopServer()
         {
+            if (discovery != null) discovery.StopDiscovery();
             serverPlayers.Clear();
             base.OnStopServer();
         }
@@ -294,7 +299,14 @@ namespace FumblePeak
         {
             base.OnClientError(error, reason);
             if (!intentionalLeave && string.IsNullOrEmpty(PendingMenuMessage))
-                PendingMenuMessage = (wasConnected ? L.T("msg.disconnected") : L.T("msg.unreachable")) + "\n(" + reason + ")";
+            {
+                // macOS "Yerel Ağ" izni kapalıysa / ağ cihazları ayırıyorsa soket "No route to host" verir
+                string r = (reason ?? "").ToLowerInvariant();
+                bool blocked = r.Contains("no route") || r.Contains("unreachable") || r.Contains("host is down") || r.Contains("permission") || r.Contains("not permitted");
+                PendingMenuMessage = blocked
+                    ? L.T("msg.local_network") + "\n(" + reason + ")"
+                    : (wasConnected ? L.T("msg.disconnected") : L.T("msg.unreachable")) + "\n(" + reason + ")";
+            }
         }
 
         public override void OnClientChangeScene(string newSceneName, SceneOperation sceneOperation, bool customHandling)

@@ -152,6 +152,10 @@ MonoBehaviour:
       Key: players
     - Id: 28857021
       Key: loading
+    - Id: 75511719
+      Key: lan_lobby
+    - Id: 29113741
+      Key: lan_searching
   - Id: 63891677
     SectionName: lobby
     SectionSheet:
@@ -211,6 +215,10 @@ MonoBehaviour:
       Key: joined
     - Id: 56325874
       Key: left
+    - Id: 63586406
+      Key: attempt
+    - Id: 63627059
+      Key: rejected
   - Id: 65552459
     SectionName: settings
     SectionSheet:
@@ -301,6 +309,12 @@ MonoBehaviour:
       Key: lobby_full
     - Id: 62867486
       Key: join_tips
+    - Id: 92538405
+      Key: local_network
+    - Id: 78364574
+      Key: reject_old
+    - Id: 20820983
+      Key: reject_version
   - Id: 42099039
     SectionName: hud
     SectionSheet:

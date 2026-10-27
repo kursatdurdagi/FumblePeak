@@ -20,11 +20,33 @@ namespace FumblePeak
 
         const byte Ok = 0, BadVersion = 1, Full = 2;
 
+        /// <summary>Host tarafı: bir bağlantı denemesi geldi (adres).</summary>
+        public static event System.Action<string> ServerAttempt;
+        /// <summary>Host tarafı: bağlantı reddedildi (adres, sebep metni).</summary>
+        public static event System.Action<string, string> ServerRejected;
+        const float AuthTimeout = 6f;
+
         // ---------------- Sunucu ----------------
         public override void OnStartServer() => NetworkServer.RegisterHandler<AuthRequest>(OnAuthRequest, false);
         public override void OnStopServer() => NetworkServer.UnregisterHandler<AuthRequest>();
 
-        public override void OnServerAuthenticate(NetworkConnectionToClient conn) { /* istemcinin mesajını bekle */ }
+        public override void OnServerAuthenticate(NetworkConnectionToClient conn)
+        {
+            // istemcinin sürüm mesajını bekle; gelmezse (eski sürüm) reddet
+            if (conn.connectionId != NetworkConnection.LocalConnectionId) ServerAttempt?.Invoke(conn.address);
+            StartCoroutine(AuthTimeoutRoutine(conn));
+        }
+
+        IEnumerator AuthTimeoutRoutine(NetworkConnectionToClient conn)
+        {
+            yield return new WaitForSecondsRealtime(AuthTimeout);
+            if (conn != null && !conn.isAuthenticated && NetworkServer.connections.ContainsKey(conn.connectionId))
+            {
+                ServerRejected?.Invoke(conn.address, L.T("msg.reject_old"));
+                conn.Send(new AuthResponse { code = BadVersion, hostVersion = Version });
+                StartCoroutine(RejectLater(conn));
+            }
+        }
 
         void OnAuthRequest(NetworkConnectionToClient conn, AuthRequest msg)
         {
@@ -33,6 +55,7 @@ namespace FumblePeak
             else if (NetworkServer.connections.Count > 4) code = Full;
 
             conn.Send(new AuthResponse { code = code, hostVersion = Version });
+            if (code != Ok) ServerRejected?.Invoke(conn.address, code == BadVersion ? L.T("msg.reject_version", msg.version) : L.T("msg.lobby_full"));
             if (code == Ok) ServerAccept(conn);
             else StartCoroutine(RejectLater(conn));
         }
