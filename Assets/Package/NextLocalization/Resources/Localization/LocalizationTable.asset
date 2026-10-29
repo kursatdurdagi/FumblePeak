@@ -410,6 +410,18 @@ MonoBehaviour:
       Key: nest_hit
     - Id: 99383229
       Key: crumble
+    - Id: 13991157
+      Key: pest_goat
+    - Id: 60601024
+      Key: goat_stubborn
+    - Id: 39005798
+      Key: goat_hit
+    - Id: 61407962
+      Key: pest_monkey
+    - Id: 59618765
+      Key: banana_throw
+    - Id: 25986065
+      Key: banana_slip
   - Id: 90629069
     SectionName: limb
     SectionSheet:

@@ -807,3 +807,27 @@ MonoBehaviour:
     EntryId: 99383229
     Key: hud.crumble
     Value: "Der Stein br\xF6ckelt! Trau keinen rissigen Steinen."
+  - SectionId: 42099039
+    EntryId: 13991157
+    Key: hud.pest_goat
+    Value: Eine Bergziege! Sie starrt dich an... hau sie mit einem Glied weg!
+  - SectionId: 42099039
+    EntryId: 60601024
+    Key: hud.goat_stubborn
+    Value: "Die Ziege ist stur, sie kommt zur\xFCck! Nochmal verscheuchen!"
+  - SectionId: 42099039
+    EntryId: 39005798
+    Key: hud.goat_hit
+    Value: BUMM! Die Ziege hat dich weggeschleudert!
+  - SectionId: 42099039
+    EntryId: 61407962
+    Key: hud.pest_monkey
+    Value: Ein Affe! Er hat eine Banane... Vorsicht.
+  - SectionId: 42099039
+    EntryId: 59618765
+    Key: hud.banana_throw
+    Value: Bananenschale geworfen! Meide die Steine mit Schale!
+  - SectionId: 42099039
+    EntryId: 25986065
+    Key: hud.banana_slip
+    Value: Bananenschale! {0} rutscht ab!

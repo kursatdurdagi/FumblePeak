@@ -68,6 +68,7 @@ namespace FumblePeak
             ClimberBody.OnLimbGaveUp += OnGaveUp;
             ClimberBody.OnLimbSlipped += OnSlipped;
             ClimberBody.OnHoldCrumbled += OnCrumbled;
+            ClimberBody.OnBananaSlip += OnBanana;
             PestController.Event += OnPest;
 
             root.schedule.Execute(() => controls.AddToClassList("controls--faded")).StartingIn(14000);
@@ -87,6 +88,7 @@ namespace FumblePeak
             ClimberBody.OnLimbGaveUp -= OnGaveUp;
             ClimberBody.OnLimbSlipped -= OnSlipped;
             ClimberBody.OnHoldCrumbled -= OnCrumbled;
+            ClimberBody.OnBananaSlip -= OnBanana;
             PestController.Event -= OnPest;
             FumblePlayer.InputBlocked = false;
             Time.timeScale = 1f;
@@ -232,14 +234,16 @@ namespace FumblePeak
                 return;
             }
             if (e == PestController.PestEvent.NestHit) { ShowToast(L.T("hud.nest_hit"), 3f); return; }
+            if (e == PestController.PestEvent.Stubborn) { ShowToast(L.T("hud.goat_stubborn"), 2.2f); return; }
             string key = e == PestController.PestEvent.Shoo ? "hud.pest_shoo"
                 : e == PestController.PestEvent.Arrive
-                    ? kind switch { PestController.Kind.Bees => "hud.pest_bees", PestController.Kind.Fly => "hud.pest_fly", PestController.Kind.Bird => "hud.pest_bird", _ => "hud.pest_spider" }
-                    : kind switch { PestController.Kind.Bees => "hud.pest_sting", PestController.Kind.Bird => "hud.pest_peck", _ => "hud.pest_spook" };
+                    ? kind switch { PestController.Kind.Bees => "hud.pest_bees", PestController.Kind.Fly => "hud.pest_fly", PestController.Kind.Bird => "hud.pest_bird", PestController.Kind.Goat => "hud.pest_goat", PestController.Kind.Monkey => "hud.pest_monkey", _ => "hud.pest_spider" }
+                    : kind switch { PestController.Kind.Bees => "hud.pest_sting", PestController.Kind.Bird => "hud.pest_peck", PestController.Kind.Goat => "hud.goat_hit", PestController.Kind.Monkey => "hud.banana_throw", _ => "hud.pest_spook" };
             ShowToast(L.T(key), 2.2f);
         }
 
         void OnCrumbled() => ShowToast(L.T("hud.crumble"), 1.8f);
+        void OnBanana(int limb) => ShowToast(L.T("hud.banana_slip", LimbUtil.Name(limb)), 2f);
 
         void OnSlipped(int limb)
         {

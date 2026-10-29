@@ -799,3 +799,27 @@ MonoBehaviour:
     EntryId: 99383229
     Key: hud.crumble
     Value: "Ta\u015F ufaland\u0131! \xC7atlak ta\u015Flara g\xFCvenme."
+  - SectionId: 42099039
+    EntryId: 13991157
+    Key: hud.pest_goat
+    Value: "Da\u011F ke\xE7isi! Kafana dikildi... uzvunla vur, kov onu!"
+  - SectionId: 42099039
+    EntryId: 60601024
+    Key: hud.goat_stubborn
+    Value: "Ke\xE7i inat\xE7\u0131, geri geldi! Bir daha kov!"
+  - SectionId: 42099039
+    EntryId: 39005798
+    Key: hud.goat_hit
+    Value: "TOS! Ke\xE7i seni u\xE7urdu!"
+  - SectionId: 42099039
+    EntryId: 61407962
+    Key: hud.pest_monkey
+    Value: Maymun! Elinde muz var... aman dikkat.
+  - SectionId: 42099039
+    EntryId: 59618765
+    Key: hud.banana_throw
+    Value: "Muz kabu\u011Fu f\u0131rlatt\u0131! Sar\u0131 ta\u015Flara basma!"
+  - SectionId: 42099039
+    EntryId: 25986065
+    Key: hud.banana_slip
+    Value: "Muz kabu\u011Fu! {0} kayd\u0131!"

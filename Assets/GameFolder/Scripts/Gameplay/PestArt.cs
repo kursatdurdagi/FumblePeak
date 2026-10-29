@@ -136,6 +136,162 @@ namespace FumblePeak
             return sp;
         }
 
+        // ---------------- Dağ keçisi ----------------
+        /// <summary>
+        /// Low-poly dağ keçisi (+z'ye bakar, ~0.55 m boy). Hareketli parçalar: Head (boyun pivotu),
+        /// LegFL/LegFR/LegBL/LegBR (kalça pivotu), Tail.
+        /// </summary>
+        public static Transform Goat(Transform parent, float s, Material body)
+        {
+            var goat = new GameObject("Goat").transform; goat.SetParent(parent, false);
+            var fur = new Color(0.94f, 0.91f, 0.85f); var furShade = new Color(0.8f, 0.76f, 0.7f);
+            var back = new Color(0.72f, 0.64f, 0.55f); var hoof = new Color(0.22f, 0.18f, 0.16f);
+            var horn = new Color(0.55f, 0.47f, 0.38f); var nose = new Color(0.86f, 0.72f, 0.7f);
+            if (!cache.ContainsKey("goatBody"))
+            {
+                var mb = new RMesh();
+                mb.Ellipsoid(new Vector3(0, 0.33f, 0), new Vector3(0.13f, 0.12f, 0.22f), (c, n) => n.y > 0.55f ? back : n.y < -0.3f ? furShade : fur);
+                // kabarık göğüs yünü
+                mb.Ellipsoid(new Vector3(0, 0.3f, 0.15f), new Vector3(0.1f, 0.1f, 0.08f), (c, n) => fur);
+                cache["goatBody"] = mb.Build("GoatBody");
+
+                var hm = new RMesh();
+                hm.Cone(new Vector3(0, -0.02f, 0), new Vector3(0, 0.12f, 0.06f), 0.06f, fur);                      // boyun
+                hm.Ellipsoid(new Vector3(0, 0.14f, 0.1f), new Vector3(0.07f, 0.07f, 0.1f), (c, n) => n.y > 0.6f ? back : fur);
+                hm.Ellipsoid(new Vector3(0, 0.11f, 0.19f), new Vector3(0.05f, 0.045f, 0.05f), (c, n) => nose);      // burun
+                hm.Ellipsoid(new Vector3(0.018f, 0.12f, 0.235f), Vector3.one * 0.008f, (c, n) => hoof);             // burun delikleri
+                hm.Ellipsoid(new Vector3(-0.018f, 0.12f, 0.235f), Vector3.one * 0.008f, (c, n) => hoof);
+                for (int sd = -1; sd <= 1; sd += 2)
+                {
+                    // sarı göz + yatay (keçi) göz bebeği
+                    hm.Ellipsoid(new Vector3(sd * 0.055f, 0.17f, 0.135f), Vector3.one * 0.022f, (c, n) => new Color(0.98f, 0.82f, 0.25f));
+                    hm.Ellipsoid(new Vector3(sd * 0.068f, 0.172f, 0.145f), new Vector3(0.006f, 0.005f, 0.014f), (c, n) => new Color(0.05f, 0.04f, 0.04f));
+                    // geriye kıvrık boynuzlar (2 parça)
+                    hm.Cone(new Vector3(sd * 0.03f, 0.2f, 0.09f), new Vector3(sd * 0.05f, 0.29f, 0.02f), 0.022f, horn);
+                    hm.Cone(new Vector3(sd * 0.05f, 0.285f, 0.025f), new Vector3(sd * 0.07f, 0.27f, -0.07f), 0.016f, horn);
+                    // sarkık kulaklar
+                    hm.DoubleTri(new Vector3(sd * 0.06f, 0.17f, 0.07f), new Vector3(sd * 0.15f, 0.12f, 0.05f), new Vector3(sd * 0.06f, 0.14f, 0.04f), furShade);
+                }
+                hm.Cone(new Vector3(0, 0.07f, 0.17f), new Vector3(0, -0.03f, 0.16f), 0.028f, Color.white);           // sakal
+                cache["goatHead"] = hm.Build("GoatHead");
+
+                var lm = new RMesh();
+                lm.Cone(Vector3.zero, new Vector3(0, -0.24f, 0.01f), 0.032f, fur);
+                lm.Ellipsoid(new Vector3(0, -0.235f, 0.012f), new Vector3(0.028f, 0.022f, 0.032f), (c, n) => hoof);
+                cache["goatLeg"] = lm.Build("GoatLeg");
+
+                var tm = new RMesh();
+                tm.Cone(Vector3.zero, new Vector3(0, 0.07f, -0.05f), 0.025f, fur);
+                cache["goatTail"] = tm.Build("GoatTail");
+            }
+            AddMesh(goat, "Body", cache["goatBody"], body);
+            var head = Pivot(goat, "Head", new Vector3(0, 0.4f, 0.19f)); AddMesh(head, "Mesh", cache["goatHead"], body);
+            foreach (var (name, pos) in new[] { ("LegFL", new Vector3(-0.075f, 0.27f, 0.13f)), ("LegFR", new Vector3(0.075f, 0.27f, 0.13f)),
+                                                 ("LegBL", new Vector3(-0.075f, 0.27f, -0.13f)), ("LegBR", new Vector3(0.075f, 0.27f, -0.13f)) })
+            {
+                var leg = Pivot(goat, name, pos); AddMesh(leg, "Mesh", cache["goatLeg"], body);
+            }
+            var tail = Pivot(goat, "Tail", new Vector3(0, 0.4f, -0.2f)); AddMesh(tail, "Mesh", cache["goatTail"], body);
+            goat.localScale = Vector3.one * s;
+            return goat;
+        }
+
+        // ---------------- Maymun ----------------
+        /// <summary>
+        /// Low-poly maymun (+z'ye bakar, ~0.45 m). Hareketli parçalar: Head, ArmL, ArmR (elinde "Banana"), Tail.
+        /// </summary>
+        public static Transform Monkey(Transform parent, float s, Material body)
+        {
+            var mk = new GameObject("Monkey").transform; mk.SetParent(parent, false);
+            var brown = new Color(0.5f, 0.32f, 0.2f); var dark = new Color(0.36f, 0.22f, 0.14f);
+            var skin = new Color(0.93f, 0.78f, 0.6f); var yellow = new Color(1f, 0.85f, 0.25f);
+            if (!cache.ContainsKey("mkBody"))
+            {
+                var mb = new RMesh();
+                mb.Ellipsoid(new Vector3(0, 0.2f, 0), new Vector3(0.11f, 0.14f, 0.1f), (c, n) => n.z > 0.55f && c.y < 0.06f ? skin : n.y > 0.6f ? dark : brown);
+                // bacaklar (çömelmiş)
+                for (int sd = -1; sd <= 1; sd += 2)
+                {
+                    mb.Cone(new Vector3(sd * 0.06f, 0.1f, 0.02f), new Vector3(sd * 0.09f, 0.02f, 0.09f), 0.035f, brown);
+                    mb.Ellipsoid(new Vector3(sd * 0.09f, 0.01f, 0.11f), new Vector3(0.035f, 0.02f, 0.045f), (c, n) => skin);
+                }
+                cache["mkBody"] = mb.Build("MonkeyBody");
+
+                var hm = new RMesh();
+                hm.Ellipsoid(Vector3.zero, new Vector3(0.09f, 0.085f, 0.085f), (c, n) => n.y > 0.5f ? dark : brown);
+                hm.Ellipsoid(new Vector3(0, -0.012f, 0.055f), new Vector3(0.068f, 0.058f, 0.045f), (c, n) => skin);       // yüz
+                hm.Ellipsoid(new Vector3(0, -0.035f, 0.09f), new Vector3(0.045f, 0.03f, 0.03f), (c, n) => skin);          // ağız çıkıntısı
+                hm.Ellipsoid(new Vector3(0, -0.045f, 0.118f), new Vector3(0.028f, 0.007f, 0.006f), (c, n) => dark);       // sırıtış
+                for (int sd = -1; sd <= 1; sd += 2)
+                {
+                    hm.Ellipsoid(new Vector3(sd * 0.026f, 0.012f, 0.095f), new Vector3(0.016f, 0.02f, 0.01f), (c, n) => Color.white);
+                    hm.Ellipsoid(new Vector3(sd * 0.026f, 0.01f, 0.104f), Vector3.one * 0.009f, (c, n) => new Color(0.05f, 0.04f, 0.04f));
+                    hm.Ellipsoid(new Vector3(sd * 0.095f, 0.01f, 0f), new Vector3(0.022f, 0.035f, 0.035f), (c, n) => n.x * sd > 0.3f ? brown : skin); // kulak
+                }
+                cache["mkHead"] = hm.Build("MonkeyHead");
+
+                var am = new RMesh();
+                am.Cone(Vector3.zero, new Vector3(0, -0.17f, 0.03f), 0.028f, brown);
+                am.Ellipsoid(new Vector3(0, -0.18f, 0.035f), new Vector3(0.028f, 0.03f, 0.025f), (c, n) => skin);
+                cache["mkArm"] = am.Build("MonkeyArm");
+
+                var bm = new RMesh();
+                // kıvrık muz: 3 parça + uçlar
+                var pts = new[] { new Vector3(0, -0.06f, 0.02f), new Vector3(0.01f, 0f, 0.035f), new Vector3(0.0f, 0.06f, 0.03f), new Vector3(-0.02f, 0.1f, 0.01f) };
+                for (int k = 0; k < pts.Length - 1; k++) bm.Cone(pts[k], pts[k + 1], 0.018f, yellow);
+                bm.Ellipsoid(pts[0], Vector3.one * 0.016f, (c, n) => yellow);
+                bm.Ellipsoid(pts[3], Vector3.one * 0.008f, (c, n) => new Color(0.35f, 0.25f, 0.1f));
+                cache["mkBanana"] = bm.Build("Banana");
+
+                var tm = new RMesh();
+                var tp = new[] { Vector3.zero, new Vector3(0, -0.02f, -0.12f), new Vector3(0, 0.08f, -0.2f), new Vector3(0, 0.2f, -0.18f), new Vector3(0, 0.24f, -0.1f) };
+                for (int k = 0; k < tp.Length - 1; k++) tm.Cone(tp[k], tp[k + 1], 0.016f, brown);
+                cache["mkTail"] = tm.Build("MonkeyTail");
+            }
+            AddMesh(mk, "Body", cache["mkBody"], body);
+            var head = Pivot(mk, "Head", new Vector3(0, 0.38f, 0.01f)); AddMesh(head, "Mesh", cache["mkHead"], body);
+            for (int sd = -1; sd <= 1; sd += 2)
+            {
+                var arm = Pivot(mk, sd < 0 ? "ArmL" : "ArmR", new Vector3(sd * 0.1f, 0.28f, 0f));
+                AddMesh(arm, "Mesh", cache["mkArm"], body);
+                if (sd > 0) { var ban = Pivot(arm, "Banana", new Vector3(0f, -0.19f, 0.04f)); AddMesh(ban, "Mesh", cache["mkBanana"], body); }
+            }
+            var tail = Pivot(mk, "Tail", new Vector3(0, 0.12f, -0.09f)); AddMesh(tail, "Mesh", cache["mkTail"], body);
+            mk.localScale = Vector3.one * s;
+            return mk;
+        }
+
+        /// <summary>Muz kabuğu (yere atılmış: 3 sarkık kabuk yaprağı + sap).</summary>
+        public static Transform Peel(Transform parent, float s, Material body)
+        {
+            var p = new GameObject("BananaPeel").transform; p.SetParent(parent, false);
+            if (!cache.ContainsKey("peel"))
+            {
+                var yellow = new Color(1f, 0.86f, 0.25f); var inner = new Color(1f, 0.95f, 0.75f); var tip = new Color(0.35f, 0.25f, 0.1f);
+                var mb = new RMesh();
+                mb.Ellipsoid(new Vector3(0, 0.03f, 0), new Vector3(0.03f, 0.035f, 0.03f), (c, n) => yellow);
+                for (int k = 0; k < 3; k++)
+                {
+                    float a = k / 3f * Mathf.PI * 2f + 0.4f;
+                    var d = new Vector3(Mathf.Cos(a), 0f, Mathf.Sin(a));
+                    var side = Vector3.Cross(d, Vector3.up) * 0.025f;
+                    var b0 = new Vector3(0, 0.05f, 0); var tipP = d * 0.11f + Vector3.up * 0.0f;
+                    mb.Tri(b0 - side, tipP, b0 + side, yellow);
+                    mb.Tri(b0 - side, b0 + side, tipP, inner);
+                }
+                mb.Cone(new Vector3(0, 0.06f, 0), new Vector3(0, 0.1f, 0.01f), 0.01f, tip);
+                cache["peel"] = mb.Build("Peel");
+            }
+            AddMesh(p, "Mesh", cache["peel"], body);
+            p.localScale = Vector3.one * s;
+            return p;
+        }
+
+        static Transform Pivot(Transform parent, string name, Vector3 at)
+        {
+            var t = new GameObject(name).transform; t.SetParent(parent, false); t.localPosition = at; return t;
+        }
+
         static void Wing(Transform parent, Vector3 at, float len, float width, Material mat)
         {
             var w = new GameObject(at.x < 0 ? "WingL" : "WingR").transform;

@@ -95,6 +95,7 @@ namespace FumblePeak
         float stuckTimer;
         readonly System.Collections.Generic.List<CrumblingHold> crumbling = new System.Collections.Generic.List<CrumblingHold>();   // tutunmadan, hareketsiz ve rotadan/kamptan uzakta geçen süre
         readonly float[] cooldown = new float[4];
+        readonly float[] slipAt = new float[4];      // muz kabuğu: bu anda uzuv kayar
         readonly Collider[] overlap = new Collider[8];
         Vector3 checkpoint;
         int lastGroundedFeet;
@@ -415,6 +416,17 @@ namespace FumblePeak
 
                 if (joints[i] != null)
                 {
+                    // Muz kabuğu: tutunur tutunmaz kayar, kabuk uçar
+                    if (slipAt[i] > 0f && Time.time >= slipAt[i])
+                    {
+                        var pg = grips[i];
+                        ReleaseInternal(i);
+                        wantGrab[i] = false; dragging[i] = false;
+                        cooldown[i] = 0.6f;
+                        eff.AddForce(new Vector3(Random.Range(-1.2f, 1.2f), -1.8f, 0f), ForceMode.VelocityChange);
+                        RpcBananaSlip((byte)i, pg != null ? pg.transform.position : eff.position);
+                        continue;
+                    }
                     // Kaygan yüzey: yavaşça aşağı kayar
                     var g = grips[i];
                     if (g != null && g.type == GripType.Slippery)
@@ -716,6 +728,9 @@ namespace FumblePeak
             // Canlı yuvası: tutan uzuv yuvayı bozar → sakinleri fırlar, tırmanıcıyı düşürür
             var nest = newGrip != null ? newGrip.GetComponent<PestNest>() : null;
             if (nest != null) GetComponent<PestController>()?.ServerNestBurst(nest, i);
+            // Muz kabuğu olan taş: el / ayak hemen kayar
+            var peel = newGrip != null ? newGrip.GetComponent<BananaPeel>() : null;
+            slipAt[i] = peel != null && peel.Landed ? Time.time + 0.2f : 0f;
             // Çürük taş: tutulunca titrer, kısa süre sonra parçalanır
             var crumb = newGrip != null ? newGrip.GetComponent<CrumblingHold>() : null;
             if (crumb != null && crumb.ServerTouch())
@@ -738,6 +753,7 @@ namespace FumblePeak
             if (joints[i] != null) Destroy(joints[i]);
             joints[i] = null;
             grips[i] = null;
+            slipAt[i] = 0f;
         }
 
         void WriteSync()
@@ -771,6 +787,7 @@ namespace FumblePeak
         public static event System.Action<int> OnLimbSlipped;
         public static event System.Action OnKnockedOff;
         public static event System.Action OnHoldCrumbled;
+        public static event System.Action<int> OnBananaSlip;
 
         [ClientRpc] void RpcRespawn(string reason) => OnRespawned?.Invoke(reason);
         [ClientRpc] void RpcCheckpoint() => OnCheckpointReached?.Invoke();
@@ -779,6 +796,13 @@ namespace FumblePeak
         [ClientRpc] void RpcLimbSlipped(byte limb) => OnLimbSlipped?.Invoke(limb);
         [ClientRpc] void RpcKnockedOff() => OnKnockedOff?.Invoke();
         [ClientRpc] void RpcHoldCrumbled() => OnHoldCrumbled?.Invoke();
+
+        [ClientRpc]
+        void RpcBananaSlip(byte limb, Vector3 holdPos)
+        {
+            BananaPeel.Nearest(holdPos)?.Slip();
+            OnBananaSlip?.Invoke(limb);
+        }
 
         [ClientRpc]
         void RpcCrumble(Vector3 pos, bool breakNow)

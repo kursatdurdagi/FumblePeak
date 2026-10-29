@@ -815,3 +815,27 @@ MonoBehaviour:
     EntryId: 99383229
     Key: hud.crumble
     Value: The rock crumbled! Don't trust cracked stones.
+  - SectionId: 42099039
+    EntryId: 13991157
+    Key: hud.pest_goat
+    Value: A mountain goat! It's staring you down... hit it with a limb!
+  - SectionId: 42099039
+    EntryId: 60601024
+    Key: hud.goat_stubborn
+    Value: The goat is stubborn, it's back! Shoo it again!
+  - SectionId: 42099039
+    EntryId: 39005798
+    Key: hud.goat_hit
+    Value: BONK! The goat sent you flying!
+  - SectionId: 42099039
+    EntryId: 61407962
+    Key: hud.pest_monkey
+    Value: A monkey! It's holding a banana... careful.
+  - SectionId: 42099039
+    EntryId: 59618765
+    Key: hud.banana_throw
+    Value: It threw a banana peel! Avoid the peeled rocks!
+  - SectionId: 42099039
+    EntryId: 25986065
+    Key: hud.banana_slip
+    Value: Banana peel! {0} slipped!
