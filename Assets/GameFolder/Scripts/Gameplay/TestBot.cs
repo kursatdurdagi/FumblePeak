@@ -103,6 +103,7 @@ namespace FumblePeak
             Vector2 best = Vector2.zero; float by = float.NegativeInfinity;
             foreach (var g in FindObjectsByType<Grip>(FindObjectsSortMode.None))
             {
+                if (g.GetComponent<PestNest>() != null || g.GetComponent<CrumblingHold>() != null) continue; // yuva / çürük taş
                 Vector2 gp = g.GetComponent<Collider>().bounds.center;
                 bool usedByOther = false;
                 for (int i = 0; i < 4; i++) if (i != L && (body.RenderEffectorPos(i) - gp).sqrMagnitude < 0.22f * 0.22f) usedByOther = true;

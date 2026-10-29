@@ -719,3 +719,99 @@ MonoBehaviour:
 
       (With Steam running,
       friends and invites appear here too.)'
+  - SectionId: 76708446
+    EntryId: 17225944
+    Key: menu.whistle
+    Value: "Fweeet \u266A"
+  - SectionId: 76708446
+    EntryId: 28533236
+    Key: menu.brr
+    Value: Brrr!
+  - SectionId: 42099039
+    EntryId: 45651187
+    Key: hud.pest_bees
+    Value: Bees! Grab a limb and swat them!
+  - SectionId: 42099039
+    EntryId: 59333924
+    Key: hud.pest_fly
+    Value: A fly is buzzing around... swat it!
+  - SectionId: 42099039
+    EntryId: 55914569
+    Key: hud.pest_bird
+    Value: A bird landed on your head! Wave it off!
+  - SectionId: 42099039
+    EntryId: 91462051
+    Key: hud.pest_spider
+    Value: A spider is on your hand! Swat it with another limb!
+  - SectionId: 42099039
+    EntryId: 42891015
+    Key: hud.pest_shoo
+    Value: Shoo! It's gone.
+  - SectionId: 42099039
+    EntryId: 39221708
+    Key: hud.pest_sting
+    Value: Ouch! Bee sting!
+  - SectionId: 42099039
+    EntryId: 59353056
+    Key: hud.pest_peck
+    Value: The bird pecked you, a hand slipped!
+  - SectionId: 42099039
+    EntryId: 87052551
+    Key: hud.pest_spook
+    Value: Spider! The hand jerked away!
+  - SectionId: 76708446
+    EntryId: 67102933
+    Key: menu.empty
+    Value: Empty already?
+  - SectionId: 76708446
+    EntryId: 83003276
+    Key: menu.oops
+    Value: Whoops!
+  - SectionId: 76708446
+    EntryId: 21316744
+    Key: menu.uhoh
+    Value: Uh-oh...
+  - SectionId: 42099039
+    EntryId: 51694559
+    Key: hud.biome2
+    Value: MOSSY PINE RIDGE
+  - SectionId: 42099039
+    EntryId: 42587740
+    Key: hud.biome3
+    Value: RED ROCK CRAGS
+  - SectionId: 42099039
+    EntryId: 28454281
+    Key: hud.biome4
+    Value: WINDY RIDGES
+  - SectionId: 42099039
+    EntryId: 65103229
+    Key: hud.biome5
+    Value: GLACIER SUMMIT
+  - SectionId: 42099039
+    EntryId: 59598298
+    Key: hud.camp_n
+    Value: "CAMP {0}/{1} \xB7 {2} m"
+  - SectionId: 42099039
+    EntryId: 66026242
+    Key: hud.nest_bees
+    Value: A BEEHIVE! You shouldn't have touched that...
+  - SectionId: 42099039
+    EntryId: 89558795
+    Key: hud.nest_bird
+    Value: A BIRD'S NEST! Mama bird is FURIOUS!
+  - SectionId: 42099039
+    EntryId: 69888145
+    Key: hud.nest_spider
+    Value: A SPIDER NEST! Hundreds of babies!
+  - SectionId: 42099039
+    EntryId: 48612928
+    Key: hud.nest_fly
+    Value: A FLY SWARM!
+  - SectionId: 42099039
+    EntryId: 55984341
+    Key: hud.nest_hit
+    Value: Down you go! Never grab a nest.
+  - SectionId: 42099039
+    EntryId: 99383229
+    Key: hud.crumble
+    Value: The rock crumbled! Don't trust cracked stones.

@@ -218,8 +218,8 @@ SkinnedMeshRenderer:
   m_BlendShapeWeights: []
   m_RootBone: {fileID: 8692222935183687964}
   m_AABB:
-    m_Center: {x: 0.00007049739, y: -0.4828369, z: -0.022834808}
-    m_Extent: {x: 0.19463173, y: 0.49741876, z: 0.21917418}
+    m_Center: {x: 0.00007049739, y: -0.48283693, z: -0.022834808}
+    m_Extent: {x: 0.19463173, y: 0.4974188, z: 0.21917419}
   m_DirtyAABB: 0
 --- !u!1 &389545128796806640
 GameObject:
@@ -1422,7 +1422,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3747003053811023883}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.0000007530563, y: 0.0001312179, z: 0.004194876, w: 0.99999124}
+  m_LocalRotation: {x: -0.0000007530563, y: 0.00013121788, z: 0.004194876, w: 0.9999912}
   m_LocalPosition: {x: -0.00020762681, y: 0.03475482, z: -0.000000100197795}
   m_LocalScale: {x: 0.99999994, y: 0.99999994, z: 0.9999999}
   m_ConstrainProportionsScale: 0
@@ -2012,6 +2012,7 @@ GameObject:
   - component: {fileID: 2410450390071896505}
   - component: {fileID: 947395420678248171}
   - component: {fileID: 3101522878102193241}
+  - component: {fileID: 1855061868136458794}
   m_Layer: 0
   m_Name: Climber
   m_TagString: Untagged
@@ -2140,6 +2141,25 @@ MonoBehaviour:
   lineMaterial: {fileID: 2100000, guid: 023438e6b190e45fab85426b41e1f528, type: 2}
   smoothing: 18
   fatigueColor: {r: 1, g: 0.25, b: 0.18, a: 1}
+--- !u!114 &1855061868136458794
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5123675355478117375}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d434ed3d97f25448a49fa16287ca2ba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FumblePeak.PestController
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  bodyMaterial: {fileID: 2100000, guid: 86068f3f0dafe4892bdba5270dc0a65e, type: 2}
+  wingMaterial: {fileID: 2100000, guid: 023438e6b190e45fab85426b41e1f528, type: 2}
+  firstDelay: 35
+  interval: {x: 35, y: 55}
 --- !u!1 &5161086103479740303
 GameObject:
   m_ObjectHideFlags: 0
@@ -2559,8 +2579,8 @@ SkinnedMeshRenderer:
   m_BlendShapeWeights: []
   m_RootBone: {fileID: 8692222935183687964}
   m_AABB:
-    m_Center: {x: 0.7841339, y: 0.42428195, z: -0.038989484}
-    m_Extent: {x: 0.112077534, y: 0.062788546, z: 0.07539367}
+    m_Center: {x: 0.7841339, y: 0.4242819, z: -0.0389895}
+    m_Extent: {x: 0.112077534, y: 0.06278835, z: 0.07539368}
   m_DirtyAABB: 0
 --- !u!1 &5813533889786149283
 GameObject:
@@ -3066,8 +3086,8 @@ SkinnedMeshRenderer:
   m_BlendShapeWeights: []
   m_RootBone: {fileID: 8692222935183687964}
   m_AABB:
-    m_Center: {x: -0.77762413, y: 0.42796218, z: -0.03969077}
-    m_Extent: {x: 0.11785081, y: 0.06501019, z: 0.075481474}
+    m_Center: {x: -0.77762413, y: 0.42796218, z: -0.03969082}
+    m_Extent: {x: 0.11785081, y: 0.065010175, z: 0.075481445}
   m_DirtyAABB: 0
 --- !u!1 &6955862432477565972
 GameObject:
@@ -4514,8 +4534,8 @@ SkinnedMeshRenderer:
   m_BlendShapeWeights: []
   m_RootBone: {fileID: 8692222935183687964}
   m_AABB:
-    m_Center: {x: 0.12933056, y: -0.9613653, z: 0.058674693}
-    m_Extent: {x: 0.09091394, y: 0.16679758, z: 0.187429}
+    m_Center: {x: 0.12933056, y: -0.9613653, z: 0.05867468}
+    m_Extent: {x: 0.09091394, y: 0.16679758, z: 0.18742898}
   m_DirtyAABB: 0
 --- !u!1 &8869511687170110970
 GameObject:
@@ -4737,8 +4757,8 @@ SkinnedMeshRenderer:
   m_BlendShapeWeights: []
   m_RootBone: {fileID: 8692222935183687964}
   m_AABB:
-    m_Center: {x: 0.008497536, y: -0.10010868, z: -0.007009022}
-    m_Extent: {x: 0.71153, y: 0.86870366, z: 0.13004729}
+    m_Center: {x: 0.008497447, y: -0.10010868, z: -0.007009022}
+    m_Extent: {x: 0.7115301, y: 0.86870366, z: 0.13004729}
   m_DirtyAABB: 0
 --- !u!1 &9174431344294719520
 GameObject:

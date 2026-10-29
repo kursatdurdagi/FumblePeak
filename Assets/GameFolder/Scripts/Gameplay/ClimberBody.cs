@@ -92,6 +92,8 @@ namespace FumblePeak
         readonly float[] holdTime = new float[4];   // bu kayada geçen (yükle ağırlıklı) süre
         readonly float[] holdLimit = new float[4];  // bu tutunuşun rastgele süre sınırı
         float feetOnlyTimer;
+        float stuckTimer;
+        readonly System.Collections.Generic.List<CrumblingHold> crumbling = new System.Collections.Generic.List<CrumblingHold>();   // tutunmadan, hareketsiz ve rotadan/kamptan uzakta geçen süre
         readonly float[] cooldown = new float[4];
         readonly Collider[] overlap = new Collider[8];
         Vector3 checkpoint;
@@ -202,6 +204,7 @@ namespace FumblePeak
             }
             bodyTarget = torsoPos;
             feetOnlyTimer = 0f;
+            stuckTimer = 0f;
         }
 
         /// <summary>
@@ -223,7 +226,7 @@ namespace FumblePeak
                 {
                     var c = overlap[k];
                     var g = c.GetComponentInParent<Grip>();
-                    if (g == null || g.type == GripType.Slippery || used.Contains(c)) continue;
+                    if (g == null || g.type == GripType.Slippery || used.Contains(c) || g.GetComponent<PestNest>() != null || g.GetComponent<CrumblingHold>() != null) continue;
                     Vector2 gp = c.bounds.center;
                     if (arm ? gp.y < a.y - 0.05f : gp.y > a.y - 0.05f) continue;
                     float d = (gp - ideal).sqrMagnitude;
@@ -334,6 +337,23 @@ namespace FumblePeak
             RpcRespawn(reason);
         }
 
+        // ---------- Böcek / kuş etkileşimi (PestController) ----------
+        [Server] public bool ServerIsHeld(int i) => joints[i] != null;
+        [Server] public bool ServerIsDragged(int i) => dragging[i];
+        [Server] public Vector3 ServerEffector(int i) => effectors[i].position;
+        [Server] public Vector3 ServerEffectorVel(int i) => effectors[i].linearVelocity;
+        [Server] public Vector3 ServerHead() => torso.position + torso.rotation * new Vector3(0f, 0.72f, -0.05f);
+        /// <summary>Uzvu rahatsız et: tutunma süresi daha hızlı dolar.</summary>
+        [Server] public void ServerAnnoy(int i, float seconds) { if (joints[i] != null) holdTime[i] = Mathf.Min(holdLimit[i], holdTime[i] + seconds); }
+        /// <summary>Korkup bırak (örümcek ele çıktı, kuş gagaladı).</summary>
+        [Server] public void ServerStartle(int i)
+        {
+            if (joints[i] == null) return;
+            ReleaseInternal(i);
+            cooldown[i] = 0.4f;
+            RpcLimbSlipped((byte)i);
+        }
+
         /// <summary>Kamp alanında ayakta duruluyorsa yorgunluk hızla geçer (tutunan uzuvlar dahil).</summary>
         [Server]
         public void ServerRest(float dt)
@@ -346,6 +366,21 @@ namespace FumblePeak
         public void ServerSummit()
         {
             RpcSummit();
+        }
+
+        /// <summary>Yuva saldırısı: tüm uzuvlar bırakır, gövde savrulur; kısa süre hiçbir şey tutulamaz → düşüş.</summary>
+        [Server]
+        public void ServerKnockOff(Vector3 impulse)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                wantGrab[i] = false; dragging[i] = false; ReleaseInternal(i);
+                cooldown[i] = 1.6f;
+            }
+            torso.AddForce(impulse, ForceMode.VelocityChange);
+            torso.AddTorque(Vector3.forward * -Mathf.Sign(impulse.x) * 6f, ForceMode.VelocityChange);
+            foreach (var e in effectors) e.AddForce(impulse * 1.2f + (Vector3)Random.insideUnitCircle * 1.5f, ForceMode.VelocityChange);
+            RpcKnockedOff();
         }
 
         [Server]
@@ -441,6 +476,28 @@ namespace FumblePeak
 
             lastGroundedFeet = groundedFeet;
 
+            // Çürük taşlar: süresi dolan parçalanır, üstündeki uzuvlar boşluğa düşer
+            for (int c = crumbling.Count - 1; c >= 0; c--)
+            {
+                var ch = crumbling[c];
+                if (ch == null) { crumbling.RemoveAt(c); continue; }
+                if (!ch.ServerShouldBreak) continue;
+                var g = ch.GetComponent<Grip>();
+                bool someone = false;
+                for (int i = 0; i < 4; i++)
+                    if (joints[i] != null && grips[i] == g)
+                    {
+                        ReleaseInternal(i);
+                        wantGrab[i] = false;
+                        cooldown[i] = 0.5f;
+                        someone = true;
+                    }
+                RpcCrumble(ch.transform.position, true);
+                ch.Break(); // sunucuda hemen (host'ta RPC ikinci kez çağırırsa etkisiz)
+                crumbling.RemoveAt(c);
+                if (someone) RpcHoldCrumbled();
+            }
+
             // Hiçbir el tutunmuyor ve yere basılmıyorsa ayaklar tek başına taşıyamaz → kayar, düşersin
             bool armHeld = joints[0] != null || joints[1] != null;
             bool legHeld = joints[2] != null || joints[3] != null;
@@ -489,6 +546,20 @@ namespace FumblePeak
             // Düşüş → checkpoint
             if (torso.position.y < checkpoint.y - fallRespawnDistance)
                 ServerRespawn("fall");
+            else
+            {
+                // Takıldı mı? Hiçbir yere tutunmuyor, duruyor (yerde / bir çıkıntıda) ve son kamptan
+                // aşağıda ya da yana uzakta → oradan bir yere gidilemez, son kampa (ya da başlangıca) dön.
+                Vector3 tp = torso.position;
+                bool idle = nowGrabbed == 0 && torso.linearVelocity.sqrMagnitude < 0.6f * 0.6f;
+                bool away = checkpoint.y - tp.y > 1.2f || Mathf.Abs(tp.x - checkpoint.x) > 2f;
+                if (idle && away && tp.y < Mountain.SummitY - 1f)
+                {
+                    stuckTimer += dt;
+                    if (stuckTimer > 1.2f) ServerRespawn("fall");
+                }
+                else stuckTimer = 0f;
+            }
 
             WriteSync();
         }
@@ -642,6 +713,16 @@ namespace FumblePeak
             else if (holdLimit[i] <= 0f) holdLimit[i] = Random.Range(minHoldTime, maxHoldTime);
             lastGrip[i] = newGrip;
             grips[i] = newGrip;
+            // Canlı yuvası: tutan uzuv yuvayı bozar → sakinleri fırlar, tırmanıcıyı düşürür
+            var nest = newGrip != null ? newGrip.GetComponent<PestNest>() : null;
+            if (nest != null) GetComponent<PestController>()?.ServerNestBurst(nest, i);
+            // Çürük taş: tutulunca titrer, kısa süre sonra parçalanır
+            var crumb = newGrip != null ? newGrip.GetComponent<CrumblingHold>() : null;
+            if (crumb != null && crumb.ServerTouch())
+            {
+                crumbling.Add(crumb);
+                RpcCrumble(crumb.transform.position, false);
+            }
             grabPoint[i] = bestP;
             cursorAtGrab[i] = targets[i];
             lastTarget[i] = targets[i];
@@ -688,11 +769,23 @@ namespace FumblePeak
         public static event System.Action OnSummitReached;
         public static event System.Action<int> OnLimbGaveUp;
         public static event System.Action<int> OnLimbSlipped;
+        public static event System.Action OnKnockedOff;
+        public static event System.Action OnHoldCrumbled;
 
         [ClientRpc] void RpcRespawn(string reason) => OnRespawned?.Invoke(reason);
         [ClientRpc] void RpcCheckpoint() => OnCheckpointReached?.Invoke();
         [ClientRpc] void RpcSummit() => OnSummitReached?.Invoke();
         [ClientRpc] void RpcLimbGaveUp(byte limb) => OnLimbGaveUp?.Invoke(limb);
         [ClientRpc] void RpcLimbSlipped(byte limb) => OnLimbSlipped?.Invoke(limb);
+        [ClientRpc] void RpcKnockedOff() => OnKnockedOff?.Invoke();
+        [ClientRpc] void RpcHoldCrumbled() => OnHoldCrumbled?.Invoke();
+
+        [ClientRpc]
+        void RpcCrumble(Vector3 pos, bool breakNow)
+        {
+            var ch = CrumblingHold.Nearest(pos);
+            if (ch == null) return;
+            if (breakNow) ch.Break(); else ch.PlayShake();
+        }
     }
 }

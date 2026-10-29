@@ -67,6 +67,8 @@ namespace FumblePeak
             ClimberBody.OnSummitReached += OnSummit;
             ClimberBody.OnLimbGaveUp += OnGaveUp;
             ClimberBody.OnLimbSlipped += OnSlipped;
+            ClimberBody.OnHoldCrumbled += OnCrumbled;
+            PestController.Event += OnPest;
 
             root.schedule.Execute(() => controls.AddToClassList("controls--faded")).StartingIn(14000);
             root.schedule.Execute(RebuildRoster).StartingIn(300);
@@ -84,6 +86,8 @@ namespace FumblePeak
             ClimberBody.OnSummitReached -= OnSummit;
             ClimberBody.OnLimbGaveUp -= OnGaveUp;
             ClimberBody.OnLimbSlipped -= OnSlipped;
+            ClimberBody.OnHoldCrumbled -= OnCrumbled;
+            PestController.Event -= OnPest;
             FumblePlayer.InputBlocked = false;
             Time.timeScale = 1f;
         }
@@ -195,7 +199,22 @@ namespace FumblePeak
             ShowToast(L.T("hud.respawned"), 2.5f);
         }
 
-        void OnCheckpoint() => ShowToast(L.T("hud.camp"), 2.5f);
+        int lastBiome;
+
+        void OnCheckpoint()
+        {
+            var b = ClimberBody.Instance;
+            float y = b != null ? b.TorsoPos.y : 0f;
+            int camp = Mathf.Clamp(Mathf.RoundToInt(y / Mountain.CampSpacing), 1, Mountain.CampCount);
+            string text = L.T("hud.camp_n", camp, Mountain.CampCount, Mathf.RoundToInt(Mountain.CampY(camp - 1)));
+            int biome = Mountain.Biome(Mountain.CampY(camp - 1) + 0.5f);
+            if (biome != lastBiome && y < Mountain.SummitY - 1f)
+            {
+                lastBiome = biome;
+                text = L.T("hud.biome" + (biome + 1)) + "\n" + text;
+            }
+            ShowToast(text, 3.2f);
+        }
 
         void OnGaveUp(int limb)
         {
@@ -204,6 +223,23 @@ namespace FumblePeak
             if (owner != null && !single) text += $" ({owner.playerName})";
             ShowToast(text, 1.8f);
         }
+
+        void OnPest(PestController.Kind kind, PestController.PestEvent e, int limb)
+        {
+            if (e == PestController.PestEvent.Nest)
+            {
+                ShowToast(L.T(kind switch { PestController.Kind.Bees => "hud.nest_bees", PestController.Kind.Bird => "hud.nest_bird", PestController.Kind.Spider => "hud.nest_spider", _ => "hud.nest_fly" }), 2.6f);
+                return;
+            }
+            if (e == PestController.PestEvent.NestHit) { ShowToast(L.T("hud.nest_hit"), 3f); return; }
+            string key = e == PestController.PestEvent.Shoo ? "hud.pest_shoo"
+                : e == PestController.PestEvent.Arrive
+                    ? kind switch { PestController.Kind.Bees => "hud.pest_bees", PestController.Kind.Fly => "hud.pest_fly", PestController.Kind.Bird => "hud.pest_bird", _ => "hud.pest_spider" }
+                    : kind switch { PestController.Kind.Bees => "hud.pest_sting", PestController.Kind.Bird => "hud.pest_peck", _ => "hud.pest_spook" };
+            ShowToast(L.T(key), 2.2f);
+        }
+
+        void OnCrumbled() => ShowToast(L.T("hud.crumble"), 1.8f);
 
         void OnSlipped(int limb)
         {

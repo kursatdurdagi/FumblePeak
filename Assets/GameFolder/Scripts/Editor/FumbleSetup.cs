@@ -291,6 +291,11 @@ namespace FumblePeak.EditorTools
             vis.steamMaterial = mats.steam;
             vis.lineMaterial = FumbleLevelBuilder.LineMaterial;
 
+            // Rahatsız eden canlılar (arı, sinek, kuş, örümcek)
+            var pests = root.AddComponent<PestController>();
+            pests.bodyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/GameFolder/Level/World_VertexColor.mat");
+            pests.wingMaterial = FumbleLevelBuilder.LineMaterial;
+
             var prefab = PrefabUtility.SaveAsPrefabAsset(root, PrefabDir + "/Climber.prefab");
             Object.DestroyImmediate(root);
             return prefab;

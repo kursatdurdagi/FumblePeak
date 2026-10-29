@@ -23,8 +23,15 @@ namespace FumblePeak.EditorTools
         const int GripLayer = 8;
 
         // ---- Rota ölçüleri ----
-        public const float Camp1Y = 12.5f, Camp2Y = 24.5f, Camp3Y = 36f, SummitY = 44f;
-        const float PeakY = 52f;
+        // Dağ ölçüleri Mountain sınıfında (oyun kodu da kullanır): her 12 m'de kamp, zirve 132 m
+        public const float SummitY = Mountain.SummitY;
+        const float PeakY = Mountain.PeakY;
+        static float CampY(int i) => Mountain.CampY(i);
+        static bool NearCamp(float y, float d)
+        {
+            for (int i = 0; i < Mountain.CampCount; i++) if (Mathf.Abs(y - CampY(i)) < d) return true;
+            return false;
+        }
 
         static System.Random rnd;
         static float R() => (float)rnd.NextDouble();
@@ -188,6 +195,7 @@ namespace FumblePeak.EditorTools
             Vector3 left = yawQ * Vector3.left, back = yawQ * Vector3.back;
             var boulderMesh = RockMesh("Menu_Boulder", RockCool, Snow, 7101, 0.8f);
             var boulder = MeshObj("LeanRock", root, boulderMesh, m.vc, Vector3.zero);
+            boulder.isStatic = false; // MenuCharacter mesh köşelerini okur (statik batch okunamaz yapar)
             var bb = boulderMesh.bounds;
             var want = new Vector3(0.95f, 1.0f, 0.9f);
             boulder.transform.localScale = new Vector3(want.x / bb.size.x, want.y / bb.size.y, want.z / bb.size.z);
@@ -520,19 +528,45 @@ namespace FumblePeak.EditorTools
             return z;
         }
 
+        // Bölge renkleri (yükseklik anahtarları): yan yüz + yukarı bakan yüz
+        static readonly Color MossRock = new Color(0.5f, 0.55f, 0.43f), ForestGreen = new Color(0.36f, 0.6f, 0.33f);
+        static readonly Color RedRock = new Color(0.78f, 0.47f, 0.37f), RedRockDeep = new Color(0.68f, 0.38f, 0.33f), Sand = new Color(0.93f, 0.77f, 0.57f);
+        static readonly Color IceRock = new Color(0.74f, 0.82f, 0.92f);
+        static readonly (float y, Color side, Color top)[] BiomeKeys =
+        {
+            (0f, Moss, Grass),
+            (5f, RockWarm, Grass),
+            (32f, RockWarm, Grass),
+            (39f, MossRock, ForestGreen),               // Yosunlu Orman Sırtı (36 m)
+            (69f, new Color(0.52f, 0.53f, 0.48f), ForestGreen),
+            (75f, RedRock, Sand),                       // Kızıl Kayalıklar (72 m)
+            (117f, RedRockDeep, Sand),
+            (123f, RockCool, Snow),                     // Rüzgârlı Sırtlar (120 m)
+            (153f, new Color(0.5f, 0.48f, 0.53f), Snow),
+            (159f, IceRock, Snow),                      // Buzul (156 m)
+            (999f, IceRock, Snow),
+        };
+
+        static void BiomeColors(float y, out Color side, out Color top)
+        {
+            for (int i = 1; i < BiomeKeys.Length; i++)
+            {
+                if (y > BiomeKeys[i].y) continue;
+                var a = BiomeKeys[i - 1]; var b = BiomeKeys[i];
+                float k = Mathf.InverseLerp(a.y, b.y, y);
+                side = Color.Lerp(a.side, b.side, k); top = Color.Lerp(a.top, b.top, k);
+                return;
+            }
+            side = BiomeKeys[0].side; top = BiomeKeys[0].top;
+        }
+
         static Color FaceColor(Vector3 c, Vector3 n)
         {
-            float y = c.y;
-            float up = n.y;
             float wn = Noise(c.x * 0.3f, c.y * 0.3f) * 3f;
-            Color col;
-            if (y + wn < 5f) col = Color.Lerp(Moss, RockWarm, Mathf.InverseLerp(1f, 5f, y + wn));
-            else if (y + wn < 22f) col = Color.Lerp(RockWarm, RockCool, Mathf.InverseLerp(5f, 22f, y + wn));
-            else if (y + wn < 32f) col = Color.Lerp(RockCool, RockDark, Mathf.InverseLerp(22f, 32f, y + wn) * 0.5f);
-            else col = Color.Lerp(RockCool, SnowShade, Mathf.InverseLerp(32f, 40f, y + wn));
-            // yukarı bakan yüzeyler: aşağıda çimen, yukarıda kar
-            if (up > 0.45f) col = y < 14f ? Color.Lerp(col, Grass, 0.75f) : Color.Lerp(col, Snow, 0.8f);
-            if (y > 40f + wn) col = Color.Lerp(col, Snow, 0.85f);
+            BiomeColors(Mathf.Max(0f, c.y + wn), out var col, out var top);
+            // yukarı bakan yüzeyler: çimen / yosun / kum / kar
+            if (n.y > 0.45f) col = Color.Lerp(col, top, 0.78f);
+            if (c.y > PeakY - 12f + wn) col = Color.Lerp(col, Snow, 0.85f);
             return Jitter(col, 0.05f);
         }
 
@@ -550,12 +584,13 @@ namespace FumblePeak.EditorTools
                     pts[i, j] = new Vector3(x, y, FaceZ(x, y));
                 }
 
-            // Yamaç iki parçada (index limiti ve gölge mesafesi için)
-            int half = ny / 2;
-            for (int part = 0; part < 2; part++)
+            // Yamaç ~24 m'lik parçalarda (index limiti, görünmeyen parçalar çizilmesin)
+            int rowsPer = Mathf.CeilToInt(24f / cell);
+            int parts = Mathf.CeilToInt(ny / (float)rowsPer);
+            for (int part = 0; part < parts; part++)
             {
                 var mb = new MB();
-                int j0 = part == 0 ? 0 : half, j1 = part == 0 ? half : ny;
+                int j0 = part * rowsPer, j1 = Mathf.Min(ny, j0 + rowsPer);
                 for (int i = 0; i < nx; i++)
                     for (int j = j0; j < j1; j++)
                     {
@@ -656,6 +691,7 @@ namespace FumblePeak.EditorTools
                 (28f, 7, 18f, 34f, new Color(0.45f, 0.6f, 0.45f)),
                 (55f, 8, 30f, 55f, new Color(0.5f, 0.58f, 0.62f)),
                 (95f, 9, 45f, 80f, new Color(0.6f, 0.66f, 0.76f)),
+                (150f, 10, 80f, 150f, new Color(0.66f, 0.7f, 0.8f)),
             };
             int idx = 0;
             foreach (var L in layers)
@@ -726,7 +762,7 @@ namespace FumblePeak.EditorTools
             return mb.Save(name);
         }
 
-        static Mesh[] holdMeshes, holdMoss, holdIce, decoRocks;
+        static Mesh[] holdMeshes, holdMoss, holdIce, holdCrumbly, decoRocks;
 
         static void MakeRockSets()
         {
@@ -750,6 +786,10 @@ namespace FumblePeak.EditorTools
             holdIce = new Mesh[shapes.Length];
             for (int hi = 0; hi < shapes.Length; hi++)
                 holdIce[hi] = StoneMesh($"HoldIce_{hi}", shapes[hi], new Color(0.7f, 0.86f, 0.98f), new Color(0.96f, 0.99f, 1f), null, 500 + hi, 0.4f);
+            // Çürük taşlar: kurşuni-kahve, çatlak çizgili (dikkatli bakan ayırt eder)
+            holdCrumbly = new Mesh[shapes.Length];
+            for (int hi = 0; hi < shapes.Length; hi++)
+                holdCrumbly[hi] = StoneMesh($"HoldCrumbly_{hi}", shapes[hi], new Color(0.66f, 0.56f, 0.48f), new Color(0.8f, 0.72f, 0.62f), null, 550 + hi, 1.3f, true);
             decoRocks = new Mesh[4];
             for (int i = 0; i < 4; i++) decoRocks[i] = RockMesh("Rock_" + i, RockWarm, RockCool, 600 + i, 0.7f);
         }
@@ -768,7 +808,7 @@ namespace FumblePeak.EditorTools
         /// Gerçek taş gibi tutamak: 2 kez bölünmüş ikosahedron + yumuşak gürültü, şekle göre ölçek,
         /// üstte tebeşir/açık ton, altta koyu gölge, ara ara liken lekeleri.
         /// </summary>
-        static Mesh StoneMesh(string name, HoldShape shape, Color main, Color top, Color? topOverride, int seed, float noiseAmt = 1f)
+        static Mesh StoneMesh(string name, HoldShape shape, Color main, Color top, Color? topOverride, int seed, float noiseAmt = 1f, bool cracked = false)
         {
             var old = rnd; rnd = new System.Random(seed);
             float t = (1f + Mathf.Sqrt(5f)) / 2f;
@@ -834,7 +874,13 @@ namespace FumblePeak.EditorTools
                     else if (n.y < -0.35f) col = main * 0.72f;
                     else col = Color.Lerp(main * 0.88f, main, n.y + 0.5f);
                     col.a = 1f;
-                    if (topOverride == null && R() < 0.025f) col = Color.Lerp(col, lichen[rnd.Next(lichen.Length)], 0.45f);
+                    if (topOverride == null && !cracked && R() < 0.025f) col = Color.Lerp(col, lichen[rnd.Next(lichen.Length)], 0.45f);
+                    if (cracked)
+                    {
+                        // çatlak bantları: koyu, ince "fay" çizgileri
+                        float h1 = Hash3(p * 7f, seed), h2 = Hash3(p * 5f + Vector3.one * 3f, seed + 11);
+                        if (Mathf.Abs(h1) < 0.07f || Mathf.Abs(h2) < 0.05f) col = new Color(0.24f, 0.19f, 0.17f);
+                    }
                     return Jitter(col, 0.012f);
                 });
             }
@@ -842,17 +888,21 @@ namespace FumblePeak.EditorTools
             return mb.Save(name);
         }
 
-        enum HoldKind { Rock, Moss, Ice }
+        enum HoldKind { Rock, Moss, Ice, Crumbly }
 
-        static void Hold(Transform parent, Vector2 p, HoldKind kind, Mats m)
+        /// <summary>Kurulan tutamaklar (rota doğrulama ve flora yerleşimi için): konum, güvenli mi.</summary>
+        static readonly List<(Vector2 p, bool solid)> holdLog = new List<(Vector2, bool)>();
+
+        static GameObject Hold(Transform parent, Vector2 p, HoldKind kind, Mats m)
         {
-            var set = kind == HoldKind.Rock ? holdMeshes : kind == HoldKind.Moss ? holdMoss : holdIce;
+            holdLog.Add((p, kind != HoldKind.Crumbly));
+            var set = kind == HoldKind.Rock ? holdMeshes : kind == HoldKind.Moss ? holdMoss : kind == HoldKind.Ice ? holdIce : holdCrumbly;
             var mesh = set[rnd.Next(set.Length)];
             float s = R(0.25f, 0.34f);
             float zFace = FaceZ(p.x, p.y);
 
             // Kök: oyun düzleminde (z=0), tekdüze ölçek → tutunma alanı tam taşın boyunda (boşluğu tutmaz)
-            var root = new GameObject(kind == HoldKind.Rock ? "Hold" : kind == HoldKind.Moss ? "Hold_Moss" : "Hold_Ice");
+            var root = new GameObject(kind == HoldKind.Rock ? "Hold" : kind == HoldKind.Moss ? "Hold_Moss" : kind == HoldKind.Ice ? "Hold_Ice" : "Hold_Crumbly");
             root.transform.SetParent(parent, false);
             root.transform.position = new Vector3(p.x, p.y, 0f);
             root.layer = GripLayer;
@@ -860,7 +910,7 @@ namespace FumblePeak.EditorTools
             col.isTrigger = true;
             col.radius = s * 0.5f;
             var grip = root.AddComponent<Grip>();
-            grip.type = kind == HoldKind.Rock ? GripType.Rock : GripType.Slippery;
+            grip.type = kind == HoldKind.Moss || kind == HoldKind.Ice ? GripType.Slippery : GripType.Rock;
             grip.slideSpeed = kind == HoldKind.Ice ? 0.3f : 0.18f;
 
             // Görsel: duvardan çıkan taş (derinlik duvara kadar uzar)
@@ -868,55 +918,447 @@ namespace FumblePeak.EditorTools
             go.isStatic = false; // vurgu için MaterialPropertyBlock kullanılır
             go.transform.localScale = new Vector3(s, s, Mathf.Max(0.5f, zFace + 0.2f));
             go.transform.rotation = Quaternion.Euler(0, 0, R(-30f, 30f));
+            if (kind == HoldKind.Crumbly) root.AddComponent<CrumblingHold>();
+            return root;
         }
 
         // ---------------------------------------------------------------
         // Rota: tutamaklar, kamp çıkıntıları, zirve
+        // ---------------------------------------------------------------
+        // ROTA ÜRETİCİ
+        //
+        // Zorluk d(y) ∈ [0,1] = Mountain.BaseDifficulty(y) + kilit noktaları (crux):
+        //   • taban: ilk 8 m sıfır, zirveye doğru 0.08 → 0.88 (üs 0.85), her kamp aralığında
+        //     0.7x (kamp çıkışı rahat) → 1.12x (sonraki kampa yaklaşırken sıkı)
+        //   • her kamp aralığına bir kilit bölgesi (1.5–2.5 m, +0.3)
+        // d'den türeyen parametreler:
+        //   basamak s = 0.25 → 0.35 m (+0..0.025), yan açıklık w = 0.18 → 0.26 m (±0.03)
+        //   yardımcı (bonus) tutamak olasılığı 0.45 → 0.08, ayak tutamağı 0.5 → 0.15
+        //   çürük taş: yardımcılarda 0 → %50, ana merdivende %12·d (yanında sağlam yedek)
+        //   d > 0.45 iken ara sıra aynı tarafta iki basamak (ritim bozulur, düşünmek gerekir)
+        // Yol olayları (kamp aralığı başına en fazla bir; ilk 12 m'de yok):
+        //   • ayrım: gerçek yol yana kayar (1.1–1.5 m), sahte kol öbür yana 2.5–3.6 m çıkıp
+        //     boşlukta biter (ucunda çoğu zaman çürük taş) → geri inmek gerekir
+        //   • travers: yol yalnızca yana kayar
+        // Garanti: kurulumdan sonra sağlam tutamaklar arasında ≤ 0.7 m'lik zincirle başlangıçtan
+        // zirveye yol aranır (BFS); kopukluk varsa araya sağlam tutamak eklenir (oyun kilitlenmez).
+        // ---------------------------------------------------------------
+        struct PathEvent { public float y0, len, shift; public bool fake; public float fakeLen, fakeShift; }
+        static readonly List<PathEvent> pathEvents = new List<PathEvent>();
+        static readonly List<Vector2> cruxes = new List<Vector2>(); // (başlangıç, uzunluk)
+
+        /// <summary>Rotanın gerçek orta çizgisi: kıvrımlı taban + ayrım/travers kaymaları.</summary>
+        public static float PathX(float y)
+        {
+            float x = RouteCenterX(y);
+            foreach (var e in pathEvents) x += e.shift * Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((y - e.y0) / e.len));
+            return x;
+        }
+
+        static float Difficulty(float y)
+        {
+            float d = Mountain.BaseDifficulty(y);
+            foreach (var c in cruxes) if (y >= c.x && y <= c.x + c.y) { d += 0.3f; break; }
+            return Mathf.Clamp01(d);
+        }
+
+        static void PlanPath()
+        {
+            pathEvents.Clear(); cruxes.Clear();
+            float total = 0f;
+            for (int k = 1; k < Mountain.CampCount; k++)
+            {
+                float segStart = CampY(k - 1), d = Mountain.BaseDifficulty(segStart + 6f);
+                // kilit bölgesi
+                cruxes.Add(new Vector2(R(segStart + 4f, segStart + 9f), R(1.5f, 2.5f)));
+                if (segStart + 12f > SummitY - 12f) continue; // zirve öncesi düz
+                float roll = R();
+                float pFork = Mathf.Lerp(0.35f, 0.8f, d);
+                if (roll > pFork + 0.2f) continue;
+                // toplam kayma ±1.6 m'yi aşmasın: yön merkeze doğru seçilir
+                float dir = Mathf.Abs(total) > 0.6f ? -Mathf.Sign(total) : (R() < 0.5f ? -1f : 1f);
+                var e = new PathEvent { y0 = R(segStart + 3f, segStart + 5.5f) };
+                if (roll <= pFork)
+                {
+                    e.shift = dir * R(1.1f, 1.5f); e.len = R(2.4f, 3.2f);
+                    e.fake = true; e.fakeLen = R(2.5f, 3.6f); e.fakeShift = -dir * R(1.1f, 1.5f);
+                }
+                else { e.shift = dir * R(0.8f, 1.2f); e.len = R(2.2f, 3f); }
+                total += e.shift;
+                pathEvents.Add(e);
+            }
+        }
+
         static void BuildRoute(Transform route, Transform holds, Mats m)
         {
             MakeRockSets();
+            holdLog.Clear();
+            PlanPath();
 
             var spawn = new GameObject("ClimberSpawn");
             spawn.transform.SetParent(route, false);
-            spawn.transform.position = new Vector3(RouteCenterX(1f), 1.0f, 0);
+            spawn.transform.position = new Vector3(PathX(1f), 1.0f, 0);
             spawn.AddComponent<ClimberSpawn>();
 
-            float[] camps = { Camp1Y, Camp2Y, Camp3Y };
+            var camps = new float[Mountain.CampCount];
+            for (int i = 0; i < camps.Length; i++) camps[i] = CampY(i);
             int campIndex = 0;
             float y = 0.45f; // yerden başlar: ayaklar da ilk basamaklara basabilsin
             float side = -1f;
+            float summitX = PathX(SummitY);
+            // Canlı yuvaları: nadiren, rotanın hemen yanında (cazip ama tutulmamalı)
+            var nests = new List<(Vector2 p, PestController.Kind kind)>();
+            float nextNestY = 8f;
+            int nestCount = 0;
             while (y < SummitY + 0.2f)
             {
-                float cx = RouteCenterX(y);
+                float d = Difficulty(y);
+                float cx = PathX(y);
                 // son metrelerde rota zirve platosunun kenarına kıvrılır (platonun altına sıkışmasın)
-                if (y > SummitY - 4f) cx = RouteCenterX(SummitY) + Mathf.Lerp(cx - RouteCenterX(SummitY), 3.15f, Mathf.SmoothStep(0f, 1f, (y - (SummitY - 4f)) / 3.2f));
-                // kamp yakınında: çıkıntı rotanın yanına kurulur, tutamaklar kenarından devam eder
+                if (y > SummitY - 4f) cx = summitX + Mathf.Lerp(cx - summitX, 3.15f, Mathf.SmoothStep(0f, 1f, (y - (SummitY - 4f)) / 3.2f));
+                // kamp yakınında: çıkıntı rotanın yanına kurulur, merdiven kesintisiz devam eder
                 if (campIndex < camps.Length && y > camps[campIndex] - 0.2f)
                 {
-                    float cy = camps[campIndex];
-                    BuildCamp(route, holds, m, campIndex, cy, cx);
+                    BuildCamp(route, holds, m, campIndex, camps[campIndex], cx);
                     campIndex++;
-                    // merdiven kesintisiz devam eder (kamp yanda, dinlenmek isteyen geçer)
                 }
 
+                // Bölgeye göre tutamak: orman sırtında yosun, rüzgârlı sırtlarda ve buzulda buz (kaygan)
                 HoldKind kind = HoldKind.Rock;
-                if (y > Camp1Y + 1f && y < Camp2Y && R() < 0.3f) kind = HoldKind.Moss;
-                if (y > Camp2Y + 1f && R() < 0.3f) kind = HoldKind.Ice;
+                int biome = Mountain.Biome(y);
+                bool fresh = NearCamp(y - 1.2f, 1.2f) || y < 10f; // başlangıç ve kamp çıkışı temiz
+                if (!fresh && biome == 1 && R() < 0.3f) kind = HoldKind.Moss;
+                if (!fresh && biome == 3 && R() < 0.2f) kind = HoldKind.Ice;
+                if (!fresh && biome == 4 && R() < 0.33f) kind = HoldKind.Ice;
+                if (!fresh && kind == HoldKind.Rock && R() < 0.12f * d) kind = HoldKind.Crumbly;
 
-                // Basamaklı merdiven: tutamaklar dönüşümlü sol / sağ (el-el tırmanış ritmi)
-                float colX = cx + side * (0.2f + R(-0.04f, 0.05f));
-                Hold(holds, new Vector2(colX, y), kind, m);
-                // kaygan tutamağın yanında güvenli bir yedek
+                bool nestHere = false;
+                if (y >= nextNestY && !NearCamp(y, 2.4f) && y < SummitY - 5f)
+                {
+                    var nk = NestKindFor(biome, nestCount++);
+                    nests.Add((new Vector2(cx + side * R(0.62f, 0.78f), y + R(0.05f, 0.2f)), nk));
+                    nextNestY = y + R(7f, 11f);
+                    nestHere = true;
+                }
+
+                // Basamaklı merdiven: tutamaklar dönüşümlü sol / sağ
+                float w = Mathf.Lerp(0.18f, 0.26f, d) + R(-0.03f, 0.03f);
+                Hold(holds, new Vector2(cx + side * w, y), kind, m);
+                // kaygan / çürük tutamağın yanında güvenli bir yedek
                 if (kind != HoldKind.Rock) Hold(holds, new Vector2(cx - side * 0.05f + R(-0.05f, 0.05f), y + 0.16f), HoldKind.Rock, m);
-                // ara sıra bonus tutamak (alternatif yol)
-                if (R() < 0.22f) Hold(holds, new Vector2(cx + side * R(0.75f, 0.95f), y + R(-0.1f, 0.1f)), HoldKind.Rock, m);
-                // ayaklar için alçak yan tutamaklar (otomatik ayak bulma)
-                if (R() < 0.3f) Hold(holds, new Vector2(cx - side * R(0.55f, 0.7f), y - 0.15f), HoldKind.Rock, m);
+                // yardımcı tutamaklar: başta bol, yukarıda seyrek ve çoğu zaman çürük
+                bool lateGame = y > 10f;
+                if (!nestHere && R() < Mathf.Lerp(0.45f, 0.08f, d))
+                    Hold(holds, new Vector2(cx + side * R(0.7f, 0.95f), y + R(-0.1f, 0.1f)), lateGame && R() < 0.5f * d ? HoldKind.Crumbly : HoldKind.Rock, m);
+                if (R() < Mathf.Lerp(0.5f, 0.15f, d))
+                    Hold(holds, new Vector2(cx - side * R(0.55f, 0.7f), y - 0.15f), lateGame && R() < 0.3f * d ? HoldKind.Crumbly : HoldKind.Rock, m);
 
-                side = -side;
-                y += (y < Camp1Y ? 0.27f : 0.3f) + R(0f, 0.05f);
+                // zor yerlerde ara sıra aynı tarafta iki basamak
+                if (!(d > 0.45f && R() < 0.18f * d)) side = -side;
+                y += Mathf.Lerp(0.25f, 0.35f, d) + R(0f, 0.025f);
             }
+            BuildFakeBranches(holds, m);
             BuildSummit(route, holds, m);
+
+            // Yuvaların çevresi boş kalsın: yanlışlıkla yuvaya tutunulmasın (yuva hep bilinçli bir hata)
+            var toRemove = new List<GameObject>();
+            foreach (Transform h in holds)
+                foreach (var n in nests)
+                    if (((Vector2)h.position - n.p).sqrMagnitude < 0.38f * 0.38f) { toRemove.Add(h.gameObject); break; }
+            foreach (var g in toRemove) Object.DestroyImmediate(g);
+
+            // Rota garantisi: kopukluk varsa onar (yuvaların yanına tutamak koymaz → o yuvayı kaldırır)
+            var added = ValidateRoute(holds, m);
+            nests.RemoveAll(n => added.Exists(a => (a - n.p).sqrMagnitude < 0.45f * 0.45f));
+
+            var nestGroup = Group(route, "Nests");
+            foreach (var n in nests) Nest(nestGroup, n.p, n.kind, m);
+        }
+
+        /// <summary>Sahte kollar: ayrım noktasından öbür yana tırmanıp boşlukta biter.</summary>
+        static void BuildFakeBranches(Transform holds, Mats m)
+        {
+            foreach (var e in pathEvents)
+            {
+                if (!e.fake) continue;
+                float y = e.y0 + 0.3f, side = 1f;
+                float baseX = PathX(e.y0);
+                while (y < e.y0 + e.fakeLen)
+                {
+                    float t = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((y - e.y0) / e.fakeLen));
+                    float cx = baseX + (RouteCenterX(y) - RouteCenterX(e.y0)) + e.fakeShift * t;
+                    bool last = y + 0.6f >= e.y0 + e.fakeLen;
+                    // ucu çoğu zaman çürük: "yanlış yoldasın" anı
+                    var kind = last && R() < 0.65f ? HoldKind.Crumbly : HoldKind.Rock;
+                    if (t > 0.25f) Hold(holds, new Vector2(cx + side * R(0.17f, 0.24f), y), kind, m);
+                    side = -side;
+                    y += R(0.27f, 0.33f);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Başlangıçtan zirveye sağlam tutamak zinciri var mı (komşuluk ≤ 0.7 m)? Yoksa en yakın kopukluğa
+        /// ara tutamaklar ekler. Eklenen konumları döndürür.
+        /// </summary>
+        static List<Vector2> ValidateRoute(Transform holds, Mats m)
+        {
+            const float link = 0.7f;
+            var added = new List<Vector2>();
+            var nodes = new List<Vector2>();
+            foreach (Transform h in holds)
+                if (h.GetComponent<Grip>() != null && h.GetComponent<CrumblingHold>() == null && h.GetComponent<PestNest>() == null)
+                    nodes.Add(h.position);
+            for (int iter = 0; iter < 300; iter++)
+            {
+                var reach = new bool[nodes.Count];
+                var q = new Queue<int>();
+                for (int i = 0; i < nodes.Count; i++) if (nodes[i].y < 1.4f) { reach[i] = true; q.Enqueue(i); }
+                bool goal = false;
+                while (q.Count > 0)
+                {
+                    int i = q.Dequeue();
+                    if (nodes[i].y > SummitY - 0.7f) { goal = true; break; }
+                    for (int j = 0; j < nodes.Count; j++)
+                        if (!reach[j] && (nodes[j] - nodes[i]).sqrMagnitude <= link * link) { reach[j] = true; q.Enqueue(j); }
+                }
+                if (goal) break;
+                // en kısa köprü: ulaşılan en yüksek bölgeden yukarıdaki ulaşılamayana
+                float maxY = 0f;
+                for (int i = 0; i < nodes.Count; i++) if (reach[i]) maxY = Mathf.Max(maxY, nodes[i].y);
+                int bi = -1, bj = -1; float bd = float.MaxValue;
+                for (int i = 0; i < nodes.Count; i++)
+                {
+                    if (!reach[i] || nodes[i].y < maxY - 1.5f) continue;
+                    for (int j = 0; j < nodes.Count; j++)
+                    {
+                        if (reach[j] || nodes[j].y <= nodes[i].y - 0.2f) continue;
+                        float dd = (nodes[j] - nodes[i]).sqrMagnitude;
+                        if (dd < bd) { bd = dd; bi = i; bj = j; }
+                    }
+                }
+                if (bi < 0) { Debug.LogWarning("[FumblePeak] Rota doğrulama: köprü bulunamadı"); break; }
+                Vector2 a0 = nodes[bi], b0 = nodes[bj];
+                int steps = Mathf.CeilToInt(Vector2.Distance(a0, b0) / 0.45f);
+                for (int k = 1; k < steps; k++)
+                {
+                    var p = Vector2.Lerp(a0, b0, k / (float)steps);
+                    Hold(holds, p, HoldKind.Rock, m);
+                    nodes.Add(p); added.Add(p);
+                }
+            }
+            Debug.Log($"<b>[FumblePeak]</b> Rota doğrulandı: {nodes.Count} sağlam tutamak, {added.Count} köprü tutamağı eklendi, {pathEvents.FindAll(e => e.fake).Count} yol ayrımı.");
+            return added;
+        }
+
+        static PestController.Kind NestKindFor(int biome, int i)
+        {
+            switch (biome)
+            {
+                case 0: return PestController.Kind.Bees;                                          // çayır: arı kovanları
+                case 1: return i % 2 == 0 ? PestController.Kind.Bees : PestController.Kind.Bird;   // orman: kovan + kuş yuvası
+                case 2: return i % 2 == 0 ? PestController.Kind.Bird : PestController.Kind.Spider; // kızıl kayalar
+                default: return i % 3 == 2 ? PestController.Kind.Bird : PestController.Kind.Spider; // yükseklerde örümcek ağları
+            }
+        }
+
+        // ---------------------------------------------------------------
+        // Canlı yuvaları (tutunulabilir görünür ama tutan düşer — PestNest / PestController)
+        static Mesh hiveMesh, birdNestMesh, webMesh, eggSacMesh;
+
+        static void Nest(Transform parent, Vector2 p, PestController.Kind kind, Mats m)
+        {
+            float zFace = FaceZ(p.x, p.y);
+            var root = new GameObject("Nest_" + kind);
+            root.transform.SetParent(parent, false);
+            root.transform.position = new Vector3(p.x, p.y, 0f);
+            root.layer = GripLayer;
+            var col = root.AddComponent<SphereCollider>();
+            col.isTrigger = true;
+            col.radius = 0.15f;
+            root.AddComponent<Grip>().type = GripType.Rock;
+            var nest = root.AddComponent<PestNest>();
+            nest.kind = kind;
+            nest.bodyMaterial = m.vc;
+            nest.wingMaterial = m.line;
+
+            var vis = new GameObject("Visual").transform;
+            vis.SetParent(root.transform, false);
+            GameObject Part(string name, Mesh mesh, Material mat, Vector3 local, Vector3 scale, bool shadows = true)
+            {
+                var go = MeshObj(name, vis, mesh, mat, root.transform.position + local, shadows);
+                go.isStatic = false; // yuva saldırıda sarsılır
+                go.transform.localScale = scale;
+                return go;
+            }
+
+            switch (kind)
+            {
+                case PestController.Kind.Bees:
+                {
+                    // Duvardan çıkan kaya dalı + altında sarkan kovan
+                    var stub = Part("Branch", decoRocks[0], m.vc, new Vector3(0f, 0.2f, zFace * 0.5f), new Vector3(0.26f, 0.12f, zFace + 0.25f));
+                    stub.transform.rotation = Quaternion.Euler(0f, 0f, R(-10f, 10f));
+                    Part("Hive", HiveMesh(), m.vc, new Vector3(0f, 0f, -0.04f), Vector3.one);
+                    nest.residentOffset = new Vector3(0f, -0.02f, -0.2f);
+                    break;
+                }
+                case PestController.Kind.Bird:
+                {
+                    // Küçük kaya çıkıntısı + üstünde dal örgüsü yuva, içinde yumurtalar ve anne kuş
+                    var shelf = Part("Shelf", decoRocks[1], m.vc, new Vector3(0f, -0.12f, zFace * 0.5f), new Vector3(0.42f, 0.14f, zFace + 0.3f));
+                    shelf.transform.rotation = Quaternion.Euler(0f, R(-20f, 20f), 0f);
+                    Part("BirdNest", BirdNestMesh(), m.vc, new Vector3(0f, -0.06f, -0.06f), Vector3.one);
+                    nest.residentOffset = new Vector3(0f, 0.04f, -0.06f);
+                    break;
+                }
+                default:
+                {
+                    // Çatlaktaki taş tutamak + önüne gerilmiş örümcek ağı, ortada yumurta kesesi
+                    var stone = Part("Stone", holdMeshes[rnd.Next(holdMeshes.Length)], m.vc, new Vector3(0f, 0f, zFace * 0.5f), new Vector3(0.3f, 0.3f, Mathf.Max(0.5f, zFace + 0.2f)));
+                    stone.transform.rotation = Quaternion.Euler(0f, 0f, R(-30f, 30f));
+                    Part("Web", WebMesh(), m.line, new Vector3(0f, 0.02f, -0.17f), Vector3.one, false);
+                    Part("EggSac", EggSacMesh(), m.vc, new Vector3(-0.03f, -0.04f, -0.2f), Vector3.one);
+                    nest.residentOffset = new Vector3(0.09f, 0.1f, -0.2f);
+                    break;
+                }
+            }
+        }
+
+        /// <summary>Döndürülerek üretilen gövde (kovan vb.): profil = (yükseklik, yarıçap) çiftleri.</summary>
+        static void Lathe(MB mb, Vector3 c, (float h, float r)[] prof, int seg, System.Func<int, Color> ringCol, float jitter = 0.08f, float normalSign = 1f)
+        {
+            var rings = new Vector3[prof.Length, seg];
+            for (int i = 0; i < prof.Length; i++)
+                for (int k = 0; k < seg; k++)
+                {
+                    float a = (k + (i % 2) * 0.5f) / seg * Mathf.PI * 2f;
+                    float r = prof[i].r * (1f + (R() - 0.5f) * jitter);
+                    rings[i, k] = c + new Vector3(Mathf.Cos(a) * r, prof[i].h, Mathf.Sin(a) * r);
+                }
+            for (int i = 0; i < prof.Length - 1; i++)
+            {
+                var col = ringCol(i);
+                // profil teğetine dik dış normal: (dh, -dr) — profil yönüne göre işaret
+                float dr = prof[i + 1].r - prof[i].r, dh = prof[i + 1].h - prof[i].h;
+                float nr = dh * normalSign, nh = -dr * normalSign;
+                for (int k = 0; k < seg; k++)
+                {
+                    int k1 = (k + 1) % seg;
+                    var mid = (rings[i, k] + rings[i, k1] + rings[i + 1, k]) / 3f - c;
+                    var radial = new Vector3(mid.x, 0f, mid.z).normalized;
+                    var outward = radial * nr + Vector3.up * nh;
+                    TriN(mb, rings[i, k], rings[i + 1, k], rings[i, k1], outward, Jitter(col, 0.03f));
+                    TriN(mb, rings[i, k1], rings[i + 1, k], rings[i + 1, k1], outward, Jitter(col, 0.03f));
+                }
+            }
+        }
+
+        static Mesh HiveMesh()
+        {
+            if (hiveMesh != null) return hiveMesh;
+            var old = rnd; rnd = new System.Random(8101);
+            var mb = new MB();
+            // damla şeklinde, halka halka (bal mumu tonları), üstten dala asılı
+            var prof = new (float h, float r)[]
+            {
+                (0.2f, 0.03f), (0.17f, 0.085f), (0.12f, 0.125f), (0.06f, 0.145f), (0.0f, 0.15f),
+                (-0.06f, 0.14f), (-0.11f, 0.115f), (-0.15f, 0.08f), (-0.18f, 0.035f), (-0.19f, 0.0f),
+            };
+            var light = new Color(0.93f, 0.72f, 0.36f); var dark = new Color(0.78f, 0.55f, 0.25f);
+            Lathe(mb, Vector3.zero, prof, 9, i => i % 2 == 0 ? light : dark, 0.06f, -1f); // profil yukarıdan aşağı
+            // giriş deliği (kameraya bakan koyu oval)
+            var hole = new Color(0.22f, 0.13f, 0.07f);
+            var hc = new Vector3(0f, -0.06f, -0.148f);
+            for (int k = 0; k < 7; k++)
+            {
+                float a0 = k / 7f * Mathf.PI * 2f, a1 = (k + 1) / 7f * Mathf.PI * 2f;
+                TriN(mb, hc, hc + new Vector3(Mathf.Cos(a1) * 0.035f, Mathf.Sin(a1) * 0.026f, 0f), hc + new Vector3(Mathf.Cos(a0) * 0.035f, Mathf.Sin(a0) * 0.026f, 0f), Vector3.back, hole);
+            }
+            // bal damlası
+            Ico(mb, new Vector3(0.03f, -0.2f, -0.03f), 0.018f, 1.4f, new Color(1f, 0.75f, 0.2f), new Color(0.95f, 0.6f, 0.15f));
+            rnd = old;
+            hiveMesh = mb.Save("Nest_Hive");
+            return hiveMesh;
+        }
+
+        static Mesh BirdNestMesh()
+        {
+            if (birdNestMesh != null) return birdNestMesh;
+            var old = rnd; rnd = new System.Random(8202);
+            var mb = new MB();
+            // çanak: dışı dal kahvesi, içi koyu
+            var prof = new (float h, float r)[] { (0.0f, 0.06f), (0.03f, 0.15f), (0.08f, 0.19f), (0.1f, 0.17f), (0.06f, 0.12f), (0.03f, 0.05f) };
+            var twig = new Color(0.55f, 0.38f, 0.22f); var twig2 = new Color(0.66f, 0.5f, 0.3f); var inner = new Color(0.36f, 0.24f, 0.15f);
+            Lathe(mb, Vector3.zero, prof, 10, i => i >= 3 ? inner : i % 2 == 0 ? twig : twig2, 0.12f);
+            // dışarı taşan dal çöpleri
+            for (int k = 0; k < 18; k++)
+            {
+                float a = R(0f, Mathf.PI * 2f), h = R(0.02f, 0.09f);
+                var dir = new Vector3(Mathf.Cos(a), 0f, Mathf.Sin(a));
+                var tan = Vector3.Cross(dir, Vector3.up);
+                var p0 = dir * 0.16f + Vector3.up * h - tan * R(0.06f, 0.12f);
+                var p1 = dir * R(0.17f, 0.24f) + Vector3.up * (h + R(-0.03f, 0.04f)) + tan * R(0.06f, 0.12f);
+                var w = Vector3.up * 0.006f;
+                DoubleTri(mb, p0 - w, p1, p0 + w, k % 2 == 0 ? twig : twig2);
+            }
+            // açık mavi benekli yumurtalar (kenardan görünür)
+            for (int e = 0; e < 3; e++)
+            {
+                var ep = new Vector3((e - 1) * 0.055f, 0.1f, -0.02f + (e == 1 ? 0.03f : 0f));
+                Ico(mb, ep, 0.034f, 1.25f, new Color(0.72f, 0.88f, 0.95f), new Color(0.62f, 0.8f, 0.9f));
+            }
+            rnd = old;
+            birdNestMesh = mb.Save("Nest_Bird");
+            return birdNestMesh;
+        }
+
+        static Mesh WebMesh()
+        {
+            if (webMesh != null) return webMesh;
+            var old = rnd; rnd = new System.Random(8303);
+            var mb = new MB();
+            var silk = new Color(1f, 1f, 1f, 0.75f);
+            const int spokes = 9; const float rad = 0.33f; const float w = 0.0035f;
+            var ends = new Vector3[spokes];
+            for (int k = 0; k < spokes; k++)
+            {
+                float a = k / (float)spokes * Mathf.PI * 2f + R(-0.12f, 0.12f);
+                ends[k] = new Vector3(Mathf.Cos(a), Mathf.Sin(a), 0f) * rad * R(0.85f, 1.1f);
+            }
+            void Strand(Vector3 a, Vector3 b)
+            {
+                var d = (b - a).normalized; var nrm = new Vector3(-d.y, d.x, 0f) * w;
+                mb.Tri(a - nrm, b - nrm, b + nrm, silk); mb.Tri(a - nrm, b + nrm, a + nrm, silk);
+                mb.Tri(a - nrm, b + nrm, b - nrm, silk); mb.Tri(a - nrm, a + nrm, b + nrm, silk);
+            }
+            foreach (var e in ends) Strand(Vector3.zero, e);
+            // sarmal halkalar (hafif sarkık)
+            for (int ring = 1; ring <= 5; ring++)
+            {
+                float f = ring / 5.5f;
+                for (int k = 0; k < spokes; k++)
+                {
+                    var a = ends[k] * f; var b = ends[(k + 1) % spokes] * f;
+                    var mid = (a + b) * 0.5f * 0.94f;
+                    Strand(a, mid); Strand(mid, b);
+                }
+            }
+            rnd = old;
+            webMesh = mb.Save("Nest_Web");
+            return webMesh;
+        }
+
+        static Mesh EggSacMesh()
+        {
+            if (eggSacMesh != null) return eggSacMesh;
+            var old = rnd; rnd = new System.Random(8404);
+            var mb = new MB();
+            Ico(mb, Vector3.zero, 0.06f, 1.3f, new Color(0.98f, 0.97f, 0.92f), new Color(0.88f, 0.86f, 0.8f));
+            Ico(mb, new Vector3(0.035f, 0.03f, -0.01f), 0.03f, 1.1f, new Color(0.98f, 0.97f, 0.92f), new Color(0.88f, 0.86f, 0.8f));
+            rnd = old;
+            eggSacMesh = mb.Save("Nest_EggSac");
+            return eggSacMesh;
         }
 
         static Mesh ledgeMesh, tentMesh, logMesh;
@@ -933,7 +1375,8 @@ namespace FumblePeak.EditorTools
             const float width = 3.0f;
             // Çıkıntı rotaya bitişik: rotadan yana adım atıp üstüne basılabilir
             float ledgeX = cx + side * (width * 0.5f + 0.38f);
-            var top = cy < 14f ? Grass : Snow;
+            int biome = Mountain.Biome(cy + 0.5f);
+            var top = biome == 0 ? Grass : biome == 1 ? ForestGreen : biome == 2 ? Sand : Snow;
             float topY = cy + 0.05f;
 
             var camp = new GameObject($"Camp_{index + 1}").transform;
@@ -962,13 +1405,13 @@ namespace FumblePeak.EditorTools
 
             // ---- Kamptan çıkış duvarı: çıkıntının üstünden başlayıp rotaya kıvrılan merdiven ----
             // Ayakta dururken eller (+1.6..2.0) ve ayaklar (+0.45..0.8) hemen tutunabilir.
-            int steps = 22;
+            int steps = 16;
             for (int k = 0; k < steps; k++)
             {
                 float y = topY + 0.45f + k * 0.3f;
                 // önce dümdüz yukarı, sonra yavaşça rotaya kıvrılır (her basamakta en fazla ~0.2 m yana)
-                float t = Mathf.Clamp01((k - 4) / (float)(steps - 6)); // doğrusal: her basamakta eşit, küçük yan kayma
-                float x = Mathf.Lerp(ledgeX - side * 0.15f, RouteCenterX(y), t) + (k % 2 == 0 ? -0.15f : 0.15f);
+                float t = Mathf.Clamp01((k - 3) / (float)(steps - 5)); // doğrusal: her basamakta eşit, küçük yan kayma
+                float x = Mathf.Lerp(ledgeX - side * 0.15f, PathX(y), t) + (k % 2 == 0 ? -0.15f : 0.15f);
                 Hold(holds, new Vector2(x, y), HoldKind.Rock, m);
                 if (k < 3) Hold(holds, new Vector2(x + (k % 2 == 0 ? 0.55f : -0.55f), y + 0.12f), HoldKind.Rock, m); // geniş başlangıç
             }
@@ -1013,8 +1456,9 @@ namespace FumblePeak.EditorTools
             bag.transform.localScale = new Vector3(0.22f, 0.3f, 0.18f);
 
             // çimen/karda küçük çiçekler (ya da kar topakları)
-            var flowerCols = cy < 14f
+            var flowerCols = biome <= 1
                 ? new[] { new Color(1f, 0.85f, 0.3f), new Color(1f, 0.5f, 0.6f), new Color(0.75f, 0.6f, 1f), Color.white }
+                : biome == 2 ? new[] { new Color(1f, 0.7f, 0.25f), new Color(0.95f, 0.45f, 0.3f), new Color(1f, 0.9f, 0.5f) }
                 : new[] { Color.white, new Color(0.85f, 0.92f, 1f) };
             for (int k = 0; k < 9; k++)
             {
@@ -1055,14 +1499,24 @@ namespace FumblePeak.EditorTools
                 log.transform.localScale = new Vector3(0.45f, 0.12f, 0.12f);
                 log.transform.rotation = Quaternion.Euler(0, i * 45f, 0);
             }
-            var flame = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            Object.DestroyImmediate(flame.GetComponent<Collider>());
-            flame.name = "Flame";
+            // Taş halka
+            if (decoRocks != null)
+                for (int i = 0; i < 9; i++)
+                {
+                    float a2 = i / 9f * Mathf.PI * 2f;
+                    var st = MeshObj("FireStone", fire.transform, decoRocks[i % decoRocks.Length], m.vc, pos + new Vector3(Mathf.Cos(a2) * 0.33f, 0.03f, Mathf.Sin(a2) * 0.33f));
+                    st.transform.localScale = new Vector3(0.13f, 0.09f, 0.12f) * R(0.85f, 1.2f);
+                    st.transform.rotation = Quaternion.Euler(0, R(0, 360), 0);
+                }
+            // Low-poly alev: iç içe 3 katman (kırmızı-turuncu dış, turuncu, sarı çekirdek) + uçuşan dil
+            var flame = new GameObject("Flame");
             flame.transform.SetParent(fire.transform, false);
-            flame.transform.position = pos + Vector3.up * 0.18f;
-            flame.transform.localScale = new Vector3(0.2f, 0.32f, 0.2f);
-            flame.GetComponent<Renderer>().sharedMaterial = m.fire;
-            flame.GetComponent<Renderer>().shadowCastingMode = ShadowCastingMode.Off;
+            flame.transform.position = pos + Vector3.up * 0.04f;
+            flame.AddComponent<MeshFilter>().sharedMesh = FlameMesh();
+            var fr = flame.AddComponent<MeshRenderer>();
+            fr.sharedMaterial = FlameMaterial;
+            fr.shadowCastingMode = ShadowCastingMode.Off;
+            var flick = flame.AddComponent<CampfireFlicker>();
 
             var ps = new GameObject("Sparks").AddComponent<ParticleSystem>();
             ps.transform.SetParent(fire.transform, false);
@@ -1082,6 +1536,75 @@ namespace FumblePeak.EditorTools
             var light = lg.AddComponent<Light>();
             light.type = LightType.Point; light.color = new Color(1f, 0.62f, 0.3f); light.range = 4f; light.intensity = 2.5f;
             light.shadows = LightShadows.None;
+            flick.fireLight = light;
+        }
+
+        static Mesh flameMesh;
+
+        /// <summary>Düşük poligonlu alev: 3 katmanlı, kıvrık, sivri dilli koniler (köşe renkli).</summary>
+        static Mesh FlameMesh()
+        {
+            if (flameMesh != null) return flameMesh;
+            var old = rnd; rnd = new System.Random(4242);
+            var mb = new MB();
+            var layers = new[]
+            {
+                (r: 0.17f, h: 0.42f, col: new Color(1f, 0.32f, 0.12f), tongues: 5),
+                (r: 0.12f, h: 0.34f, col: new Color(1f, 0.58f, 0.15f), tongues: 4),
+                (r: 0.07f, h: 0.22f, col: new Color(1f, 0.9f, 0.45f), tongues: 3),
+            };
+            foreach (var L in layers)
+            {
+                int seg = 7;
+                var ring = new Vector3[seg];
+                for (int i = 0; i < seg; i++)
+                {
+                    float a = i / (float)seg * Mathf.PI * 2f;
+                    ring[i] = new Vector3(Mathf.Cos(a) * L.r * R(0.8f, 1.1f), 0f, Mathf.Sin(a) * L.r * R(0.8f, 1.1f));
+                }
+                // orta boğum (alev göbekli, yukarı incelir)
+                var mid = new Vector3[seg];
+                for (int i = 0; i < seg; i++) mid[i] = ring[i] * 0.75f + new Vector3(R(-0.02f, 0.02f), L.h * 0.38f, R(-0.02f, 0.02f));
+                var tip = new Vector3(R(-0.02f, 0.02f), L.h, R(-0.02f, 0.02f));
+                for (int i = 0; i < seg; i++)
+                {
+                    int j = (i + 1) % seg;
+                    var c0 = Jitter(L.col * 0.92f, 0.04f); var c1 = Jitter(L.col, 0.04f);
+                    TriN(mb, ring[i], ring[j], mid[i], (ring[i] + ring[j]) * 0.5f, c0);
+                    TriN(mb, ring[j], mid[j], mid[i], (ring[j] + mid[j]) * 0.5f, c0);
+                    TriN(mb, mid[i], mid[j], tip, (mid[i] + mid[j]) * 0.5f, c1);
+                }
+                // yana kıvrılan alev dilleri
+                for (int k = 0; k < L.tongues; k++)
+                {
+                    float a = R(0, Mathf.PI * 2f);
+                    var dir = new Vector3(Mathf.Cos(a), 0, Mathf.Sin(a));
+                    var b0 = dir * L.r * 0.6f + Vector3.up * L.h * 0.2f;
+                    var t2 = dir * L.r * R(0.9f, 1.3f) + Vector3.up * L.h * R(0.7f, 1.05f);
+                    var side = Vector3.Cross(dir, Vector3.up) * L.r * 0.35f;
+                    DoubleTri(mb, b0 - side, t2, b0 + side, Jitter(L.col, 0.05f));
+                }
+            }
+            rnd = old;
+            flameMesh = mb.Save("Flame");
+            return flameMesh;
+        }
+
+        /// <summary>Alev malzemesi: köşe rengini kullanan, ışıktan etkilenmeyen, HDR parlak (bloom ile parlar).</summary>
+        static Material FlameMaterial
+        {
+            get
+            {
+                var path = $"{LevelDir}/FlameLowPoly.mat";
+                var mat = AssetDatabase.LoadAssetAtPath<Material>(path);
+                if (mat == null) { mat = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit")); AssetDatabase.CreateAsset(mat, path); }
+                mat.SetColor("_BaseColor", new Color(1.8f, 1.6f, 1.4f, 1f));
+                mat.SetFloat("_Surface", 0);
+                mat.SetFloat("_Cull", 0); // iki yüzlü
+                mat.SetTexture("_BaseMap", null);
+                EditorUtility.SetDirty(mat);
+                return mat;
+            }
         }
 
         static Mesh TentMesh()
@@ -1101,7 +1624,7 @@ namespace FumblePeak.EditorTools
 
         static void BuildSummit(Transform route, Transform holds, Mats m)
         {
-            float cx = RouteCenterX(SummitY);
+            float cx = PathX(SummitY);
             var summit = new GameObject("Summit").transform;
             summit.SetParent(route, false);
 
@@ -1219,12 +1742,13 @@ namespace FumblePeak.EditorTools
                 go.transform.rotation = Quaternion.Euler(0, R(0, 360), 0);
             }
             // yamaçta süs kayalar (rota dışı, karakterin arkasında)
-            for (int i = 0; i < 90; i++)
+            for (int i = 0; i < 360; i++)
             {
                 float y = R(2f, PeakY - 4f);
                 float x = RouteCenterX(y) + (R() < 0.5f ? -1f : 1f) * R(2.2f, HalfWidth(y) + 3f);
                 float zf = FaceZ(x, y);
                 float s = R(0.6f, 1.8f);
+                if (NearAnyHold(new Vector2(x, y), 0.5f + s)) continue; // tutamakları (sahte yollar dahil) örtmesin
                 var go = MeshObj("Outcrop", parent, decoRocks[rnd.Next(decoRocks.Length)], m.vc, new Vector3(x, y, zf + s * 0.35f));
                 go.transform.localScale = new Vector3(s * R(1f, 2f), s * R(0.5f, 1f), s);
                 go.transform.rotation = Quaternion.Euler(R(-20, 20), R(0, 360), R(-20, 20));
@@ -1237,28 +1761,37 @@ namespace FumblePeak.EditorTools
         {
             const float band = 8f;
             int bands = Mathf.CeilToInt((PeakY - 4f) / band);
+            float[] camps = new float[Mountain.CampCount];
+            for (int i = 0; i < camps.Length; i++) camps[i] = CampY(i);
             for (int bi = 0; bi < bands; bi++)
             {
                 var mb = new MB();
                 float y0 = 0.6f + bi * band, y1 = Mathf.Min(PeakY - 4f, y0 + band);
-                int clusters = Mathf.RoundToInt(55 * (1f - bi / (float)bands * 0.5f));
+                int clusters = Mathf.RoundToInt(44 * (1f - bi / (float)bands * 0.5f));
                 for (int c = 0; c < clusters; c++)
                 {
                     float y = R(y0, y1);
-                    float cx = RouteCenterX(y);
+                    float cx = PathX(y);
                     float hw = HalfWidth(y);
                     float sideSign = R() < 0.5f ? -1f : 1f;
                     float x = cx + sideSign * R(1.5f, Mathf.Max(1.8f, hw * 0.75f));
                     // kampların çıkıntı bölgesini boş bırak
-                    if (Mathf.Abs(y - Camp1Y) < 1.6f || Mathf.Abs(y - Camp2Y) < 1.6f || Mathf.Abs(y - Camp3Y) < 1.6f)
-                        if (Mathf.Abs(x - cx) < 4.5f) continue;
+                    if (NearCamp(y, 1.6f) && Mathf.Abs(x - cx) < 4.5f) continue;
                     if (y > SummitY - 2f && Mathf.Abs(x - cx) < 4f) continue;
+                    if (NearAnyHold(new Vector2(x, y), 0.8f)) continue; // sahte yollar dahil tutamakları kapatmasın
                     float z = FaceZ(x, y) + 0.06f; // raf duvara gömülü başlar (havada durmasın)
                     FloraCluster(mb, new Vector3(x, y, z), y);
                 }
                 if (mb.v.Count == 0) continue;
                 var go = MeshObj("Flora_" + bi, parent, mb.Save("Flora_" + bi), m.vc, Vector3.zero, false);
             }
+        }
+
+        static bool NearAnyHold(Vector2 p, float r)
+        {
+            float r2 = r * r;
+            foreach (var h in holdLog) if ((h.p - p).sqrMagnitude < r2) return true;
+            return false;
         }
 
         static void FloraCluster(MB target, Vector3 at, float y)
@@ -1277,25 +1810,34 @@ namespace FumblePeak.EditorTools
 
         static void FloraClusterLocal(MB mb, Vector3 o, float y)
         {
-            bool snowy = y >= Camp3Y;
+            int biome = Mountain.Biome(y);
+            bool snowy = biome >= 4 || (biome == 3 && R() < 0.5f);
             Color moss, soil, grassLo, grassHi;
             FlowerKind[] kinds;
             Color[] daisyCols;
-            if (y < Camp1Y)
+            if (biome == 0)
             {
                 moss = new Color(0.34f, 0.64f, 0.3f); soil = new Color(0.5f, 0.38f, 0.3f);
                 grassLo = new Color(0.2f, 0.52f, 0.26f); grassHi = new Color(0.5f, 0.86f, 0.32f);
                 kinds = new[] { FlowerKind.Daisy, FlowerKind.Poppy, FlowerKind.Lavender, FlowerKind.Bluebell };
                 daisyCols = new[] { new Color(1f, 0.98f, 0.95f), new Color(1f, 0.85f, 0.35f) };
             }
-            else if (y < Camp2Y)
+            else if (biome <= 1)
             {
                 moss = new Color(0.46f, 0.62f, 0.38f); soil = new Color(0.48f, 0.4f, 0.36f);
                 grassLo = new Color(0.24f, 0.52f, 0.3f); grassHi = new Color(0.52f, 0.82f, 0.4f);
                 kinds = new[] { FlowerKind.Gentian, FlowerKind.Daisy, FlowerKind.Poppy, FlowerKind.Lavender };
                 daisyCols = new[] { new Color(1f, 0.88f, 0.4f), new Color(1f, 0.7f, 0.82f) };
             }
-            else if (y < Camp3Y)
+            else if (biome == 2)
+            {
+                // kızıl kayalarda kuru çimen, turuncu-sarı çiçekler
+                moss = new Color(0.72f, 0.66f, 0.42f); soil = new Color(0.62f, 0.4f, 0.32f);
+                grassLo = new Color(0.62f, 0.56f, 0.3f); grassHi = new Color(0.9f, 0.82f, 0.48f);
+                kinds = new[] { FlowerKind.Poppy, FlowerKind.Daisy, FlowerKind.Poppy };
+                daisyCols = new[] { new Color(1f, 0.82f, 0.3f), new Color(1f, 0.62f, 0.28f) };
+            }
+            else if (!snowy)
             {
                 moss = new Color(0.58f, 0.64f, 0.48f); soil = new Color(0.5f, 0.46f, 0.44f);
                 grassLo = new Color(0.5f, 0.56f, 0.38f); grassHi = new Color(0.8f, 0.82f, 0.6f);
@@ -1683,9 +2225,9 @@ namespace FumblePeak.EditorTools
                 }
             }
             var cloud = mb.Save("Cloud");
-            for (int i = 0; i < 16; i++)
+            for (int i = 0; i < 60; i++)
             {
-                var pos = new Vector3(R(-70f, 70f), R(14f, 62f), R(18f, 45f));
+                var pos = new Vector3(R(-70f, 70f), R(14f, PeakY + 25f), R(18f, 45f));
                 var go = MeshObj("Cloud", parent, cloud, m.vc, pos, false);
                 go.isStatic = false;
                 float s = R(1.5f, 3.5f);

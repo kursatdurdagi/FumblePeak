@@ -16,16 +16,22 @@ namespace FumblePeak
         {
             ClimberBody.OnRespawned += OnRespawn;
             ClimberBody.OnLimbGaveUp += OnGaveUp;
+            ClimberBody.OnKnockedOff += OnKnocked;
+            ClimberBody.OnHoldCrumbled += OnCrumble;
         }
 
         void OnDisable()
         {
             ClimberBody.OnRespawned -= OnRespawn;
             ClimberBody.OnLimbGaveUp -= OnGaveUp;
+            ClimberBody.OnKnockedOff -= OnKnocked;
+            ClimberBody.OnHoldCrumbled -= OnCrumble;
         }
 
         void OnRespawn(string _) => shake = 0.4f;
         void OnGaveUp(int _) => shake = Mathf.Max(shake, 0.12f);
+        void OnKnocked() => shake = Mathf.Max(shake, 0.5f);
+        void OnCrumble() => shake = Mathf.Max(shake, 0.2f);
 
         void LateUpdate()
         {

@@ -64,6 +64,16 @@ MonoBehaviour:
       Key: ahh
     - Id: 29175290
       Key: scream
+    - Id: 17225944
+      Key: whistle
+    - Id: 28533236
+      Key: brr
+    - Id: 67102933
+      Key: empty
+    - Id: 83003276
+      Key: oops
+    - Id: 21316744
+      Key: uhoh
   - Id: 89308091
     SectionName: howto
     SectionSheet:
@@ -362,6 +372,44 @@ MonoBehaviour:
       Key: connected
     - Id: 27427525
       Key: slipped
+    - Id: 45651187
+      Key: pest_bees
+    - Id: 59333924
+      Key: pest_fly
+    - Id: 55914569
+      Key: pest_bird
+    - Id: 91462051
+      Key: pest_spider
+    - Id: 42891015
+      Key: pest_shoo
+    - Id: 39221708
+      Key: pest_sting
+    - Id: 59353056
+      Key: pest_peck
+    - Id: 87052551
+      Key: pest_spook
+    - Id: 51694559
+      Key: biome2
+    - Id: 42587740
+      Key: biome3
+    - Id: 28454281
+      Key: biome4
+    - Id: 65103229
+      Key: biome5
+    - Id: 59598298
+      Key: camp_n
+    - Id: 66026242
+      Key: nest_bees
+    - Id: 89558795
+      Key: nest_bird
+    - Id: 69888145
+      Key: nest_spider
+    - Id: 48612928
+      Key: nest_fly
+    - Id: 55984341
+      Key: nest_hit
+    - Id: 99383229
+      Key: crumble
   - Id: 90629069
     SectionName: limb
     SectionSheet:

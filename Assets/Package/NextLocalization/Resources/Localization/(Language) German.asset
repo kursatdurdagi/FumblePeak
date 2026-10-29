@@ -711,3 +711,99 @@ MonoBehaviour:
     Value: "Suche offene Lobbys im WLAN...\nWenn keine erscheint, Host-IP eingeben
       und '\xDCBER IP VERBINDEN' dr\xFCcken.\n(Mit Steam erscheinen hier auch Freunde
       und Einladungen.)"
+  - SectionId: 76708446
+    EntryId: 17225944
+    Key: menu.whistle
+    Value: "F\xFC\xFC\xFCt \u266A"
+  - SectionId: 76708446
+    EntryId: 28533236
+    Key: menu.brr
+    Value: Brrr!
+  - SectionId: 42099039
+    EntryId: 45651187
+    Key: hud.pest_bees
+    Value: Bienen! Schnapp dir ein Glied und verscheuch sie!
+  - SectionId: 42099039
+    EntryId: 59333924
+    Key: hud.pest_fly
+    Value: Eine Fliege summt... verscheuch sie!
+  - SectionId: 42099039
+    EntryId: 55914569
+    Key: hud.pest_bird
+    Value: Ein Vogel sitzt auf deinem Kopf! Wink ihn weg!
+  - SectionId: 42099039
+    EntryId: 91462051
+    Key: hud.pest_spider
+    Value: Eine Spinne auf deiner Hand! Wisch sie weg!
+  - SectionId: 42099039
+    EntryId: 42891015
+    Key: hud.pest_shoo
+    Value: Husch! Weg ist es.
+  - SectionId: 42099039
+    EntryId: 39221708
+    Key: hud.pest_sting
+    Value: Autsch! Bienenstich!
+  - SectionId: 42099039
+    EntryId: 59353056
+    Key: hud.pest_peck
+    Value: Der Vogel hat gepickt, eine Hand rutscht!
+  - SectionId: 42099039
+    EntryId: 87052551
+    Key: hud.pest_spook
+    Value: Spinne! Die Hand zuckt weg!
+  - SectionId: 76708446
+    EntryId: 67102933
+    Key: menu.empty
+    Value: Schon leer?
+  - SectionId: 76708446
+    EntryId: 83003276
+    Key: menu.oops
+    Value: Hoppla!
+  - SectionId: 76708446
+    EntryId: 21316744
+    Key: menu.uhoh
+    Value: Oh-oh...
+  - SectionId: 42099039
+    EntryId: 51694559
+    Key: hud.biome2
+    Value: MOOSIGER KIEFERNKAMM
+  - SectionId: 42099039
+    EntryId: 42587740
+    Key: hud.biome3
+    Value: ROTE FELSEN
+  - SectionId: 42099039
+    EntryId: 28454281
+    Key: hud.biome4
+    Value: WINDIGE GRATE
+  - SectionId: 42099039
+    EntryId: 65103229
+    Key: hud.biome5
+    Value: GLETSCHERGIPFEL
+  - SectionId: 42099039
+    EntryId: 59598298
+    Key: hud.camp_n
+    Value: "LAGER {0}/{1} \xB7 {2} m"
+  - SectionId: 42099039
+    EntryId: 66026242
+    Key: hud.nest_bees
+    Value: "EIN BIENENSTOCK! Das h\xE4ttest du lassen sollen..."
+  - SectionId: 42099039
+    EntryId: 89558795
+    Key: hud.nest_bird
+    Value: EIN VOGELNEST! Mama Vogel ist STINKSAUER!
+  - SectionId: 42099039
+    EntryId: 69888145
+    Key: hud.nest_spider
+    Value: EIN SPINNENNEST! Hunderte Babys!
+  - SectionId: 42099039
+    EntryId: 48612928
+    Key: hud.nest_fly
+    Value: EIN FLIEGENSCHWARM!
+  - SectionId: 42099039
+    EntryId: 55984341
+    Key: hud.nest_hit
+    Value: Runter mit dir! Nester sind keine Griffe.
+  - SectionId: 42099039
+    EntryId: 99383229
+    Key: hud.crumble
+    Value: "Der Stein br\xF6ckelt! Trau keinen rissigen Steinen."

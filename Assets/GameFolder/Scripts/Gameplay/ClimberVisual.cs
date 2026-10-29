@@ -59,6 +59,16 @@ namespace FumblePeak
                 upBind[i] = up[i].localRotation; loBind[i] = lo[i].localRotation; enBind[i] = en[i].localRotation;
             }
             rootBindRot = visualRoot.rotation;
+            fingers[0] = FingerBones("Left"); fingers[1] = FingerBones("Right");
+            for (int hh = 0; hh < 2; hh++)
+            {
+                fingerBind[hh] = new Quaternion[5][];
+                for (int k = 0; k < 5; k++)
+                {
+                    fingerBind[hh][k] = new Quaternion[3];
+                    for (int j = 0; j < 3; j++) fingerBind[hh][k][j] = fingers[hh][k][j] != null ? fingers[hh][k][j].localRotation : Quaternion.identity;
+                }
+            }
 
             var all = visualRoot.GetComponentsInChildren<Renderer>(true);
             var list = new System.Collections.Generic.List<Renderer>();
@@ -261,6 +271,57 @@ namespace FumblePeak
         void OnDestroy()
         {
             if (hovered != null) hovered.SetPropertyBlock(null);
+        }
+
+        // ---------- El pozu: tırmanış tutuşu ----------
+        readonly Transform[][][] fingers = new Transform[2][][];
+        readonly float[] curlNow = new float[2];
+        readonly Quaternion[][][] fingerBind = new Quaternion[2][][];
+
+        Transform[][] FingerBones(string side)
+        {
+            string[] names = { "Index", "Middle", "Ring", "Pinky", "Thumb" };
+            var all = visualRoot.GetComponentsInChildren<Transform>(true);
+            var r = new Transform[5][];
+            for (int f = 0; f < 5; f++)
+            {
+                r[f] = new Transform[3];
+                for (int j = 0; j < 3; j++)
+                {
+                    string want = side + "Hand" + names[f] + (j + 1);
+                    foreach (var t in all)
+                    {
+                        var n = t.name.Contains(":") ? t.name.Substring(t.name.LastIndexOf(':') + 1) : t.name;
+                        if (n == want) { r[f][j] = t; break; }
+                    }
+                }
+            }
+            return r;
+        }
+
+        /// <summary>
+        /// El her zaman yatay: parmaklar duvara (ileri, hafif yukarı), avuç aşağı — kayanın üstünü kavrar gibi.
+        /// Tutunurken parmaklar kıvrılır, serbestken açık.
+        /// </summary>
+        void PoseHand(int i)
+        {
+            var h = en[i];
+            Vector3 fingerDir = new Vector3(0f, 0.35f, 1f).normalized;   // duvara doğru
+            Vector3 palmDir = new Vector3(0f, -1f, 0.35f).normalized;    // avuç aşağı (kayanın üstüne)
+            // bağlama pozunda: up = parmak yönü, forward = avuç normali
+            h.rotation = Quaternion.LookRotation(palmDir, fingerDir);
+            bool grab = body.IsGrabbing(i);
+            float want = grab ? 70f : body.IsDragged(i) ? 25f : 12f;
+            curlNow[i] = Mathf.Lerp(curlNow[i], want, 1f - Mathf.Exp(-14f * Time.deltaTime));
+            var f = fingers[i];
+            if (f == null) return;
+            for (int k = 0; k < 5; k++)
+                for (int j = 0; j < 3; j++)
+                {
+                    var b = f[k][j]; if (b == null) continue;
+                    float a = k == 4 ? curlNow[i] * (j == 0 ? 0.3f : 0.6f) : curlNow[i] * (j == 0 ? 0.8f : 1f);
+                    b.localRotation = fingerBind[i][k][j] * Quaternion.Euler(a, 0f, 0f);
+                }
         }
 
         /// <summary>Analitik iki kemikli IK (D. Holden yöntemi).</summary>
